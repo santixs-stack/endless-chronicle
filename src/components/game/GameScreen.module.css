@@ -13,3 +13,20 @@
   overflow: hidden;
   min-width: 0;
 }
+.mobileMenuBtn {
+  display: none;
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 300;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+@media (max-width: 640px) {
+  .mobileMenuBtn { display: block; }
+}

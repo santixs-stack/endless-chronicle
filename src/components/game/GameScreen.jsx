@@ -11,8 +11,11 @@ import StoryWindow from './StoryWindow.jsx';
 import InputArea from './InputArea.jsx';
 import MilestoneBar from './MilestoneBar.jsx';
 import MusicPlayer from './MusicPlayer.jsx';
+import CombatBanner from './CombatBanner.jsx';
 import SaveDialog from '../overlays/SaveDialog.jsx';
 import SettingsOverlay from '../overlays/SettingsOverlay.jsx';
+import JournalOverlay from '../overlays/JournalOverlay.jsx';
+import ExportOverlay from '../overlays/ExportOverlay.jsx';
 import styles from './GameScreen.module.css';
 
 export default function GameScreen() {
@@ -20,6 +23,9 @@ export default function GameScreen() {
   const hasOpened = useRef(false);
   const [showSave, setShowSave] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showJournal, setShowJournal] = useState(false);
+  const [showExport, setShowExport] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (hasOpened.current || !state.players?.length) return;
@@ -30,8 +36,8 @@ export default function GameScreen() {
     const g = state.goal;
     const goalCtx = g ? `Quest: ${g.name}. ${g.start || g.hint}` : 'Begin the story.';
     const partyNames = state.players.map(p => `${p.name} the ${p.className}`).join(' and ');
-    const openingPrompt = `${goalCtx}\n\nParty: ${partyNames}.\n\nWrite the opening scene SHORT (2-4 sentences). Drop players straight into action. End with a direct question to ${state.players[0]?.name || 'Player 1'}. Include [SCENE:...] and [ACTIONS:...] tags.`;
-    const msgs = [{ role: 'user', content: openingPrompt }];
+    const prompt = `${goalCtx}\n\nParty: ${partyNames}.\n\nWrite the opening scene SHORT (2-4 sentences). Drop players straight into action. End with a direct question to ${state.players[0]?.name || 'Player 1'}. Include [SCENE:...] and [ACTIONS:...] tags.`;
+    const msgs = [{ role: 'user', content: prompt }];
     set({ isLoading: true });
     callAPI(msgs, buildSystemPrompt({ ...state, hiddenArc: arc }))
       .then(text => {
@@ -51,11 +57,19 @@ export default function GameScreen() {
     try {
       const text = await callAPI(newMessages, buildSystemPrompt(state));
       const parsed = parseAllTags(text);
-      const updates = { messages: [...newMessages, { role: 'assistant', content: text }], isLoading: false, turnCount: (state.turnCount || 0) + 1, currentActions: parsed.actions || [] };
+      const updates = {
+        messages: [...newMessages, { role: 'assistant', content: text }],
+        isLoading: false,
+        turnCount: (state.turnCount || 0) + 1,
+        currentActions: parsed.actions || [],
+      };
       if (parsed.scene) updates.lastScene = parsed.scene;
       if (parsed.location) updates.location = parsed.location;
-      if (parsed.milestone !== null && parsed.milestone !== undefined) updates.milestones = parsed.milestone;
-      if (parsed.stats?.health !== undefined) updates.stats = { ...state.stats, health: parsed.stats.health };
+      if (parsed.milestone != null) updates.milestones = parsed.milestone;
+      if (parsed.stats?.health != null) updates.stats = { ...state.stats, health: parsed.stats.health };
+      // Combat
+      if (parsed.combat) updates.inCombat = true;
+      if (parsed.combatEnd) { updates.inCombat = false; updates.combatants = []; }
       set(updates);
       if (parsed.scene?.type) autoTrackFromScene(parsed.scene.type);
       if (state.playerCount > 1) set({ currentPlayerIdx: (state.currentPlayerIdx + 1) % state.playerCount });
@@ -73,15 +87,32 @@ export default function GameScreen() {
 
   return (
     <div className={`screen ${styles.gameScreen}`}>
-      <GameSidebar onSave={() => setShowSave(true)} onSettings={() => setShowSettings(true)} />
+      {/* Mobile sidebar toggle */}
+      <button className={styles.mobileMenuBtn} onClick={() => setSidebarOpen(o => !o)} aria-label="Menu">
+        ☰
+      </button>
+
+      <GameSidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onSave={() => setShowSave(true)}
+        onSettings={() => setShowSettings(true)}
+        onJournal={() => setShowJournal(true)}
+        onExport={() => setShowExport(true)}
+      />
+
       <div className={styles.main}>
+        <CombatBanner />
         <MilestoneBar />
         <MusicPlayer />
         <StoryWindow />
         <InputArea onAction={handleAction} />
       </div>
+
       {showSave     && <SaveDialog     onClose={() => setShowSave(false)} />}
       {showSettings && <SettingsOverlay onClose={() => setShowSettings(false)} />}
+      {showJournal  && <JournalOverlay  onClose={() => setShowJournal(false)} />}
+      {showExport   && <ExportOverlay   onClose={() => setShowExport(false)} />}
     </div>
   );
 }
