@@ -4,11 +4,11 @@ import { PLAYER_COLORS } from '../../lib/constants.js';
 import { showNotif } from '../ui/Notification.jsx';
 import styles from './GameSidebar.module.css';
 
-export default function GameSidebar() {
+export default function GameSidebar({ onSave, onSettings }) {
   const { state, set, reset } = useGame();
   const { saveToSlot, getAllSlots } = useSaveSlots();
 
-  function quickSave() {
+  function quickSave() { if(onSave){onSave();return;}
     // Save to first available slot, or slot 0
     const slots = getAllSlots();
     const emptyIdx = slots.findIndex(s => !s);
@@ -103,7 +103,8 @@ export default function GameSidebar() {
         <span className={`${styles.modeBadge} ${styles[state.mode]}`}>
           {state.mode === 'creative' ? 'Anything Goes' : 'Try Hard'}
         </span>
-        <button className={styles.iconBtn} onClick={quickSave}>💾 Save</button>
+        <button className={styles.iconBtn} onClick={onSave || quickSave}>💾 Save</button>
+        <button className={styles.iconBtn} onClick={onSettings}>⚙ Settings</button>
         <button className={styles.iconBtn} onClick={confirmNew}>↩ New Game</button>
       </div>
     </div>
