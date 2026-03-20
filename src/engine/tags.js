@@ -140,6 +140,7 @@ export function parseAllTags(raw) {
   creatureMatches.forEach(m => { try { result.creatures.push(JSON.parse(m[1])); } catch {} });
   text = text.replace(/\[CREATURE:[^\]]+\]/g, '').trim();
 
-  result.narrative = text;
+  text = text.replace(/\s*\]\s*$/g, '').replace(/^\s*\[\s*/g, '').trim();
+result.narrative = text;
   return result;
 }
