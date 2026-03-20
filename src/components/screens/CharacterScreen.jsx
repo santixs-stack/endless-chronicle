@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import { CHAR_PRESETS } from '../../data/presets.js';
 import { DND_CLASSES } from '../../data/classes.js';
 import { PLAYER_COLORS, PLAYER_COLOR_NAMES } from '../../lib/constants.js';

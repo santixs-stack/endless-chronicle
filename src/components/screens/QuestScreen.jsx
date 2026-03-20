@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import { STORY_GOALS } from '../../data/quests.js';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './QuestScreen.module.css';

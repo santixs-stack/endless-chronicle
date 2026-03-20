@@ -1,4 +1,4 @@
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import styles from './TitleScreen.module.css';
 

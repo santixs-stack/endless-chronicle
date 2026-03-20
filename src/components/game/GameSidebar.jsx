@@ -1,4 +1,4 @@
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import { showNotif } from '../ui/Notification.jsx';

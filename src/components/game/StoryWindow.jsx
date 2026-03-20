@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import { parseAllTags } from '../../engine/tags.js';
 import styles from './StoryWindow.module.css';
 

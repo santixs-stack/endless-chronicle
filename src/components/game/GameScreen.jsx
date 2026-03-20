@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import { callAPI } from '../../engine/api.js';
 import { buildSystemPrompt } from '../../engine/systemPrompt.js';
 import { parseAllTags } from '../../engine/tags.js';

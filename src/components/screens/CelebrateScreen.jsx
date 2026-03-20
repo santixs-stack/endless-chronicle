@@ -1,4 +1,4 @@
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import styles from './CelebrateScreen.module.css';
 
 export default function CelebrateScreen() {

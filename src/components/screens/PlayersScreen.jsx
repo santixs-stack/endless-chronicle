@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './PlayersScreen.module.css';
 

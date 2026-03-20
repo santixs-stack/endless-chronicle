@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useGame } from '../../hooks/useGameState.js';
+import { useGame } from '../../hooks/useGameState.jsx';
 import { CLASS_IDEAS } from '../../data/classes.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import styles from './InputArea.module.css';
