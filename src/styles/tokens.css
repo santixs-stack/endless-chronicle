@@ -1,0 +1,43 @@
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS — The Endless Chronicle
+   All colors, fonts, and spacing in one place.
+   Change here, updates everywhere.
+═══════════════════════════════════════════ */
+
+:root {
+  /* Core palette */
+  --bg: #0a0812;
+  --bg-card: #120f1c;
+  --bg-panel: #0e0b18;
+  --bg-input: #0a0912;
+
+  /* Borders */
+  --border: #1e1a2e;
+  --border-accent: #2e2848;
+
+  /* Text */
+  --text: #e8e0f0;
+  --text-muted: #a098b8;
+  --text-dim: #5a5270;
+
+  /* Accent — gold */
+  --accent: #c4a84f;
+  --mode-glow: rgba(196, 168, 79, 0.08);
+
+  /* Fonts */
+  --font-title: 'Cinzel', serif;
+  --font-body: 'Crimson Text', Georgia, serif;
+  --font-mono: 'Share Tech Mono', monospace;
+
+  /* Radius */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Transitions */
+  --transition: all 0.2s ease;
+}
+
+/* Mode-specific accent overrides */
+.mode-creative  { --accent: #a87ed4; --mode-glow: rgba(168,126,212,0.08); }
+.mode-adventure { --accent: #5595e0; --mode-glow: rgba(85,149,224,0.08); }

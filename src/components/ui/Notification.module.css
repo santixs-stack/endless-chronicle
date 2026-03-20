@@ -1,0 +1,21 @@
+.notif {
+  position: fixed;
+  bottom: 1.4rem;
+  right: 1.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.95rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  max-width: 270px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.28s;
+  z-index: 600;
+  pointer-events: none;
+}
+.visible  { opacity: 1; transform: translateY(0); }
+.success  { border-color: #6dbb7c; color: #6dbb7c; }
+.error    { border-color: #e05555; color: #e05555; }
+.info     { border-color: var(--accent); color: var(--accent); }

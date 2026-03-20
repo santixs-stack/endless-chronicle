@@ -1,0 +1,8 @@
+.title  { font-family: var(--font-title); font-size: 1.4rem; font-weight: 600; color: var(--accent); margin-bottom: 0.4rem; }
+.sub    { font-style: italic; color: var(--text-muted); margin-bottom: 1.6rem; font-size: 0.9rem; }
+.slots  { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; max-width: 440px; margin-bottom: 1.6rem; }
+.slot   { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.75rem 1rem; }
+.slotInfo   { flex: 1; }
+.slotNum    { font-family: var(--font-title); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.slotDetail { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); margin-top: 0.15rem; }
+.slotEmpty  { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); font-style: italic; margin-top: 0.15rem; }

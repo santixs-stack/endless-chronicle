@@ -1,0 +1,12 @@
+.window { flex: 1; overflow-y: auto; padding: 1.2rem 1.4rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.entry  { animation: fadeIn 0.3s ease; }
+.narrator { font-family: var(--font-body); font-size: 1.02rem; line-height: 1.75; color: var(--text); }
+.playerEntry { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.35rem 0; }
+.playerArrow { font-size: 0.7rem; color: var(--accent); opacity: 0.7; margin-top: 0.25rem; flex-shrink: 0; }
+.playerText  { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.03em; line-height: 1.55; }
+.loading { display: flex; gap: 0.4rem; padding: 1rem 0; justify-content: center; }
+.loadingDot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: 0.4; animation: loadPulse 1.2s ease infinite; }
+.loadingDot:nth-child(2) { animation-delay: 0.2s; }
+.loadingDot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes loadPulse { 0%,100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }

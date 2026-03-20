@@ -1,0 +1,17 @@
+.bar   { display: flex; align-items: flex-start; width: 100%; max-width: 500px; margin-bottom: 1.8rem; padding-top: 0.5rem; }
+.item  { display: flex; align-items: center; flex: 1; }
+.item:last-child { flex: none; }
+.bubble { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+.dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-title); font-size: 0.68rem; font-weight: 700;
+  color: var(--text-dim); transition: all 0.3s;
+}
+.active { border-color: var(--accent); background: var(--accent); color: var(--bg); }
+.done   { border-color: var(--accent); background: var(--mode-glow); color: var(--accent); }
+.label  { font-family: var(--font-mono); font-size: 0.5rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-dim); text-align: center; white-space: nowrap; }
+.activeLabel { color: var(--accent); }
+.line     { flex: 1; height: 2px; background: var(--border); margin: 0 0.2rem; margin-bottom: 1.2rem; }
+.lineDone { background: var(--accent); }
