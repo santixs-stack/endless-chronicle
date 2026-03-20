@@ -4,7 +4,7 @@ import { callAPI } from '../../engine/api.js';
 import { buildSystemPrompt } from '../../engine/systemPrompt.js';
 import { parseAllTags } from '../../engine/tags.js';
 import { pickHiddenArc } from '../../data/hiddenArcs.js';
-import { autoTrackFromScene } from './MusicEngine.js';
+import { autoTrackFromScene, startCombatMusic, endCombatMusic } from './MusicEngine.js';
 import { showNotif } from '../ui/Notification.jsx';
 import GameSidebar from './GameSidebar.jsx';
 import StoryWindow from './StoryWindow.jsx';
@@ -68,8 +68,8 @@ export default function GameScreen() {
       if (parsed.milestone != null) updates.milestones = parsed.milestone;
       if (parsed.stats?.health != null) updates.stats = { ...state.stats, health: parsed.stats.health };
       // Combat
-      if (parsed.combat) updates.inCombat = true;
-      if (parsed.combatEnd) { updates.inCombat = false; updates.combatants = []; }
+      if (parsed.combat) { updates.inCombat = true; startCombatMusic(); }
+      if (parsed.combatEnd) { updates.inCombat = false; updates.combatants = []; endCombatMusic(parsed.scene?.type || state.lastScene?.type); }
       set(updates);
       if (parsed.scene?.type) autoTrackFromScene(parsed.scene.type);
       if (state.playerCount > 1) set({ currentPlayerIdx: (state.currentPlayerIdx + 1) % state.playerCount });

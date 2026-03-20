@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════
 //  MIDI-STYLE MUSIC ENGINE
 //  Real melodic sequences via Web Audio API
+//  Crossfade between tracks, combat awareness
 // ═══════════════════════════════════════════
 
 const NOTE = {
@@ -10,38 +11,38 @@ const NOTE = {
   Bb3:233.08,Eb4:311.13,Ab4:415.3,Bb4:466.16,_:0,
 };
 
-const TRACKS = {
-  adventure: {
+export const TRACKS = {
+  adventure:{
     bpm:108, wave:'triangle', gain:.18, reverb:.3,
     melody:['E4','E4','G4','A4','_','A4','G4','E4','D4','E4','_','G4','A4','B4','_','A4','G4','E4'],
     durs:  [.5,  .5,  .5,  1,  .5, .5,  .5,  .5,  .5,  1,  .5,  .5,  .5,  1,  .5, .5,  .5,  1],
     bass:  ['C3','G3','A3','F3'], bassDurs:[2,2,2,2],
   },
-  dungeon: {
+  dungeon:{
     bpm:72, wave:'sawtooth', gain:.12, reverb:.6,
     melody:['A3','_','C4','B3','_','G3','A3','_','F3','G3','A3','_','E3','_','F3','G3'],
     durs:  [1,  .5, .5,  1,  1,  .5,  1,  .5, .5,  .5,  1,  1,  1,  .5, .5,  1],
     bass:  ['A2','E3','A2','G2'], bassDurs:[2,2,2,2],
   },
-  mystery: {
+  mystery:{
     bpm:80, wave:'sine', gain:.15, reverb:.5,
     melody:['E4','G4','F4','E4','_','D4','F4','E4','D4','C4','_','E4','G4','A4','G4','F4','E4'],
     durs:  [.5,  .5,  .5,  1,  .5, .5,  .5,  .5,  .5,  1,  .5, .5,  .5,  .5,  .5,  .5,  1],
     bass:  ['C3','G3','Bb3','F3'], bassDurs:[2,2,2,2],
   },
-  battle: {
+  battle:{
     bpm:140, wave:'square', gain:.14, reverb:.2,
     melody:['E4','E4','E4','_','E4','G4','_','A4','G4','E4','_','D4','E4','_','E4','E4','G4','A4'],
     durs:  [.25,.25, .5, .25,.25, .5, .25, .5, .25, .5, .25,.25, .5, .25,.25, .25,.25,  .5],
     bass:  ['A3','A3','E3','A3'], bassDurs:[1,1,1,1],
   },
-  peaceful: {
+  peaceful:{
     bpm:88, wave:'sine', gain:.16, reverb:.45,
     melody:['C4','E4','G4','E4','C4','D4','F4','A4','F4','D4','E4','G4','B4','G4','E4','C4'],
     durs:  [.5,  .5,  .5,  .5,  1,  .5,  .5,  .5,  .5,  1,  .5,  .5,  .5,  .5,  .5,  1],
     bass:  ['C3','F3','G3','C3'], bassDurs:[2,2,2,2],
   },
-  space: {
+  space:{
     bpm:60, wave:'sine', gain:.13, reverb:.7,
     melody:['A3','_','E4','_','D4','_','C4','_','G3','_','A3','_','B3','_','C4','_'],
     durs:  [1,   1,  1,  1,  1,  .5,  1,  1,  1,   1,  1,  .5,  1,  .5,  1,  1],
@@ -49,7 +50,7 @@ const TRACKS = {
   },
 };
 
-// Scene type → track mapping
+// Scene type → track
 const SCENE_TRACK = {
   dungeon:'dungeon', cave:'dungeon',
   castle:'mystery',  ruins:'mystery', swamp:'mystery',
@@ -59,7 +60,14 @@ const SCENE_TRACK = {
   storm:'battle',
 };
 
-let ctx = null, nodes = [], active = null, scheduler = null, masterVol = 0.4;
+let ctx = null;
+let masterGain = null;        // master volume control
+let nodes = [];               // all scheduled nodes
+let active = null;            // currently playing track id
+let preCombarTrack = null;    // track to return to after combat
+let scheduler = null;
+let masterVol = 0.4;
+const CROSSFADE_TIME = 0.8;   // seconds to crossfade between tracks
 
 function initCtx() {
   if (!ctx) {
@@ -86,22 +94,29 @@ function makeReverb(audioCtx, mix) {
   return conv;
 }
 
-export function playTrack(trackId) {
+function startTrackInternal(trackId, fadeIn = false) {
   const audioCtx = initCtx();
   if (!audioCtx) return;
-  stopMusic(false);
+
   const track = TRACKS[trackId];
   if (!track) return;
-  active = trackId;
 
-  const master = audioCtx.createGain();
-  master.gain.value = masterVol * track.gain;
-  master.connect(audioCtx.destination);
-  nodes.push(master);
+  // Create new master gain for this track (for crossfade)
+  const newMaster = audioCtx.createGain();
+  newMaster.gain.value = fadeIn ? 0 : masterVol * track.gain;
+  newMaster.connect(audioCtx.destination);
+
+  if (fadeIn) {
+    newMaster.gain.setValueAtTime(0, audioCtx.currentTime);
+    newMaster.gain.linearRampToValueAtTime(masterVol * track.gain, audioCtx.currentTime + CROSSFADE_TIME);
+  }
+
+  masterGain = newMaster;
+  nodes.push(newMaster);
 
   const reverb = makeReverb(audioCtx, track.reverb);
-  reverb._dry.connect(master);
-  reverb._out.connect(master);
+  reverb._dry.connect(newMaster);
+  reverb._out.connect(newMaster);
   nodes.push(reverb, reverb._dry, reverb._out);
 
   const spb = 60 / track.bpm;
@@ -111,12 +126,13 @@ export function playTrack(trackId) {
   const bDur = track.bassDurs;
 
   let mIdx = 0, bIdx = 0;
-  let mTime = audioCtx.currentTime + 0.05;
-  let bTime = audioCtx.currentTime + 0.05;
+  let mTime = audioCtx.currentTime + (fadeIn ? CROSSFADE_TIME * 0.5 : 0.05);
+  let bTime = audioCtx.currentTime + (fadeIn ? CROSSFADE_TIME * 0.5 : 0.05);
   const AHEAD = 3;
+  const myTrackId = trackId;
 
   function schedule() {
-    if (!active || active !== trackId) return;
+    if (!active || active !== myTrackId) return;
     while (mTime < audioCtx.currentTime + AHEAD) {
       const freq = mel[mIdx % mel.length];
       const dur = mDur[mIdx % mDur.length] * spb;
@@ -146,36 +162,93 @@ export function playTrack(trackId) {
         env.gain.setValueAtTime(0, bTime);
         env.gain.linearRampToValueAtTime(0.4, bTime + 0.03);
         env.gain.exponentialRampToValueAtTime(0.001, bTime + dur * 0.7);
-        osc.connect(env); env.connect(master);
+        osc.connect(env); env.connect(newMaster);
         osc.start(bTime); osc.stop(bTime + dur);
         nodes.push(osc, env);
       }
       bTime += dur;
       bIdx = (bIdx + 1) % bas.length;
     }
-    if (nodes.length > 200) nodes = nodes.filter(n => n === master || n === reverb);
+    // Prune old finished nodes
+    if (nodes.length > 250) nodes = nodes.filter(n => n === newMaster || n === reverb);
   }
 
   schedule();
   scheduler = setInterval(schedule, 500);
 }
 
+export function playTrack(trackId) {
+  if (!trackId || trackId === active) return;
+  const audioCtx = initCtx();
+  if (!audioCtx) return;
+
+  // Fade out current track
+  if (masterGain && active) {
+    const oldGain = masterGain;
+    oldGain.gain.setValueAtTime(oldGain.gain.value, audioCtx.currentTime);
+    oldGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + CROSSFADE_TIME);
+  }
+
+  // Stop old scheduler
+  if (scheduler) { clearInterval(scheduler); scheduler = null; }
+
+  // Clean up old nodes after fade
+  const oldNodes = [...nodes];
+  setTimeout(() => {
+    oldNodes.forEach(n => { try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch {} });
+  }, (CROSSFADE_TIME + 0.2) * 1000);
+  nodes = [];
+
+  active = trackId;
+  startTrackInternal(trackId, true);
+}
+
 export function stopMusic(resetUI = true) {
   if (scheduler) { clearInterval(scheduler); scheduler = null; }
-  nodes.forEach(n => { try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch {} });
-  nodes = []; active = null;
+
+  // Fade out gracefully
+  if (masterGain && ctx) {
+    masterGain.gain.setValueAtTime(masterGain.gain.value, ctx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + CROSSFADE_TIME);
+    const oldNodes = [...nodes];
+    setTimeout(() => {
+      oldNodes.forEach(n => { try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch {} });
+    }, (CROSSFADE_TIME + 0.2) * 1000);
+  } else {
+    nodes.forEach(n => { try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch {} });
+  }
+  nodes = [];
+  active = null;
+  masterGain = null;
+  preCombarTrack = null;
 }
 
 export function setMusicVol(v) {
   masterVol = v;
-  const mg = nodes.find(n => n.gain);
-  if (mg && ctx) mg.gain.setValueAtTime(v * (TRACKS[active]?.gain || 0.15), ctx.currentTime);
+  if (masterGain && ctx) {
+    masterGain.gain.setValueAtTime(v * (TRACKS[active]?.gain || 0.15), ctx.currentTime);
+  }
 }
 
+// Called when a scene changes location — switches track based on environment
 export function autoTrackFromScene(sceneType) {
   const suggested = SCENE_TRACK[sceneType];
   if (suggested && suggested !== active) playTrack(suggested);
 }
 
+// Called when combat starts — switches to battle music, remembers what was playing
+export function startCombatMusic() {
+  if (active !== 'battle') {
+    preCombarTrack = active;  // remember what to go back to
+    playTrack('battle');
+  }
+}
+
+// Called when combat ends — fades back to the pre-combat track
+export function endCombatMusic(sceneType) {
+  const returnTo = preCombarTrack || SCENE_TRACK[sceneType] || 'adventure';
+  preCombarTrack = null;
+  playTrack(returnTo);
+}
+
 export function getMusicActive() { return active; }
-export { TRACKS };
