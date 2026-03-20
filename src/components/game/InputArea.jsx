@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { CLASS_IDEAS } from '../../data/classes.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
+import DiceRoller from './DiceRoller.jsx';
 import styles from './InputArea.module.css';
 
 const GENERIC_IDEAS = [
@@ -116,6 +117,7 @@ export default function InputArea({ onAction }) {
         >
           💡 Ideas
         </button>
+        <DiceRoller onResult={result => { setText(result); textareaRef.current?.focus(); }} />
       </div>
 
       {/* Text input */}

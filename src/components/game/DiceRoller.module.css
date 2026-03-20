@@ -1,0 +1,29 @@
+.toggleBtn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); border-radius: var(--radius-sm); padding: 0.22rem 0.5rem; cursor: pointer; font-size: 0.9rem; transition: var(--transition); }
+.toggleBtn:hover { border-color: var(--accent); }
+.panel   { background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: 8px; padding: 0.8rem; min-width: 220px; }
+.header  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
+.title   { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.close   { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.85rem; }
+.diceRow { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.die     {
+  display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 6px; padding: 0.5rem 0.4rem; cursor: pointer;
+  transition: all 0.18s; min-width: 40px;
+}
+.die:hover { border-color: var(--die-color, var(--accent)); transform: translateY(-2px); }
+.rolling { animation: shake 0.4s ease; border-color: var(--die-color, var(--accent)) !important; }
+.dieIcon { font-size: 1.1rem; color: var(--die-color, var(--accent)); transition: color 0.18s; }
+.die:hover .dieIcon { color: var(--die-color, var(--accent)); }
+.dieName { font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-dim); }
+.results { display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid var(--border); padding-top: 0.5rem; }
+.result  { display: flex; align-items: center; gap: 0.5rem; animation: popIn 0.25s ease; }
+.resultDie { font-family: var(--font-mono); font-size: 0.6rem; width: 28px; }
+.resultNum { font-family: var(--font-title); font-size: 1.1rem; font-weight: 700; min-width: 28px; }
+.resultLabel { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.06em; }
+.nat20   { color: #c4a84f; font-weight: 700; }
+.nat1    { color: #e05555; }
+.great   { color: #6dbb7c; }
+.bad     { color: #e07055; }
+@keyframes shake { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-12deg)} 75%{transform:rotate(12deg)} }
+@keyframes popIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }

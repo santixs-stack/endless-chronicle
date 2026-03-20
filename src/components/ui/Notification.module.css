@@ -1,21 +1,26 @@
 .notif {
   position: fixed;
-  bottom: 1.4rem;
-  right: 1.4rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.6rem 0.95rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  max-width: 270px;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all 0.28s;
-  z-index: 600;
-  pointer-events: none;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--border);
+  animation: slideIn 0.22s ease;
+  max-width: 320px;
+  backdrop-filter: blur(8px);
 }
-.visible  { opacity: 1; transform: translateY(0); }
-.success  { border-color: #6dbb7c; color: #6dbb7c; }
-.error    { border-color: #e05555; color: #e05555; }
-.info     { border-color: var(--accent); color: var(--accent); }
+.icon { font-size: 0.75rem; flex-shrink: 0; }
+.success { background: rgba(109,187,124,0.15); border-color: #6dbb7c; color: #6dbb7c; }
+.error   { background: rgba(224,85,85,0.15);  border-color: #e05555; color: #e05555; }
+.info    { background: rgba(85,149,224,0.15);  border-color: #5595e0; color: #5595e0; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}

@@ -4,7 +4,7 @@ import { PLAYER_COLORS } from '../../lib/constants.js';
 import { showNotif } from '../ui/Notification.jsx';
 import styles from './GameSidebar.module.css';
 
-export default function GameSidebar({ open, onClose, onSave, onSettings, onJournal, onExport }) {
+export default function GameSidebar({ open, onClose, onSave, onSettings, onJournal, onExport, onRecap }) {
   const { state, set, reset } = useGame();
   const { saveToSlot, getAllSlots } = useSaveSlots();
   const curPlayerIdx = state.currentPlayerIdx || 0;
@@ -114,6 +114,7 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
           </span>
           <button className={styles.iconBtn} onClick={onSave}>💾 Save</button>
           <button className={styles.iconBtn} onClick={onJournal}>📖 Journal</button>
+          <button className={styles.iconBtn} onClick={onRecap}>📺 Session Recap</button>
           <button className={styles.iconBtn} onClick={onExport}>📄 Export</button>
           <button className={styles.iconBtn} onClick={onSettings}>⚙ Settings</button>
           <button className={styles.iconBtn} onClick={confirmNew}>↩ New Game</button>
