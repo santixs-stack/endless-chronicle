@@ -1,3 +1,4 @@
+.outer  { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .window { flex: 1; overflow-y: auto; padding: 1.2rem 1.4rem; display: flex; flex-direction: column; gap: 0.8rem; }
 .entry  { animation: fadeIn 0.3s ease; }
 .narrator { font-family: var(--font-body); font-size: 1.02rem; line-height: 1.75; color: var(--text); }

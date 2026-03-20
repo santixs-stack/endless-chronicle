@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { parseAllTags } from '../../engine/tags.js';
+import SceneRenderer from './SceneRenderer.jsx';
 import styles from './StoryWindow.module.css';
 
 function fmt(text) {
@@ -48,13 +49,17 @@ export default function StoryWindow() {
   });
 
   return (
-    <div className={styles.window}>
-      {/* Loading shimmer */}
-      {state.isLoading && (
-        <div className={styles.loading}>
-          <div className={styles.loadingDot} /><div className={styles.loadingDot} /><div className={styles.loadingDot} />
-        </div>
-      )}
+    <div className={styles.outer}>
+      {/* Scene illustration — updates with each story beat */}
+      <SceneRenderer scene={state.lastScene} turnCount={state.turnCount || 0} />
+
+      <div className={styles.window}>
+        {/* Loading shimmer */}
+        {state.isLoading && (
+          <div className={styles.loading}>
+            <div className={styles.loadingDot} /><div className={styles.loadingDot} /><div className={styles.loadingDot} />
+          </div>
+        )}
 
       {/* Opening entry */}
       {entries[0] && (
@@ -83,6 +88,7 @@ export default function StoryWindow() {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
