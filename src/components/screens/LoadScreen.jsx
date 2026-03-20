@@ -1,35 +1,115 @@
+import { useState, useEffect } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
+import { supabase } from '../../lib/supabase.js';
+import AuthOverlay from '../overlays/AuthOverlay.jsx';
 import styles from './LoadScreen.module.css';
 
 export default function LoadScreen() {
   const { set } = useGame();
-  const { getAllSlots } = useSaveSlots();
-  const slots = getAllSlots();
+  const { getAllSlots, deleteSlot, syncLocalToCloud } = useSaveSlots();
+  const [slots, setSlots] = useState([null, null, null]);
+  const [loading, setLoading] = useState(true);
+  const [isCloud, setIsCloud] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
 
-  function load(data) {
+  useEffect(() => {
+    loadSlots();
+    if (supabase) {
+      supabase.auth.getUser().then(({ data: { user } }) => setIsCloud(!!user));
+    }
+  }, []);
+
+  async function loadSlots() {
+    setLoading(true);
+    const loaded = await getAllSlots();
+    setSlots(loaded);
+    setLoading(false);
+  }
+
+  async function load(data) {
     set({ ...data, isLoading: false, screen: 'game' });
+  }
+
+  async function handleDelete(i) {
+    if (!window.confirm(`Delete Slot ${i + 1}?`)) return;
+    await deleteSlot(i);
+    loadSlots();
+  }
+
+  async function handleAuthSuccess() {
+    setIsCloud(true);
+    setShowAuth(false);
+    await syncLocalToCloud();
+    loadSlots();
+  }
+
+  const hasAnySave = slots.some(Boolean);
+
+  if (showAuth) {
+    return <AuthOverlay onClose={() => setShowAuth(false)} onSuccess={handleAuthSuccess} />;
   }
 
   return (
     <div className="screen">
       <h2 className={styles.title}>Load a Saved Game</h2>
-      <p className={styles.sub}>Choose a save slot to resume your adventure.</p>
-      <div className={styles.slots}>
-        {slots.map((slot, i) => (
-          <div key={i} className={styles.slot}>
-            <div className={styles.slotInfo}>
-              <div className={styles.slotNum}>Slot {i + 1}</div>
-              {slot
-                ? <div className={styles.slotDetail}>{slot.players?.map(p => p.name).join(' & ')} · Turn {slot.turnCount} · {new Date(slot.savedAt).toLocaleDateString()}</div>
-                : <div className={styles.slotEmpty}>Empty</div>
-              }
-            </div>
-            {slot && <button className="btn-primary" onClick={() => load(slot)} style={{fontSize:'.72rem',padding:'.4rem 1rem'}}>Load</button>}
-          </div>
-        ))}
+
+      {/* Cloud status */}
+      <div className={`${styles.cloudBar} ${isCloud ? styles.cloudOn : styles.cloudOff}`}>
+        {isCloud ? (
+          <><span className={styles.cloudDot}/> Cloud saves synced</>
+        ) : (
+          <>
+            <span>Local saves only</span>
+            {supabase && (
+              <button className={styles.cloudBtn} onClick={() => setShowAuth(true)}>
+                Sign in for cloud saves →
+              </button>
+            )}
+          </>
+        )}
       </div>
-      <button className="btn-ghost" onClick={() => set({ screen: 'title' })}>← Back</button>
+
+      {loading ? (
+        <div className={styles.loading}>
+          <div className={styles.dot}/><div className={styles.dot}/><div className={styles.dot}/>
+        </div>
+      ) : !hasAnySave ? (
+        <div className={styles.empty}>No saves found. Start a new adventure!</div>
+      ) : (
+        <div className={styles.slots}>
+          {slots.map((slot, i) => (
+            <div key={i} className={`${styles.slot} ${!slot ? styles.slotEmpty : ''}`}>
+              <div className={styles.slotInfo}>
+                <div className={styles.slotNum}>Slot {i + 1}</div>
+                {slot ? (
+                  <>
+                    <div className={styles.slotDetail}>
+                      {slot.players?.map(p => `${p.name} (${p.className})`).join(' & ')}
+                    </div>
+                    <div className={styles.slotMeta}>
+                      {slot.goal?.name} · Turn {slot.turnCount} · {new Date(slot.savedAt).toLocaleDateString()}
+                    </div>
+                  </>
+                ) : (
+                  <div className={styles.slotEmptyLabel}>Empty</div>
+                )}
+              </div>
+              {slot && (
+                <div className={styles.slotActions}>
+                  <button className="btn-primary" onClick={() => load(slot)} style={{ fontSize: '.72rem', padding: '.4rem 1rem' }}>
+                    Load
+                  </button>
+                  <button className={styles.deleteBtn} onClick={() => handleDelete(i)} title="Delete save">
+                    🗑
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      <button className="btn-ghost" style={{ marginTop: '1rem' }} onClick={() => set({ screen: 'title' })}>← Back</button>
     </div>
   );
 }

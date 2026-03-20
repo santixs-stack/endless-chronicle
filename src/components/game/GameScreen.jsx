@@ -18,6 +18,7 @@ import SettingsOverlay from '../overlays/SettingsOverlay.jsx';
 import JournalOverlay from '../overlays/JournalOverlay.jsx';
 import ExportOverlay from '../overlays/ExportOverlay.jsx';
 import SessionRecap from '../overlays/SessionRecap.jsx';
+import AuthOverlay from '../overlays/AuthOverlay.jsx';
 import styles from './GameScreen.module.css';
 
 // XP thresholds for level up
@@ -34,6 +35,7 @@ export default function GameScreen() {
   const [showJournal,  setShowJournal]  = useState(false);
   const [showExport,   setShowExport]   = useState(false);
   const [showRecap,    setShowRecap]    = useState(false);
+  const [showCloud,    setShowCloud]    = useState(false);
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
 
   // ── Auto-save every 5 turns to slot 0 ──
@@ -173,6 +175,7 @@ export default function GameScreen() {
         onJournal={() => setShowJournal(true)}
         onExport={() => setShowExport(true)}
         onRecap={() => setShowRecap(true)}
+        onCloud={() => setShowCloud(true)}
       />
 
       <div className={styles.main}>
