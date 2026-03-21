@@ -119,8 +119,48 @@ export default function CharacterScreen() {
     setGenBS(true);
     try {
       const cls = DND_CLASSES.find(c => c.id === selectedClass);
-      const prompt = `Write a vivid, specific 3-sentence backstory for this character. Personal and story-hook-rich.\n\nName: ${name || 'Unknown'}\nAge: ${age || 'Unknown'}\nBackground: ${role}\nClass: ${cls?.name}\nTrait: ${trait}\n\nWrite only the backstory.`;
-      const text = await callAPI([{ role: 'user', content: prompt }], 'You are a character backstory writer for a tabletop RPG. Write vivid, short backstories.');
+
+      // Build party context from already-created players
+      const existingParty = (state.players || []).filter((p, i) => i < idx && p?.name);
+      const isMultiplayer = state.playerCount > 1 && existingParty.length > 0;
+
+      // Build party descriptions for context
+      const partyDesc = existingParty.map(p =>
+        `- ${p.name}, age ${p.age || 'unknown'}, ${p.role || p.className} (${p.className})`
+        + (p.trait ? `. Trait: ${p.trait}` : '')
+        + (p.backstory ? `\n  Their backstory: "${p.backstory.slice(0, 120)}..."` : '')
+      ).join('\n');
+
+      const prompt = isMultiplayer
+        ? `Write a vivid, specific 3-sentence backstory for this character that WEAVES IN their relationship with the other party members. Create a genuine connection — maybe they grew up together, share a past event, owe each other a debt, or have a complicated history. The connection should feel organic, not forced.
+
+This character:
+Name: ${name || 'Unknown'}
+Age: ${age || 'Unknown'}  
+Background: ${role}
+Class: ${cls?.name}
+Trait: ${trait || 'none'}
+
+The other party members they know:
+${partyDesc}
+
+Quest they're all embarking on: ${state.goal?.name || 'an adventure'}
+
+Write 3 sentences. Include at least one specific detail that connects this character to one of the other party members. Write only the backstory, no labels or headers.`
+        : `Write a vivid, specific 3-sentence backstory for this character. Personal and story-hook-rich.
+
+Name: ${name || 'Unknown'}
+Age: ${age || 'Unknown'}
+Background: ${role}
+Class: ${cls?.name}
+Trait: ${trait || 'none'}
+
+Write only the backstory.`;
+
+      const text = await callAPI(
+        [{ role: 'user', content: prompt }],
+        'You are a character backstory writer for a tabletop RPG. Write vivid, personal backstories with specific details. In multiplayer games, create meaningful connections between party members.'
+      );
       setBackstory(text.trim());
     } catch { showNotif('Backstory generation failed', 'error'); }
     finally { setGenBS(false); }
@@ -253,7 +293,12 @@ export default function CharacterScreen() {
         )}
 
         <button className={styles.backstoryBtn} onClick={generateBackstory} disabled={generatingBS}>
-          {generatingBS ? '✦ Generating…' : '✦ Generate Backstory →'}
+          {generatingBS
+            ? '✦ Generating…'
+            : state.playerCount > 1 && (state.players || []).filter((p, i) => i < idx && p?.name).length > 0
+              ? '✦ Generate Backstory (weaves in party connections) →'
+              : '✦ Generate Backstory →'
+          }
         </button>
         {backstory && <div className={styles.backstoryPreview}>{backstory}</div>}
 
