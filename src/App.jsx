@@ -1,8 +1,7 @@
 import { useGame } from './hooks/useGameState.jsx';
 import { useSaveSlots } from './hooks/useSaveSlots.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { AppErrorBoundary, GameErrorBoundary } from './components/ui/ErrorBoundary.jsx';
-import { LoadingScreen } from './components/ui/LoadingScreen.jsx';
 import OfflineBanner from './components/ui/OfflineBanner.jsx';
 import Notification from './components/ui/Notification.jsx';
 
@@ -31,34 +30,18 @@ const SCREENS = {
 function AppContent() {
   const { state, set } = useGame();
   const { getLatestSlot } = useSaveSlots();
-  const [appReady, setAppReady] = useState(false);
   const screen = state.screen || 'title';
 
-  // Apply mode class for CSS theming
   useEffect(() => {
     const root = document.getElementById('root');
     if (root) root.className = state.mode ? `mode-${state.mode}` : '';
   }, [state.mode]);
 
-  // Boot sequence — check for existing save, mark ready
   useEffect(() => {
-    async function boot() {
-      try {
-        const { data } = await getLatestSlot();
-        if (data) set({ hasSave: true, latestSave: data });
-      } catch (e) {
-        console.warn('Save check failed:', e);
-      } finally {
-        // Small delay so the loading screen doesn't flash
-        setTimeout(() => setAppReady(true), 400);
-      }
-    }
-    boot();
+    getLatestSlot().then(({ data }) => {
+      if (data) set({ hasSave: true, latestSave: data });
+    }).catch(() => {});
   }, []);
-
-  if (!appReady) {
-    return <LoadingScreen message="Starting up…" showTip={false} />;
-  }
 
   const Screen = SCREENS[screen] || TitleScreen;
   const isGame = screen === 'game';

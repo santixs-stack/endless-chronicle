@@ -10,7 +10,6 @@
 // ═══════════════════════════════════════════
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { showNotif } from '../components/ui/Notification.jsx';
 
 // ── Error classifier ────────────────────────
 export function classifyError(error) {
@@ -99,8 +98,8 @@ export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    const goOnline  = () => { setIsOnline(true);  showNotif('Back online ✓', 'success'); };
-    const goOffline = () => { setIsOnline(false); showNotif('No internet connection', 'error'); };
+    const goOnline  = () => { setIsOnline(true);   };
+    const goOffline = () => { setIsOnline(false);  };
 
     window.addEventListener('online',  goOnline);
     window.addEventListener('offline', goOffline);

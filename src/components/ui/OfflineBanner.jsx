@@ -1,8 +1,22 @@
-import { useOnlineStatus } from '../../lib/recovery.jsx';
+import { useState, useEffect } from 'react';
 import styles from './OfflineBanner.module.css';
 
 export default function OfflineBanner() {
-  const isOnline = useOnlineStatus();
+  const [isOnline, setIsOnline] = useState(true);
+
+  useEffect(() => {
+    // Set initial state inside effect to avoid SSR/init issues
+    setIsOnline(navigator.onLine);
+    const goOnline  = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+    window.addEventListener('online',  goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online',  goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
+
   if (isOnline) return null;
 
   return (
