@@ -363,26 +363,42 @@ export default function CharacterCreateScreen() {
     players[idx] = newPlayer;
 
     if (idx < playerCount - 1) {
-      set({ players, setupIdx: idx + 1 });
+      // More players — flag custom player exists, stay on character screen
+      set({ players, setupIdx: idx + 1, hasCustomPlayer: true });
       setSubFlow(null);
       setFreeformText('');
       setPendingChar(null);
     } else {
-      set({ players, screen: 'world' });
+      // Last player — custom always goes to world screen
+      // World may already be pre-filled from a preset player — that's fine as a default
+      set({ players, hasCustomPlayer: true, screen: 'world' });
     }
   }
 
   function handlePresetSelect(preset) {
-    
     const presetClassMap = {
       brave_squire: 'warrior', old_wizard: 'mage', sneaky_thief: 'rogue',
       forest_ranger: 'ranger', space_cadet: 'spaceranger', sea_captain: 'pirate',
       ageless_slime: 'mage', gruff_veteran: 'warrior',
     };
+
+    // Default world per preset genre — skips world screen entirely
+    const presetWorlds = {
+      brave_squire:  { world: 'A medieval fantasy kingdom with dark dungeons and ancient magic', location: 'The cobblestone streets of a bustling castle town', tone: 'Epic & Exciting',    genre: 'fantasy'  },
+      old_wizard:    { world: 'A realm of ancient magic where spells shape reality itself',       location: 'A crumbling wizard tower at the edge of civilization',   tone: 'Mysterious & Wondrous', genre: 'fantasy' },
+      sneaky_thief:  { world: 'A sprawling city of merchants, guilds, and shadowy back alleys',  location: 'The rooftops of the merchant quarter at dusk',            tone: 'Epic & Exciting',    genre: 'fantasy'  },
+      forest_ranger: { world: 'An ancient wilderness where nature holds secrets and danger',      location: 'The edge of the Whispering Forest at dawn',              tone: 'Mysterious & Wondrous', genre: 'fantasy' },
+      space_cadet:   { world: 'A distant star system with alien worlds and uncharted space',      location: 'The observation deck of a battered starship',            tone: 'Mysterious & Wondrous', genre: 'space'   },
+      sea_captain:   { world: 'The Golden Age of Piracy — treacherous seas, hidden islands',      location: 'The deck of a weathered ship, open ocean in every direction', tone: 'Epic & Exciting', genre: 'ocean'  },
+      ageless_slime: { world: 'A strange world where the impossible is merely improbable',        location: 'A dungeon that seems oddly familiar to a slime',         tone: 'Funny & Silly',      genre: 'fantasy'  },
+      gruff_veteran: { world: 'A war-scarred land rebuilding itself after a great conflict',       location: 'A crossroads tavern where old soldiers gather',          tone: 'Dark & Mysterious',  genre: 'historical' },
+    };
+
     const classId = presetClassMap[preset.id] || 'warrior';
     const cls = DND_CLASSES.find(c => c.id === classId) || DND_CLASSES[0];
     const randName = randomizeName(detectedGenre);
     const randBg = randomFrom(RANDOM_BACKGROUNDS);
+    const defaultWorld = presetWorlds[preset.id] || presetWorlds.brave_squire;
 
     const player = {
       ...preset.char,
@@ -400,9 +416,28 @@ export default function CharacterCreateScreen() {
     players[idx] = player;
 
     if (idx < playerCount - 1) {
+      // More players — stay on character screen
       set({ players, setupIdx: idx + 1 });
     } else {
-      set({ players, screen: 'world' });
+      // Last player — check if any previous player used custom
+      const anyCustom = state.hasCustomPlayer;
+      if (anyCustom) {
+        // Mixed game — go to world screen, pre-filled with preset's world as default
+        set({
+          players,
+          world: { world: defaultWorld.world, location: defaultWorld.location, tone: defaultWorld.tone, extra: '' },
+          location: defaultWorld.location,
+          screen: 'world',
+        });
+      } else {
+        // All presets — skip world screen entirely
+        set({
+          players,
+          world: { world: defaultWorld.world, location: defaultWorld.location, tone: defaultWorld.tone, extra: '' },
+          location: defaultWorld.location,
+          screen: 'quest',
+        });
+      }
     }
   }
 

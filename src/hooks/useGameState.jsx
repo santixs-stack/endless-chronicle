@@ -15,6 +15,7 @@ const INITIAL_STATE = {
   world:            null,   // { world, location, tone, extra }
   playerCount:      1,
   setupIdx:         0,
+  hasCustomPlayer:  false,
   players:          [],
   _presetWorld:     null,   // temp: world from char preset
 
