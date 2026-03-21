@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { buildDebugReport, logRenderError } from '../../lib/debugLogger.js';
 import styles from './ErrorBoundary.module.css';
 
 // ═══════════════════════════════════════════
@@ -11,7 +12,7 @@ import styles from './ErrorBoundary.module.css';
 export class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { error: null, errorInfo: null, recovered: false };
+    this.state = { error: null, errorInfo: null, recovered: false, copied: false };
   }
 
   static getDerivedStateFromError(error) {
@@ -20,7 +21,22 @@ export class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo);
+    logRenderError(this.props.level || 'unknown', error);
     this.setState({ errorInfo });
+  }
+
+  handleCopyDebug() {
+    const report = buildDebugReport();
+    navigator.clipboard?.writeText(report).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = report;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    });
+    this.setState({ copied: true });
+    setTimeout(() => this.setState({ copied: false }), 2000);
   }
 
   handleReset() {
@@ -66,13 +82,7 @@ export class ErrorBoundary extends Component {
           <div className={styles.actions}>
             {isGameLevel ? (
               <>
-                <button
-                  className={styles.primaryBtn}
-                  onClick={() => {
-                    this.handleReset();
-                    if (onReset) onReset();
-                  }}
-                >
+                <button className={styles.primaryBtn} onClick={() => { this.handleReset(); if (onReset) onReset(); }}>
                   ↻ Try Again
                 </button>
                 <button className={styles.ghostBtn} onClick={this.handleReload.bind(this)}>
@@ -89,6 +99,9 @@ export class ErrorBoundary extends Component {
                 </button>
               </>
             )}
+            <button className={styles.ghostBtn} onClick={this.handleCopyDebug.bind(this)}>
+              {this.state.copied ? '✓ Copied!' : '📋 Copy Debug Info'}
+            </button>
           </div>
         </div>
       </div>

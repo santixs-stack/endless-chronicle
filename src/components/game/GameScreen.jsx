@@ -3,6 +3,7 @@ import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { callAPI, trimMessagesForContext, getContextStatus } from '../../engine/api.js';
 import { classifyError, withRetry } from '../../lib/recovery.jsx';
+import { logApiError, logFlow, logCombatEvent, updateStateSnapshot, logError } from '../../lib/debugLogger.js';
 import { buildSystemPrompt } from '../../engine/systemPrompt.js';
 import { parseAllTags } from '../../engine/tags.js';
 import { pickHiddenArc } from '../../data/hiddenArcs.js';
@@ -23,6 +24,7 @@ import SessionRecap from '../overlays/SessionRecap.jsx';
 import AuthOverlay from '../overlays/AuthOverlay.jsx';
 import SearchOverlay from '../overlays/SearchOverlay.jsx';
 import CharacterSheetOverlay from '../overlays/CharacterSheetOverlay.jsx';
+import DebugPanel from '../overlays/DebugPanel.jsx';
 import styles from './GameScreen.module.css';
 
 // XP thresholds for level up
@@ -42,10 +44,28 @@ export default function GameScreen() {
   const [showCloud,    setShowCloud]    = useState(false);
   const [showSearch,   setShowSearch]   = useState(false);
   const [showCharSheet,setShowCharSheet]= useState(false);
+  const [showDebug,    setShowDebug]    = useState(false);
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
   const [apiError,     setApiError]     = useState(null); // {title, message, retryable}
 
   // ── Auto-save every 5 turns to slot 0 ──
+  // ── Update debug snapshot on every state change ──
+  useEffect(() => {
+    updateStateSnapshot(state);
+  }, [state.turnCount, state.screen, state.inCombat, state.isLoading]);
+
+  // ── Keyboard shortcut: Ctrl+Shift+D opens debug panel ──
+  useEffect(() => {
+    function onKey(e) {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        setShowDebug(d => !d);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   useEffect(() => {
     if (!state.messages?.length || state.screen !== 'game') return;
     const now = state.turnCount || 0;
@@ -78,8 +98,8 @@ export default function GameScreen() {
         if (parsed.scene) autoTrackFromScene(parsed.scene.type, parsed.scene.time, parsed.scene.mood);
       })
       .catch(err => {
-        console.error(err);
         const classified = classifyError(err);
+        logApiError(err, { msgCount: msgs.length, sysPromptLen: sysPrompt.length });
         setApiError(classified);
         set({ isLoading: false });
       });
@@ -217,8 +237,13 @@ export default function GameScreen() {
       }
 
     } catch (err) {
-      console.error(err);
       const classified = classifyError(err);
+      logApiError(err, {
+        msgCount:     newMessages.length,
+        sysPromptLen: buildSystemPrompt(state).length,
+        lastUserMsg:  actionText,
+        turn:         (state.turnCount || 0) + 1,
+      });
       setApiError(classified);
       set({ isLoading: false });
     }
@@ -278,6 +303,7 @@ export default function GameScreen() {
         onCloud={() => setShowCloud(true)}
         onSearch={() => setShowSearch(true)}
         onCharSheet={() => setShowCharSheet(true)}
+        onDebug={() => setShowDebug(true)}
       />
 
       <div className={styles.main}>
@@ -295,6 +321,7 @@ export default function GameScreen() {
       {showRecap    && <SessionRecap          onClose={() => setShowRecap(false)} />}
       {showSearch   && <SearchOverlay         onClose={() => setShowSearch(false)} />}
       {showCharSheet&& <CharacterSheetOverlay onClose={() => setShowCharSheet(false)} />}
+      {showDebug    && <DebugPanel            onClose={() => setShowDebug(false)} />}
     </div>
   );
 }

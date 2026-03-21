@@ -4,6 +4,8 @@
 //  parseAllTags() extracts everything at once.
 // ═══════════════════════════════════════════
 
+import { logTagParseError } from '../lib/debugLogger.js';
+
 export function parseAllTags(raw) {
   const result = {
     narrative:  raw,
@@ -71,12 +73,12 @@ export function parseAllTags(raw) {
 
   // Actions
   const actM = text.match(/\[ACTIONS:(\[[^\]]+\])\]/);
-  if (actM) { try { result.actions = JSON.parse(actM[1]); } catch {} }
+  if (actM) { try { result.actions = JSON.parse(actM[1]); } catch(e) { logTagParseError("ACTIONS", actM[1], e); } }
   text = text.replace(/\[ACTIONS:[^\]]*\]/g, '').trim();
 
   // Stats (adventure mode health)
   const statsM = text.match(/\[STATS:(\{[^}]+\})\]/);
-  if (statsM) { try { result.stats = JSON.parse(statsM[1]); } catch {} }
+  if (statsM) { try { result.stats = JSON.parse(statsM[1]); } catch(e) { logTagParseError("STATS", statsM[1], e); } }
   text = text.replace(/\[STATS:[^\]]+\]/g, '').trim();
 
   // HP Deltas
@@ -94,12 +96,12 @@ export function parseAllTags(raw) {
 
   // XP Awards
   const xpMatches = [...text.matchAll(/\[XP:(\{[^}]+\})\]/g)];
-  xpMatches.forEach(m => { try { result.xpAwards.push(JSON.parse(m[1])); } catch {} });
+  xpMatches.forEach(m => { try { result.xpAwards.push(JSON.parse(m[1])); } catch(e) { logTagParseError("XP", m[1], e); } });
   text = text.replace(/\[XP:[^\]]+\]/g, '').trim();
 
   // NPCs
   const npcMatches = [...text.matchAll(/\[NPC:(\{[^}]+\})\]/g)];
-  npcMatches.forEach(m => { try { result.npcs.push(JSON.parse(m[1])); } catch {} });
+  npcMatches.forEach(m => { try { result.npcs.push(JSON.parse(m[1])); } catch(e) { logTagParseError("NPC", m[1], e); } });
   text = text.replace(/\[NPC:[^\]]+\]/g, '').trim();
 
   // Journal
