@@ -78,12 +78,18 @@ export default function InputArea({ onAction }) {
   // Current actions from story response
   const actions = state.currentActions || [];
 
+  // Combat-specific actions to inject
+  const combatChips = state.inCombat ? ['🔍 Assess the enemy'] : [];
+
   return (
     <div className={styles.inputSection}>
       {/* Action suggestion chips */}
-      {actions.length > 0 && (
+      {(actions.length > 0 || combatChips.length > 0) && (
         <div className={styles.chips}>
           <span className={styles.chipsLabel}>Try:</span>
+          {combatChips.map((a, i) => (
+            <button key={`combat-${i}`} className={`${styles.chip} ${styles.assessChip}`} onClick={() => useIdea(a)}>{a}</button>
+          ))}
           {actions.slice(0, 4).map((a, i) => (
             <button key={i} className={styles.chip} onClick={() => useIdea(a)}>{a}</button>
           ))}

@@ -110,6 +110,16 @@ ALWAYS include:
 Roll 20 = CRITICAL HIT — describe it dramatically in the narrative AND set crit:true
 Roll 1 = FUMBLE — describe the mishap, may do less or no damage
 
+ENEMY HEALTH — CRITICAL RULE:
+NEVER reveal exact enemy HP numbers in the narrative by default. Describe enemy condition in vivid narrative terms only:
+- Healthy: "The goblin leers at you, completely unscathed"
+- Lightly wounded: "The goblin winces, a thin cut across its arm"
+- Bloodied (roughly half HP): "The goblin staggers, bleeding freely from a deep gash"  
+- Critical (very low HP): "The goblin can barely stand, gasping and clutching its wounds"
+- Near death: "The goblin is on its knees, vision fading — one more blow will finish it"
+
+EXCEPTION — "Assess Enemy" ability: If a player specifically uses "Assess", "Analyze", "Study", "Examine" or similar on an enemy, you MAY reveal approximate HP as a range (e.g. "roughly 8–12 HP remaining") plus one weakness. This is the only time numbers are allowed.
+
 STORYTELLING RULES — CRITICAL:
 - LENGTH: Keep responses SHORT. Easy: 4–6 sentences. Medium: 3–5 sentences. Hard/Advanced: 2 short paragraphs.
 ${playerCount > 1
