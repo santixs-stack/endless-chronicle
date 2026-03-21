@@ -262,6 +262,96 @@ export const SFX = {
       playTone(freq, 'triangle', 0.3, 0.2, i * 0.08);
     });
   },
+
+  // 🖱 Button click — subtle UI feedback
+  click() {
+    playTone(800, 'sine', 0.06, 0.12);
+    playNoise(0.03, 0.08, 8000);
+  },
+
+  // 🔀 Screen transition — soft whoosh
+  transition() {
+    const m = master(0.25);
+    if (!m) return;
+    const { c, g } = m;
+    const now = c.currentTime;
+    const osc = c.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+    osc.connect(g);
+    g.gain.setValueAtTime(0.3, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.start(now);
+    osc.stop(now + 0.22);
+  },
+
+  // 🧙 Archetype / character confirmed
+  characterConfirm() {
+    [523, 784, 1047].forEach((freq, i) => {
+      playTone(freq, 'triangle', 0.2, 0.25, i * 0.07);
+    });
+    playNoise(0.15, 0.1, 6000);
+  },
+
+  // 📜 Quest selected — dramatic sting
+  questSelected() {
+    const m = master(0.5);
+    if (!m) return;
+    const { c, g } = m;
+    const now = c.currentTime;
+    // Low rumble + rising tone
+    [110, 165, 220].forEach((freq, i) => {
+      const o = c.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = freq;
+      o.connect(g);
+      g.gain.setValueAtTime(0.4, now + i * 0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      o.start(now + i * 0.05);
+      o.stop(now + 0.55);
+    });
+    // High shimmer
+    playTone(880, 'triangle', 0.3, 0.2, 0.15);
+    playNoise(0.2, 0.15, 4000);
+  },
+
+  // ⏳ AI thinking — subtle shimmer tick
+  thinkingTick() {
+    playTone(1200, 'sine', 0.08, 0.05);
+  },
+
+  // 🔔 Notification success — soft ping
+  notifSuccess() {
+    [659, 880].forEach((freq, i) => {
+      playTone(freq, 'sine', 0.12, 0.12, i * 0.06);
+    });
+  },
+
+  // ❌ Notification error — low thud
+  notifError() {
+    playTone(180, 'sawtooth', 0.15, 0.2);
+    playNoise(0.08, 0.15, 1000);
+  },
+
+  // 📢 NPC introduced — character appearance sting
+  npcIntroduced() {
+    [440, 554, 440].forEach((freq, i) => {
+      playTone(freq, 'triangle', 0.14, 0.15, i * 0.08);
+    });
+  },
+
+  // ✨ New game started — opening fanfare
+  newGame() {
+    const notes = [261, 329, 392, 523, 659, 523, 659, 784, 1047];
+    notes.forEach((freq, i) => {
+      playTone(freq, 'triangle', 0.22, 0.22, i * 0.08);
+    });
+    [130, 196, 261].forEach((freq, i) => {
+      playTone(freq, 'sine', 0.5, 0.18, i * 0.1);
+    });
+    playNoise(1.2, 0.08, 8000);
+  },
 };
 
 // ── Settings ───────────────────────────────

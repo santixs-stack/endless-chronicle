@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './Notification.module.css';
+import { SFX } from '../game/SoundEngine.js';
 
 let _show = null;
 export function showNotif(message, type = 'info') {
   if (_show) _show(message, type);
+  if (type === 'success') SFX.notifSuccess?.();
+  else if (type === 'error') SFX.notifError?.();
 }
 
 export default function Notification() {

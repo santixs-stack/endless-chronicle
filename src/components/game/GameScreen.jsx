@@ -54,7 +54,12 @@ export default function GameScreen() {
     updateStateSnapshot(state);
   }, [state.turnCount, state.screen, state.inCombat, state.isLoading]);
 
-  // ── Keyboard shortcut: Ctrl+Shift+D opens debug panel ──
+  // ── Thinking tick while AI is generating ──
+  useEffect(() => {
+    if (!state.isLoading) return;
+    const t = setInterval(() => SFX.thinkingTick(), 1800);
+    return () => clearInterval(t);
+  }, [state.isLoading]);
   useEffect(() => {
     function onKey(e) {
       if (e.ctrlKey && e.shiftKey && e.key === 'D') {
@@ -184,7 +189,7 @@ export default function GameScreen() {
 
       // Side effects
       if (parsed.journal) { addJournal(parsed.journal); SFX.journal(); }
-      parsed.npcs.forEach(npc => addNpc(npc));
+      parsed.npcs.forEach(npc => { addNpc(npc); SFX.npcIntroduced(); });
       parsed.codex.forEach(entry => addCodex(entry));
       if (parsed.gold) updateGold(parsed.gold.amount, parsed.gold.reason);
 

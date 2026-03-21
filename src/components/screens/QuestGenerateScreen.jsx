@@ -4,6 +4,7 @@ import { callAPI } from '../../engine/api.js';
 import { STORY_GOALS } from '../../data/quests.js';
 import { GAME_ICONS } from '../../data/gameIcons.js';
 import GameIcon from '../ui/GameIcon.jsx';
+import { SFX } from '../game/SoundEngine.js';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './QuestGenerateScreen.module.css';
 
@@ -125,6 +126,7 @@ Respond ONLY with a JSON array of 4 objects, each with:
   }
 
   function selectQuest(quest) {
+    SFX.questSelected();
     set({
       goal: {
         id: quest.id,
@@ -145,11 +147,13 @@ Respond ONLY with a JSON array of 4 objects, each with:
   }
 
   function selectPreset(quest) {
+    SFX.questSelected();
     set({ goal: quest, screen: 'game' });
   }
 
   function handleCustomSubmit() {
     if (!customText.trim()) return;
+    SFX.questSelected();
     const custom = {
       id: 'custom',
       icon: '✨',

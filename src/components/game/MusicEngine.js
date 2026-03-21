@@ -353,3 +353,6 @@ export function endCombatMusic(sceneType, timeOfDay, mood) {
 }
 
 export function getMusicActive() { return active; }
+export function getMusicVol() { return masterGain?.gain.value ?? 0.4; }
+export function setMusicMuted(m) { if (m) stopMusic(); }
+export function getMusicMuted() { return !active; }

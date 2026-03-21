@@ -20,3 +20,20 @@
 .attribution { font-family: var(--font-mono); font-size: 0.58rem; color: var(--text-dim); text-align: center; padding: 0.8rem 0 0.2rem; letter-spacing: 0.06em; }
 .attrLink { color: var(--accent); text-decoration: none; }
 .attrLink:hover { text-decoration: underline; }
+
+/* Mode selection */
+.modeRow { display: flex; gap: 0.6rem; }
+.modeBtn { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; cursor: pointer; text-align: left; transition: var(--transition); }
+.modeBtn:hover { border-color: var(--border-accent); }
+.modeBtnActive { background: var(--mode-glow); }
+.modeBtnName { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+.modeBtnDesc { font-family: var(--font-body); font-size: 0.75rem; color: var(--text-dim); }
+.modeNote { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.06em; margin: 0.4rem 0 0; }
+
+/* SFX controls */
+.sfxRow { display: flex; align-items: center; gap: 0.8rem; }
+.sliderRow { display: flex; align-items: center; gap: 0.6rem; }
+.sliderIcon { font-size: 0.9rem; flex-shrink: 0; }
+.muteBtn { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.3rem 0.6rem; cursor: pointer; white-space: nowrap; color: var(--text-dim); transition: var(--transition); }
+.muteBtn:hover { border-color: var(--accent); color: var(--accent); }
+.muteBtnActive { border-color: #e05555; color: #e05555; }

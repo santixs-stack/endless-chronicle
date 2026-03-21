@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
+import { SFX } from '../game/SoundEngine.js';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './PlayersScreen.module.css';
 
@@ -15,6 +16,7 @@ export default function PlayersScreen() {
   const [count, setCount] = useState(state.playerCount || null);
 
   function confirm() {
+    SFX.transition();
     set({ playerCount: count, setupIdx: 0, players: [], screen: 'character' });
   }
 

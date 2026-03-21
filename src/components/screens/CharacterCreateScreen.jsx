@@ -6,6 +6,8 @@ import { CHAR_PRESETS } from '../../data/presets.js';
 import { DND_CLASSES } from '../../data/classes.js';
 import { callAPI } from '../../engine/api.js';
 import GameIcon from '../ui/GameIcon.jsx';
+import { SFX } from '../game/SoundEngine.js';
+
 import StepBar from '../ui/StepBar.jsx';
 import styles from './CharacterCreateScreen.module.css';
 
@@ -310,6 +312,8 @@ export default function CharacterCreateScreen() {
   const genreIcon  = GENRES.find(g => g.id === genre)?.icon  || '⚔';
 
   function handleArchetypeSelect(archetype) {
+    SFX.click();
+    SFX.characterConfirm();
     // Generate character from archetype immediately
     const cls = archetype.classId || 'warrior';
     const name = randomizeName(genre);
@@ -371,6 +375,7 @@ export default function CharacterCreateScreen() {
     } else {
       // Last player — custom always goes to world screen
       // World may already be pre-filled from a preset player — that's fine as a default
+      SFX.transition();
       set({ players, hasCustomPlayer: true, screen: 'world' });
     }
   }
