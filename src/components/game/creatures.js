@@ -317,7 +317,7 @@ export function drawDragon(x, y, sc, fac, status, uid) {
       <path d="M${x-8*sc},${y-10*sc} Q${x},${y-8*sc} ${x+8*sc},${y-10*sc} Q${x+6*sc},${y-30*sc} ${x},${y-32*sc} Q${x-6*sc},${y-30*sc} ${x-8*sc},${y-10*sc}Z"
         fill="url(#${id}_belly)" opacity="0.8"/>
       <!-- Scale texture lines -->
-      ${[-20,-14,-8].map(yy=>`<path d="M${x-${8+Math.abs(yy/3)}*sc},${y+yy*sc} Q${x},${y+(yy-2)*sc} ${x+${8+Math.abs(yy/3)}*sc},${y+yy*sc}" fill="none" stroke="${f.shadow}" stroke-width="${0.6*sc}" opacity="0.4"/>`).join('')}
+      ${[-20,-14,-8].map(yy=>{ const w=(8+Math.abs(yy/3))*sc; return `<path d="M${x-w},${y+yy*sc} Q${x},${y+(yy-2)*sc} ${x+w},${y+yy*sc}" fill="none" stroke="${f.shadow}" stroke-width="${0.6*sc}" opacity="0.4"/>`;}).join('')}
       <!-- Neck -->
       <path d="M${x+5*sc},${y-55*sc} Q${x+10*sc},${y-48*sc} ${x+8*sc},${y-38*sc} Q${x+4*sc},${y-30*sc} ${x},${y-28*sc}" fill="none" stroke="${f.primary}" stroke-width="${12*sc}" stroke-linecap="round"/>
       <!-- Head -->
@@ -842,7 +842,7 @@ export function drawDemon(x, y, sc, fac, status, uid) {
       <path d="M${x-16*sc},${y-44*sc} Q${x-20*sc},${y-32*sc} ${x-14*sc},${y-20*sc} L${x+14*sc},${y-20*sc} Q${x+20*sc},${y-32*sc} ${x+16*sc},${y-44*sc} Q${x+10*sc},${y-54*sc} ${x},${y-54*sc} Q${x-10*sc},${y-54*sc} ${x-16*sc},${y-44*sc}Z"
         fill="url(#${id}_body)" stroke="#150408" stroke-width="${1*sc}"/>
       <!-- Scale texture -->
-      ${[-40,-34,-28,-22].map(yy=>`<path d="M${x-${12+Math.abs((yy+35)/3)}*sc},${y+yy*sc} Q${x},${y+(yy-2)*sc} ${x+${12+Math.abs((yy+35)/3)}*sc},${y+yy*sc}" fill="none" stroke="#150408" stroke-width="${0.5*sc}" opacity="0.4"/>`).join('')}
+      ${[-40,-34,-28,-22].map(yy=>{ const w=(12+Math.abs((yy+35)/3))*sc; return `<path d="M${x-w},${y+yy*sc} Q${x},${y+(yy-2)*sc} ${x+w},${y+yy*sc}" fill="none" stroke="#150408" stroke-width="${0.5*sc}" opacity="0.4"/>`;}).join('')}
       <!-- Left wing -->
       <path d="M${x-8*sc},${y-44*sc} Q${x-40*sc},${y-80*sc} ${x-55*sc},${y-55*sc} Q${x-50*sc},${y-40*sc} ${x-20*sc},${y-36*sc}Z"
         fill="url(#${id}_wing)"/>
@@ -1143,7 +1143,7 @@ export function drawElder(x, y, sc, fac, status, uid) {
       <path d="M${x-8*sc},${y-30*sc} Q${x-9*sc},${y-20*sc} ${x-7*sc},${y-8*sc} L${x+7*sc},${y-8*sc} Q${x+9*sc},${y-20*sc} ${x+8*sc},${y-30*sc} Q${x+4*sc},${y-36*sc} ${x},${y-36*sc} Q${x-4*sc},${y-36*sc} ${x-8*sc},${y-30*sc}Z"
         fill="url(#${id}_robe)"/>
       <!-- Robe pattern lines -->
-      ${[-28,-22,-16,-10].map(yy=>`<path d="M${x-${7+Math.abs(yy/4)}*sc},${y+yy*sc} Q${x},${y+(yy-1)*sc} ${x+${7+Math.abs(yy/4)}*sc},${y+yy*sc}" fill="none" stroke="#887850" stroke-width="${0.5*sc}" opacity="0.4"/>`).join('')}
+      ${[-28,-22,-16,-10].map(yy=>{ const w=(7+Math.abs(yy/4))*sc; return `<path d="M${x-w},${y+yy*sc} Q${x},${y+(yy-1)*sc} ${x+w},${y+yy*sc}" fill="none" stroke="#887850" stroke-width="${0.5*sc}" opacity="0.4"/>`;}).join('')}
       <!-- Arms — one raised with walking stick -->
       <path d="M${x-8*sc},${y-28*sc} Q${x-14*sc},${y-22*sc} ${x-14*sc},${y-12*sc}" fill="none" stroke="#a89060" stroke-width="${4*sc}" stroke-linecap="round"/>
       <path d="M${x+8*sc},${y-28*sc} Q${x+16*sc},${y-22*sc} ${x+16*sc},${y-8*sc}" fill="none" stroke="#a89060" stroke-width="${4*sc}" stroke-linecap="round"/>
