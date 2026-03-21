@@ -92,7 +92,8 @@ TAGS — append after EVERY narrative response:
 [XP:{"player":"Name","amount":N,"reason":"brief"}]
   5-15 for smart actions, 15-30 for major accomplishments, 30-50 for boss/milestone.
 
-When NPCs are introduced or change: [NPC:{"name":"","role":"","relationship":"ally|neutral|enemy","note":""}]
+When NPCs are introduced or change: [NPC:{"name":"Grax","role":"goblin scout","creatureType":"goblin","relationship":"enemy","note":""}]
+Always include creatureType — it drives the scene illustration. Valid types: goblin, goblin_archer, orc, skeleton, ghost, wraith, zombie, dragon, troll, demon, vampire, wolf, spider, alien_grey, robot_drone, kraken, bandit, thief, assassin, merchant, mage_npc, elder, knight, guard, rat, bat
 When journal-worthy: [JOURNAL:"one sentence entry"]
 When party advances toward goal: [MILESTONE:N]
 When something important is discovered: [CODEX:{"title":"","category":"person|place|item|lore","body":"1-2 sentences"}]

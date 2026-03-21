@@ -49,3 +49,18 @@
 /* Lightning */
 .lightning { animation: bolt 8s ease infinite; }
 @keyframes bolt { 0%,92%,94%,96%,100%{opacity:0} 93%,95%{opacity:.08} }
+
+/* Creature animations */
+.idleFloat  { animation: float 3s ease-in-out infinite; }
+.idleBob    { animation: bob 1.2s ease-in-out infinite; }
+.idleRattle { animation: rattle 0.8s ease-in-out infinite; }
+.idleSway   { animation: sway 3s ease-in-out infinite; }
+.idleBreath { animation: breath 4s ease-in-out infinite; }
+.eyeGlow    { animation: eyePulse 2s ease-in-out infinite; }
+
+@keyframes float   { 0%,100%{transform:translateY(0)}    50%{transform:translateY(-8px)} }
+@keyframes bob     { 0%,100%{transform:translateY(0)}    50%{transform:translateY(-4px)} }
+@keyframes rattle  { 0%,100%{transform:rotate(0)}  25%{transform:rotate(-2deg)} 75%{transform:rotate(2deg)} }
+@keyframes sway    { 0%,100%{transform:rotate(0)}  50%{transform:rotate(3deg)} }
+@keyframes breath  { 0%,100%{transform:scaleX(1) scaleY(1)} 50%{transform:scaleX(1.03) scaleY(0.98)} }
+@keyframes eyePulse{ 0%,100%{opacity:1} 50%{opacity:0.5} }

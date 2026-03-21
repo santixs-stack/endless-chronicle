@@ -144,7 +144,14 @@ export default function StoryWindow() {
 
   return (
     <div className={styles.outer}>
-      <SceneRenderer scene={state.lastScene} players={state.players} turnCount={state.turnCount || 0} />
+      <SceneRenderer
+        scene={state.lastScene}
+        players={state.players}
+        npcs={state.npcs}
+        inCombat={state.inCombat}
+        combatants={state.combatants}
+        turnCount={state.turnCount || 0}
+      />
 
       <div className={styles.window}>
         {state.isLoading && (
