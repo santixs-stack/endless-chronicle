@@ -1,0 +1,31 @@
+.boundary { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 999; padding: 2rem; }
+.appLevel  { background: var(--bg); }
+.gameLevel { background: rgba(8,7,10,0.92); backdrop-filter: blur(8px); }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 10px;
+  padding: 2rem 2.2rem;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: center;
+}
+
+.icon  { font-size: 2.5rem; }
+.title { font-family: var(--font-title); font-size: 1.1rem; font-weight: 600; color: var(--accent); margin: 0; letter-spacing: 0.08em; }
+.message { font-family: var(--font-body); font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+
+.detail { width: 100%; text-align: left; }
+.detail summary { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--text-dim); cursor: pointer; padding: 0.3rem 0; }
+.errorText { font-family: var(--font-mono); font-size: 0.62rem; color: #e05555; background: var(--bg-input); padding: 0.6rem; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; margin-top: 0.4rem; max-height: 120px; overflow-y: auto; }
+
+.actions { display: flex; gap: 0.8rem; margin-top: 0.4rem; flex-wrap: wrap; justify-content: center; }
+.primaryBtn { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; background: var(--accent); color: var(--bg); border: none; border-radius: var(--radius-sm); padding: 0.5rem 1.2rem; cursor: pointer; transition: var(--transition); }
+.primaryBtn:hover { filter: brightness(1.15); }
+.ghostBtn { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; border: 1px solid var(--border); color: var(--text-dim); border-radius: var(--radius-sm); padding: 0.5rem 1rem; cursor: pointer; transition: var(--transition); }
+.ghostBtn:hover { border-color: var(--accent); color: var(--accent); }

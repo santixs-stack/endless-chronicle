@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { callAPI } from '../../engine/api.js';
+import { classifyError, withRetry } from '../../lib/recovery.js';
 import { buildSystemPrompt } from '../../engine/systemPrompt.js';
 import { parseAllTags } from '../../engine/tags.js';
 import { pickHiddenArc } from '../../data/hiddenArcs.js';
@@ -37,6 +38,7 @@ export default function GameScreen() {
   const [showRecap,    setShowRecap]    = useState(false);
   const [showCloud,    setShowCloud]    = useState(false);
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
+  const [apiError,     setApiError]     = useState(null); // {title, message, retryable}
 
   // ── Auto-save every 5 turns to slot 0 ──
   useEffect(() => {
@@ -62,13 +64,20 @@ export default function GameScreen() {
     const prompt = `${goalCtx}\n\nParty: ${partyNames}.\n\nWrite the opening scene SHORT (2-4 sentences). Drop players straight into action. End with a direct question to ${state.players[0]?.name || 'Player 1'}. Include [SCENE:...] and [ACTIONS:...] tags.`;
     const msgs = [{ role: 'user', content: prompt }];
     set({ isLoading: true });
-    callAPI(msgs, buildSystemPrompt({ ...state, hiddenArc: arc }))
+    setApiError(null);
+    const sysPrompt = buildSystemPrompt({ ...state, hiddenArc: arc });
+    withRetry(() => callAPI(msgs, sysPrompt), 2)
       .then(text => {
         const parsed = parseAllTags(text);
         set({ messages: [...msgs, { role: 'assistant', content: text }], isLoading: false, lastScene: parsed.scene || null, currentActions: parsed.actions || [] });
         if (parsed.scene) autoTrackFromScene(parsed.scene.type, parsed.scene.time, parsed.scene.mood);
       })
-      .catch(err => { console.error(err); showNotif('Could not start the adventure. Check your API key.', 'error'); set({ isLoading: false }); });
+      .catch(err => {
+        console.error(err);
+        const classified = classifyError(err);
+        setApiError(classified);
+        set({ isLoading: false });
+      });
   }, []);
 
   // ── Process XP awards and level ups ──
@@ -174,7 +183,8 @@ export default function GameScreen() {
 
     } catch (err) {
       console.error(err);
-      showNotif('The story engine stumbled. Try again.', 'error');
+      const classified = classifyError(err);
+      setApiError(classified);
       set({ isLoading: false });
     }
   }
@@ -182,6 +192,45 @@ export default function GameScreen() {
   return (
     <div className={`screen ${styles.gameScreen}`}>
       <button className={styles.mobileMenuBtn} onClick={() => setSidebarOpen(o => !o)}>☰</button>
+
+      {/* ── API Error Recovery UI ── */}
+      {apiError && (
+        <div className={styles.errorOverlay}>
+          <div className={styles.errorCard}>
+            <span className={styles.errorIcon}>
+              {apiError.type === 'offline' ? '📵' :
+               apiError.type === 'ratelimit' ? '⏳' :
+               apiError.type === 'auth' ? '🔑' : '⚠'}
+            </span>
+            <h3 className={styles.errorTitle}>{apiError.title}</h3>
+            <p className={styles.errorMsg}>{apiError.message}</p>
+            <div className={styles.errorActions}>
+              {apiError.retryable && (
+                <button className={styles.retryBtn} onClick={() => { setApiError(null); sendTurn(state.messages[state.messages.length - 2]?.content || ''); }}>
+                  ↻ Retry
+                </button>
+              )}
+              <button className={styles.dismissBtn} onClick={() => setApiError(null)}>
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Initial loading screen (before first AI response) ── */}
+      {state.isLoading && !state.messages?.length && (
+        <div className={styles.initLoadOverlay}>
+          <div className={styles.initLoadInner}>
+            <div className={styles.initSpinnerWrap}>
+              <div className={styles.initSpinner} />
+              <div className={styles.initSpinnerInner} />
+            </div>
+            <p className={styles.initLoadMsg}>The GM is setting the scene…</p>
+            <p className={styles.initLoadSub}>Preparing your adventure</p>
+          </div>
+        </div>
+      )}
 
       <GameSidebar
         open={sidebarOpen}

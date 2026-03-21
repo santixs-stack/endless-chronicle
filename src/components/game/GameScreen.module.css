@@ -30,3 +30,59 @@
 @media (max-width: 640px) {
   .mobileMenuBtn { display: block; }
 }
+
+/* ── API Error Recovery ── */
+.errorOverlay {
+  position: absolute; inset: 0; z-index: 200;
+  background: rgba(8,6,14,0.82); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.25s ease;
+}
+.errorCard {
+  background: var(--bg-card); border: 1px solid var(--border-accent);
+  border-radius: 10px; padding: 1.8rem 2rem;
+  max-width: 380px; width: 90%;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.7rem; text-align: center;
+}
+.errorIcon  { font-size: 2rem; }
+.errorTitle { font-family: var(--font-title); font-size: 1rem; color: var(--accent); margin: 0; letter-spacing: 0.08em; }
+.errorMsg   { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+.errorActions { display: flex; gap: 0.6rem; margin-top: 0.3rem; }
+.retryBtn { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; background: var(--accent); color: var(--bg); border: none; border-radius: var(--radius-sm); padding: 0.45rem 1rem; cursor: pointer; }
+.retryBtn:hover { filter: brightness(1.15); }
+.dismissBtn { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; border: 1px solid var(--border); color: var(--text-dim); border-radius: var(--radius-sm); padding: 0.45rem 0.8rem; cursor: pointer; }
+.dismissBtn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Initial loading screen ── */
+.initLoadOverlay {
+  position: absolute; inset: 0; z-index: 100;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+.initLoadInner {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1rem; text-align: center;
+}
+.initSpinnerWrap { position: relative; width: 52px; height: 52px; }
+.initSpinner {
+  position: absolute; inset: 0;
+  border: 2px solid rgba(196,168,79,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: gameSpin 1s linear infinite;
+}
+.initSpinnerInner {
+  position: absolute; inset: 9px;
+  border: 1.5px solid rgba(196,168,79,0.08);
+  border-bottom-color: var(--accent);
+  border-radius: 50%;
+  animation: gameSpin 0.65s linear infinite reverse;
+}
+.initLoadMsg { font-family: var(--font-title); font-size: 1rem; color: var(--accent); letter-spacing: 0.12em; margin: 0; }
+.initLoadSub { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin: 0; animation: pulse 2s ease infinite; }
+
+@keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+@keyframes gameSpin { to{transform:rotate(360deg)} }
+@keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
