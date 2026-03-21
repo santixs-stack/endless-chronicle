@@ -66,7 +66,7 @@ export default function GameScreen() {
       .then(text => {
         const parsed = parseAllTags(text);
         set({ messages: [...msgs, { role: 'assistant', content: text }], isLoading: false, lastScene: parsed.scene || null, currentActions: parsed.actions || [] });
-        if (parsed.scene?.type) autoTrackFromScene(parsed.scene.type);
+        if (parsed.scene) autoTrackFromScene(parsed.scene.type, parsed.scene.time, parsed.scene.mood);
       })
       .catch(err => { console.error(err); showNotif('Could not start the adventure. Check your API key.', 'error'); set({ isLoading: false }); });
   }, []);
@@ -122,12 +122,12 @@ export default function GameScreen() {
       if (parsed.milestone != null) updates.milestones = parsed.milestone;
       if (parsed.stats?.health != null) updates.stats = { ...state.stats, health: parsed.stats.health };
       if (parsed.combat)          { updates.inCombat  = true;  startCombatMusic(); }
-      if (parsed.combatEnd)       { updates.inCombat  = false; updates.combatants = []; endCombatMusic(parsed.scene?.type || state.lastScene?.type); }
+      if (parsed.combatEnd)       { updates.inCombat  = false; updates.combatants = []; endCombatMusic(parsed.scene?.type || state.lastScene?.type, parsed.scene?.time || state.lastScene?.time, parsed.scene?.mood || state.lastScene?.mood); }
 
       set(updates);
 
       // Auto-switch music on scene change
-      if (parsed.scene?.type && !updates.inCombat) autoTrackFromScene(parsed.scene.type);
+      if (parsed.scene?.type && !updates.inCombat) autoTrackFromScene(parsed.scene.type, parsed.scene.time, parsed.scene.mood);
 
       // Multiplayer turn advance
       if (state.playerCount > 1) set({ currentPlayerIdx: (state.currentPlayerIdx + 1) % state.playerCount });
