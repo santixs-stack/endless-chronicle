@@ -1,4 +1,27 @@
-.outer  { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.outer  { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; transition: box-shadow 0.4s ease; }
+
+/* Red pulsing border during combat */
+.combatMode { box-shadow: 0 0 0 2px #e05555, 0 0 20px rgba(224,85,85,0.2); }
+
+.combatBorderTop {
+  background: linear-gradient(90deg, transparent, #e05555, #c03030, #e05555, transparent);
+  color: white;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-align: center;
+  padding: 0.18rem 0;
+  flex-shrink: 0;
+  animation: combatPulse 2s ease infinite;
+}
+.combatBorderBottom {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #e05555, #c03030, #e05555, transparent);
+  flex-shrink: 0;
+  animation: combatPulse 2s ease infinite;
+}
+@keyframes combatPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
 .window { flex: 1; overflow-y: auto; padding: 1.2rem 1.4rem; display: flex; flex-direction: column; gap: 0.9rem; }
 
 /* Narrator text */
@@ -13,7 +36,11 @@
 
 /* Player action */
 .playerEntry {
-  border-left: 3px solid var(--accent); padding: 0.4rem 0 0.4rem 0.8rem; margin: 0.1rem 0;
+  border-left: 3px solid var(--accent);
+  padding: 0.4rem 0 0.4rem 0.8rem;
+  margin: 0.1rem 0;
+  background: rgba(255,255,255,0.02);
+  border-radius: 0 4px 4px 0;
 }
 .playerHeader { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem; }
 .playerArrow  { font-size: 0.65rem; opacity: 0.8; }
@@ -32,7 +59,40 @@
   padding: 0.5rem 0.8rem;
   display: flex; flex-direction: column; gap: 0.3rem;
   animation: slideIn 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
+.critEvent {
+  background: rgba(255,165,0,0.1);
+  border-color: rgba(255,165,0,0.5);
+  border-left-color: #ffa020;
+  box-shadow: 0 0 12px rgba(255,165,0,0.2);
+}
+.critBanner {
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #ffa020;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.15rem 0;
+  margin-bottom: 0.2rem;
+  animation: critFlash 0.5s ease;
+}
+.fumbleBanner {
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #e05555;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.15rem 0;
+  margin-bottom: 0.2rem;
+}
+@keyframes critFlash { 0%{transform:scale(1.1)} 100%{transform:scale(1)} }
+
 .healEvent {
   background: rgba(109,187,124,0.07);
   border-color: rgba(109,187,124,0.25);
@@ -42,23 +102,25 @@
   background: rgba(196,168,79,0.07);
   border-color: rgba(196,168,79,0.25);
   border-left-color: #c4a84f;
-  flex-direction: row; align-items: center; gap: 0.5rem;
+  flex-direction: row !important; align-items: center; gap: 0.5rem;
 }
 .combatRow  { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .combatIcon { font-size: 0.9rem; flex-shrink: 0; }
 .combatTarget { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--text); letter-spacing: 0.05em; }
 .combatAction { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-muted); }
+.xpReason   { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); font-style: italic; }
 
-/* Dice result badge */
+/* Dice badge */
 .diceResult {
-  font-family: var(--font-mono); font-size: 0.68rem;
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
   background: var(--bg-input); border: 1px solid var(--border);
   border-radius: 4px; padding: 0.1rem 0.45rem;
   color: var(--text-muted); margin-left: auto;
 }
-.nat20 { background: rgba(196,168,79,0.15); border-color: #c4a84f; color: #c4a84f; font-weight: 700; }
+.nat20 { background: rgba(196,168,79,0.15); border-color: #c4a84f; color: #c4a84f; font-weight: 700; animation: nat20Pop 0.4s ease; }
 .nat1  { background: rgba(224,85,85,0.15); border-color: #e05555; color: #e05555; }
 .good  { background: rgba(109,187,124,0.12); border-color: #6dbb7c; color: #6dbb7c; }
+@keyframes nat20Pop { 0%{transform:scale(1.3)} 100%{transform:scale(1)} }
 
 /* HP bar */
 .hpBarRow   { display: flex; align-items: center; gap: 0.5rem; }
@@ -66,7 +128,8 @@
 .hpBarFill  { height: 100%; background: #e05555; border-radius: 3px; transition: width 0.5s ease; }
 .hpBarFillHeal { height: 100%; background: #6dbb7c; border-radius: 3px; transition: width 0.5s ease; }
 .hpLow      { background: #c03030; }
-.hpNumbers  { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; }
+.hpNumbers  { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); white-space: nowrap; }
+.hpNumbers strong { color: var(--text-muted); }
 
 /* Entry + loading */
 .entry  { animation: fadeIn 0.3s ease; }

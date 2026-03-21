@@ -20,32 +20,46 @@ function cleanNarrative(text) {
     .trim();
 }
 
-// ── Inline combat event card ────────────────
+// ── Combat event card ──────────────────────
 function CombatEvent({ event }) {
   if (event.type === 'damage') {
-    const pct = Math.round((event.hpAfter / event.hpMax) * 100);
+    const isCrit = event.crit || event.roll === 20;
+    const isFumble = event.roll === 1;
+    const hpPct = Math.max(0, (event.hpAfter / event.maxHp) * 100);
+
     return (
-      <div className={styles.combatEvent}>
+      <div className={`${styles.combatEvent} ${isCrit ? styles.critEvent : ''}`}>
+        {isCrit && <div className={styles.critBanner}>⚡ CRITICAL HIT!</div>}
+        {isFumble && <div className={styles.fumbleBanner}>💀 FUMBLE!</div>}
         <div className={styles.combatRow}>
           <span className={styles.combatIcon}>💔</span>
           <span className={styles.combatTarget}>{event.target}</span>
           <span className={styles.combatAction}>
-            {event.weapon ? `takes ${event.amount} damage from ${event.weapon}` : `takes ${event.amount} damage`}
+            {event.weapon
+              ? `takes ${event.amount} damage from ${event.weapon}`
+              : `takes ${event.amount} damage`}
           </span>
-          {event.roll && (
-            <span className={`${styles.diceResult} ${event.roll === 20 ? styles.nat20 : event.roll === 1 ? styles.nat1 : event.roll >= 15 ? styles.good : ''}`}>
-              🎲 {event.roll}{event.roll === 20 ? ' NAT 20!' : event.roll === 1 ? ' NAT 1' : ''}
+          {event.roll != null && (
+            <span className={`${styles.diceResult} ${
+              isCrit ? styles.nat20 :
+              isFumble ? styles.nat1 :
+              event.roll >= 15 ? styles.good : ''
+            }`}>
+              🎲 {event.roll}
+              {isCrit ? ' NAT 20!' : isFumble ? ' NAT 1' : ''}
             </span>
           )}
         </div>
         <div className={styles.hpBarRow}>
           <div className={styles.hpBarTrack}>
             <div
-              className={`${styles.hpBarFill} ${event.hpAfter < event.maxHp * 0.3 ? styles.hpLow : ''}`}
-              style={{ width: `${Math.max(0, (event.hpAfter / event.maxHp) * 100)}%` }}
+              className={`${styles.hpBarFill} ${hpPct < 30 ? styles.hpLow : ''}`}
+              style={{ width: `${hpPct}%` }}
             />
           </div>
-          <span className={styles.hpNumbers}>{event.hpBefore} → {event.hpAfter} / {event.maxHp}</span>
+          <span className={styles.hpNumbers}>
+            {event.hpBefore} → <strong>{event.hpAfter}</strong> / {event.maxHp}
+          </span>
         </div>
       </div>
     );
@@ -58,13 +72,17 @@ function CombatEvent({ event }) {
           <span className={styles.combatIcon}>💚</span>
           <span className={styles.combatTarget}>{event.target}</span>
           <span className={styles.combatAction}>heals {event.amount} HP</span>
-          {event.roll && <span className={styles.diceResult}>🎲 {event.roll}</span>}
+          {event.roll != null && (
+            <span className={styles.diceResult}>🎲 {event.roll}</span>
+          )}
         </div>
         <div className={styles.hpBarRow}>
           <div className={styles.hpBarTrack}>
             <div className={styles.hpBarFillHeal} style={{ width: `${(event.hpAfter / event.maxHp) * 100}%` }} />
           </div>
-          <span className={styles.hpNumbers}>{event.hpBefore} → {event.hpAfter} / {event.maxHp}</span>
+          <span className={styles.hpNumbers}>
+            {event.hpBefore} → <strong>{event.hpAfter}</strong> / {event.maxHp}
+          </span>
         </div>
       </div>
     );
@@ -76,6 +94,7 @@ function CombatEvent({ event }) {
         <span className={styles.combatIcon}>⭐</span>
         <span className={styles.combatTarget}>{event.player}</span>
         <span className={styles.combatAction}>gained {event.amount} XP</span>
+        {event.reason && <span className={styles.xpReason}>{event.reason}</span>}
       </div>
     );
   }
@@ -85,11 +104,15 @@ function CombatEvent({ event }) {
 
 export default function StoryWindow() {
   const { state } = useGame();
-  const lastEntryRef = useRef(null);
+  // Ref for the player input entry — scroll here after each turn
+  const lastPlayerEntryRef = useRef(null);
+  const windowRef = useRef(null);
 
+  // After each new message, scroll to the player's input (not the AI response)
+  // so the user sees what they did first, then reads down
   useEffect(() => {
-    if (lastEntryRef.current) {
-      lastEntryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (lastPlayerEntryRef.current) {
+      lastPlayerEntryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [state.messages?.length]);
 
@@ -111,7 +134,6 @@ export default function StoryWindow() {
     const narrative = cleanNarrative(parseAllTags(firstAssistant.content).narrative);
     if (narrative) {
       timeline.push({ type: 'narrator', text: narrative, turn: 0 });
-      // Combat events for turn 0
       if (combatByTurn[0]?.length) {
         timeline.push({ type: 'combat', events: combatByTurn[0], turn: 0 });
       }
@@ -126,14 +148,13 @@ export default function StoryWindow() {
     if (msg.role === 'user') {
       const clean = msg.content.replace(/^\[.+?'s turn\]:\s*/, '').trim();
       const pIdx = playerTurnCount % (state.playerCount || 1);
-      timeline.push({ type: 'player', text: clean, playerIdx: pIdx });
+      timeline.push({ type: 'player', text: clean, playerIdx: pIdx, isLatest: false });
       playerTurnCount++;
     } else if (msg.role === 'assistant' && msg !== firstAssistant) {
       const narrative = cleanNarrative(parseAllTags(msg.content).narrative);
       if (narrative) {
         const turn = assistantCount;
         timeline.push({ type: 'narrator', text: narrative, turn });
-        // Attach combat events for this turn
         if (combatByTurn[turn]?.length) {
           timeline.push({ type: 'combat', events: combatByTurn[turn], turn });
         }
@@ -142,8 +163,12 @@ export default function StoryWindow() {
     }
   });
 
+  // Mark the last player entry for scrolling
+  let lastPlayerIdx = -1;
+  timeline.forEach((item, i) => { if (item.type === 'player') lastPlayerIdx = i; });
+
   return (
-    <div className={styles.outer}>
+    <div className={`${styles.outer} ${state.inCombat ? styles.combatMode : ''}`}>
       <SceneRenderer
         scene={state.lastScene}
         players={state.players}
@@ -153,7 +178,14 @@ export default function StoryWindow() {
         turnCount={state.turnCount || 0}
       />
 
-      <div className={styles.window}>
+      {/* Combat border indicator */}
+      {state.inCombat && (
+        <div className={styles.combatBorderTop}>
+          ⚔ COMBAT ⚔
+        </div>
+      )}
+
+      <div className={styles.window} ref={windowRef}>
         {state.isLoading && (
           <div className={styles.loading}>
             <div className={styles.loadingDot} />
@@ -163,12 +195,16 @@ export default function StoryWindow() {
         )}
 
         {timeline.map((item, i) => {
-          const isLast = i === timeline.length - 1;
+          const isLastPlayer = i === lastPlayerIdx;
           const playerColor = PLAYER_COLORS[item.playerIdx || 0];
           const playerName = state.players?.[item.playerIdx || 0]?.name || 'Player';
 
           return (
-            <div key={i} className={styles.entry} ref={isLast ? lastEntryRef : null}>
+            <div
+              key={i}
+              className={styles.entry}
+              ref={isLastPlayer ? lastPlayerEntryRef : null}
+            >
               {item.type === 'player' && (
                 <div className={styles.playerEntry} style={{ borderLeftColor: playerColor }}>
                   <div className={styles.playerHeader} style={{ color: playerColor }}>
@@ -192,6 +228,9 @@ export default function StoryWindow() {
           );
         })}
       </div>
+
+      {/* Bottom combat border */}
+      {state.inCombat && <div className={styles.combatBorderBottom} />}
     </div>
   );
 }

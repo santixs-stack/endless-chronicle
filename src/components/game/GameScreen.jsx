@@ -162,6 +162,7 @@ export default function GameScreen() {
             maxHp: p.maxHp,
             weapon: delta.weapon || null,
             roll: delta.roll || null,
+            crit: delta.crit || delta.roll === 20 || false,
           });
           if (delta.delta < 0) showNotif(`💔 ${p.name} took ${Math.abs(delta.delta)} damage`, 'error');
           if (delta.delta > 0) showNotif(`💚 ${p.name} healed ${delta.delta} HP`, 'success');

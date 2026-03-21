@@ -334,8 +334,9 @@ export function setMusicVol(v) {
   }
 }
 
-// Called on each scene update — uses all three signals
+// Called on each scene update — only switches if music is already playing
 export function autoTrackFromScene(sceneType, timeOfDay, mood) {
+  if (!active) return; // music is off — don't auto-start
   if (active === 'battle') return; // don't interrupt combat
   const suggested = selectTrack(sceneType, timeOfDay, mood);
   if (suggested !== active) playTrack(suggested);

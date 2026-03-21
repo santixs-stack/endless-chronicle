@@ -57,7 +57,16 @@ export function parseAllTags(raw) {
 
   // Scene
   const sceneM = text.match(/\[SCENE:\s*(\{[^}]+\})\]/);
-  if (sceneM) { try { result.scene = JSON.parse(sceneM[1]); } catch {} }
+  if (sceneM) { try { result.scene = JSON.parse(sceneM[1]); } catch {
+    // Try extracting fields manually if JSON malformed
+    try {
+      const type    = sceneM[1].match(/"type"\s*:\s*"([^"]+)"/)?.[1];
+      const time    = sceneM[1].match(/"time"\s*:\s*"([^"]+)"/)?.[1];
+      const weather = sceneM[1].match(/"weather"\s*:\s*"([^"]+)"/)?.[1];
+      const mood    = sceneM[1].match(/"mood"\s*:\s*"([^"]+)"/)?.[1];
+      if (type) result.scene = { type, time: time||'day', weather: weather||'clear', mood: mood||'exciting' };
+    } catch {}
+  }}
   text = text.replace(/\[SCENE:[^\]]+\]/g, '').trim();
 
   // Actions
@@ -71,9 +80,16 @@ export function parseAllTags(raw) {
   text = text.replace(/\[STATS:[^\]]+\]/g, '').trim();
 
   // HP Deltas
-  // HP Deltas — [HPDELTA:{"target":"name","delta":-8,"weapon":"sword","roll":14}]
+  // HP Deltas — [HPDELTA:{"target":"name","delta":-8,"weapon":"sword","roll":14,"crit":false}]
   const hpMatches = [...text.matchAll(/\[HPDELTA:(\{[^}]+\})\]/g)];
-  hpMatches.forEach(m => { try { result.hpDeltas.push(JSON.parse(m[1])); } catch {} });
+  hpMatches.forEach(m => {
+    try {
+      const delta = JSON.parse(m[1]);
+      // roll=20 always means crit even if not flagged
+      if (delta.roll === 20) delta.crit = true;
+      result.hpDeltas.push(delta);
+    } catch {}
+  });
   text = text.replace(/\[HPDELTA:[^\]]+\]/g, '').trim();
 
   // XP Awards

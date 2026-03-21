@@ -16,7 +16,11 @@ export default function MusicPlayer() {
   }, []);
 
   function handleTrack(id) {
-    if (id === 'off') { stopMusic(); setActive(null); return; }
+    if (id === 'off') {
+      stopMusic();
+      setActive(null);
+      return;
+    }
     playTrack(id);
     setActive(id);
   }
