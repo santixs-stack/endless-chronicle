@@ -29,9 +29,10 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  justify-content: flex-start;
+  padding: 2rem 2rem 3rem;
   overflow-y: auto;
+  scroll-behavior: smooth;
   animation: screenFadeIn 0.3s ease;
 }
 
