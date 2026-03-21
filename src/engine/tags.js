@@ -47,10 +47,12 @@ export function parseAllTags(raw) {
     } catch {}
   }}
   text = text.replace(/\[IMAGE:\{[\s\S]*?\}\]/g, '').trim();
+
+  // Clarify — GM asking for more info before continuing
+  const clarifyM = text.match(/\[CLARIFY:([^\]]+)\]/);
   if (clarifyM) {
     result.clarify = clarifyM[1].trim();
-    result.narrative = '';
-    return result;
+    text = text.replace(/\[CLARIFY:[^\]]+\]/g, '').trim();
   }
 
   // Scene
