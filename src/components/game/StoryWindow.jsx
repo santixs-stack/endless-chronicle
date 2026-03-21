@@ -172,9 +172,6 @@ export default function StoryWindow() {
       <SceneRenderer
         scene={state.lastScene}
         players={state.players}
-        npcs={state.npcs}
-        inCombat={state.inCombat}
-        combatants={state.combatants}
         turnCount={state.turnCount || 0}
       />
 

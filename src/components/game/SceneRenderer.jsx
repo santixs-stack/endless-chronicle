@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import styles from './SceneRenderer.module.css';
-import { buildScenePopulation, renderPopulation, renderParticles, renderStatusAuras, renderNpcLabels } from './scenePopulation.js';
 import { W as ART_W, H as ART_H } from './artStyle.js';
 
 // ═══════════════════════════════════════════
@@ -62,7 +61,7 @@ function getCharSvg(cls, x, y, color) {
   return fn(x, y, color);
 }
 
-export default function SceneRenderer({ scene, players, npcs, inCombat, combatants, turnCount = 0 }) {
+export default function SceneRenderer({ scene, players, turnCount = 0 }) {
   const type  = scene?.type  || 'plains';
   const time  = scene?.time  || 'night';
   const weather = scene?.weather || 'clear';
@@ -337,16 +336,6 @@ export default function SceneRenderer({ scene, players, npcs, inCombat, combatan
     return null;
   }, [weather, type, turnCount]);
 
-  // ── Creature population ───────────────────
-  const population = useMemo(() => buildScenePopulation(
-    npcs, inCombat, combatants, type, turnCount, terrain.pts
-  ), [npcs, inCombat, combatants, type, turnCount]);
-
-  const creatureRender = useMemo(() => renderPopulation(population), [population]);
-  const particleRender = useMemo(() => renderParticles(population, turnCount), [population, turnCount]);
-  const auraRender     = useMemo(() => renderStatusAuras(population, uid), [population, uid]);
-  const labelRender    = useMemo(() => renderNpcLabels(population), [population]);
-
   const fogOp = weather==='fog' ? 0.7 : weather==='storm' ? 0.4 : parseFloat(pal.fog) * 0.6;
   const uid = `s${turnCount}${type.slice(0,2)}`;
 
@@ -383,8 +372,6 @@ export default function SceneRenderer({ scene, players, npcs, inCombat, combatan
           <filter id={`sglow${uid}`}><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           <filter id={`softblur${uid}`}><feGaussianBlur stdDeviation="2"/></filter>
         </defs>
-        {/* Creature gradient defs */}
-        <defs dangerouslySetInnerHTML={{__html: creatureRender.defs}}/>
 
         {/* ── Sky ── */}
         <rect width={W} height={H} fill={`url(#sky${uid})`}/>
@@ -653,28 +640,10 @@ export default function SceneRenderer({ scene, players, npcs, inCombat, combatan
           return null;
         })}
 
-        {/* ── Far depth creatures ── */}
-        <g dangerouslySetInnerHTML={{__html: creatureRender.far}}/>
-
         {/* ── Character silhouettes ── */}
         {charPositions.map((cp,i) => (
           <g key={i} dangerouslySetInnerHTML={{__html: getCharSvg(cp.cls, cp.x, cp.y, cp.color)}}/>
         ))}
-
-        {/* ── Mid depth creatures ── */}
-        <g dangerouslySetInnerHTML={{__html: creatureRender.mid}}/>
-
-        {/* ── Status auras under feet ── */}
-        <g dangerouslySetInnerHTML={{__html: auraRender}}/>
-
-        {/* ── Near depth creatures (in front of party) ── */}
-        <g dangerouslySetInnerHTML={{__html: creatureRender.near}}/>
-
-        {/* ── Creature particles ── */}
-        <g dangerouslySetInnerHTML={{__html: particleRender}}/>
-
-        {/* ── NPC name labels ── */}
-        <g dangerouslySetInnerHTML={{__html: labelRender}}/>
 
         {/* ── Weather ── */}
         {weatherParticles?.type==='rain' && weatherParticles.drops.map((d,i)=>(
