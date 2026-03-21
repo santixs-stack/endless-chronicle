@@ -5,23 +5,22 @@ import { AppErrorBoundary, GameErrorBoundary } from './components/ui/ErrorBounda
 import OfflineBanner from './components/ui/OfflineBanner.jsx';
 import Notification from './components/ui/Notification.jsx';
 
-import TitleScreen     from './components/screens/TitleScreen.jsx';
-import PlayersScreen   from './components/screens/PlayersScreen.jsx';
-import PresetsScreen   from './components/screens/PresetsScreen.jsx';
-import CharacterScreen from './components/screens/CharacterScreen.jsx';
-import QuestScreen     from './components/screens/QuestScreen.jsx';
-import WorldScreen     from './components/screens/WorldScreen.jsx';
-import GameScreen      from './components/game/GameScreen.jsx';
-import LoadScreen      from './components/screens/LoadScreen.jsx';
-import CelebrateScreen from './components/screens/CelebrateScreen.jsx';
+import TitleScreen            from './components/screens/TitleScreen.jsx';
+import PlayersScreen          from './components/screens/PlayersScreen.jsx';
+import CharacterCreateScreen  from './components/screens/CharacterCreateScreen.jsx';
+import WorldScreen            from './components/screens/WorldScreen.jsx';
+import QuestGenerateScreen    from './components/screens/QuestGenerateScreen.jsx';
+import GameScreen             from './components/game/GameScreen.jsx';
+import LoadScreen             from './components/screens/LoadScreen.jsx';
+import CelebrateScreen        from './components/screens/CelebrateScreen.jsx';
 
+// New flow: title → players → character → world → quest → game
 const SCREENS = {
   title:     TitleScreen,
   players:   PlayersScreen,
-  presets:   PresetsScreen,
-  character: CharacterScreen,
-  quest:     QuestScreen,
+  character: CharacterCreateScreen,
   world:     WorldScreen,
+  quest:     QuestGenerateScreen,
   game:      GameScreen,
   load:      LoadScreen,
   celebrate: CelebrateScreen,

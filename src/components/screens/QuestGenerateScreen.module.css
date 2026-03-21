@@ -1,0 +1,75 @@
+.header { margin-bottom: 0.8rem; }
+
+.partyBanner {
+  display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+  margin-bottom: 1rem; padding: 0.5rem 0;
+}
+.partyChip { display: flex; align-items: center; gap: 0.3rem; background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: 20px; padding: 0.2rem 0.6rem; }
+.partyIcon { font-size: 0.85rem; }
+.partyName { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); font-weight: 600; }
+.partyWorld { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); }
+
+/* Loading */
+.loadingSection { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; padding: 2rem 0; flex: 1; }
+.loadingSpinnerWrap { position: relative; width: 56px; height: 56px; }
+.loadingSpinner { position: absolute; inset: 0; border: 2px solid rgba(196,168,79,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+.loadingSpinnerInner { position: absolute; inset: 9px; border: 1.5px solid rgba(196,168,79,0.08); border-bottom-color: var(--accent); border-radius: 50%; animation: spin 0.65s linear infinite reverse; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loadingTitle { font-family: var(--font-title); font-size: 1.1rem; color: var(--accent); letter-spacing: 0.1em; }
+.loadingLine { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; animation: pulse 2s ease infinite; min-height: 1.2em; text-align: center; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.loadingParty { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+.loadingCharCard { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; min-width: 80px; }
+.loadingCharIcon { font-size: 1.5rem; }
+.loadingCharName { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; color: var(--accent); }
+.loadingCharClass { font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-dim); }
+
+/* Quest grid */
+.questTitle { font-family: var(--font-title); font-size: 0.9rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.8rem; }
+.questGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; margin-bottom: 1rem; }
+@media (max-width: 600px) { .questGrid { grid-template-columns: 1fr; } }
+
+.questCard {
+  background: var(--bg-card); border: 1px solid var(--border-accent);
+  border-radius: 9px; padding: 1rem 1.1rem;
+  cursor: pointer; transition: var(--transition);
+  text-align: left; display: flex; flex-direction: column; gap: 0.4rem;
+}
+.questCard:hover { border-color: var(--accent); background: var(--mode-glow); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+
+.questCardHeader { display: flex; align-items: center; justify-content: space-between; }
+.questIcon { font-size: 1.4rem; }
+.questTone { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase; }
+.questName { font-family: var(--font-title); font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: 0.06em; }
+.questTagline { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+.questStart { font-family: var(--font-body); font-size: 0.78rem; color: var(--text-dim); font-style: italic; line-height: 1.5; border-left: 2px solid var(--border-accent); padding-left: 0.6rem; margin-top: 0.2rem; }
+
+/* Alt options */
+.altOptions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+.altBtn { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.35rem 0.7rem; color: var(--text-dim); cursor: pointer; transition: var(--transition); }
+.altBtn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Custom input */
+.customSection { display: flex; gap: 0.8rem; align-items: flex-end; margin-bottom: 1rem; }
+.customInput { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; font-family: var(--font-body); font-size: 0.9rem; color: var(--text); resize: none; }
+.customInput:focus { outline: none; border-color: var(--accent); }
+
+/* Presets */
+.presetSection { border-top: 1px solid var(--border); padding-top: 1rem; }
+.presetTitle { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.7rem; }
+.presetGrid { display: flex; flex-direction: column; gap: 0.4rem; }
+.presetCard { display: flex; align-items: flex-start; gap: 0.7rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 0.55rem 0.8rem; cursor: pointer; text-align: left; transition: var(--transition); }
+.presetCard:hover { border-color: var(--border-accent); }
+.presetIcon { font-size: 1.1rem; flex-shrink: 0; }
+.presetInfo { min-width: 0; }
+.presetName { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }
+.presetTagline { font-family: var(--font-body); font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; }
+
+/* Error */
+.errorSection { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 2rem; text-align: center; }
+.errorMsg { font-family: var(--font-body); font-size: 0.88rem; color: var(--text-muted); }
+.errorActions { display: flex; gap: 0.8rem; }
+
+.footer { padding-top: 0.5rem; }

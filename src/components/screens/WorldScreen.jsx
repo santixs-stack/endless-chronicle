@@ -39,7 +39,7 @@ export default function WorldScreen() {
       tone:     tone || goal?.tone || '',
       extra,
     };
-    set({ world: worldData, location: worldData.location, screen: 'presets' });
+    set({ world: worldData, location: worldData.location, screen: 'quest' });
   }
 
   const showBanner = goal && goal.id !== 'custom' && !presetWorld;
@@ -91,8 +91,8 @@ export default function WorldScreen() {
       </div>
 
       <div className={styles.actions}>
-        <button className="btn-ghost" onClick={() => set({ screen: 'quest' })}>← Back to Quest</button>
-        <button className="btn-primary" onClick={start}>Create Your Characters →</button>
+        <button className="btn-ghost" onClick={() => set({ screen: 'character', setupIdx: (state.playerCount || 1) - 1 })}>← Back to Characters</button>
+        <button className="btn-primary" onClick={start}>Find Your Quest →</button>
       </div>
     </div>
   );

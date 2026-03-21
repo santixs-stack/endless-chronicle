@@ -15,7 +15,7 @@ export default function PlayersScreen() {
   const [count, setCount] = useState(state.playerCount || null);
 
   function confirm() {
-    set({ playerCount: count, setupIdx: 0, players: [], screen: 'quest' });
+    set({ playerCount: count, setupIdx: 0, players: [], screen: 'character' });
   }
 
   return (
