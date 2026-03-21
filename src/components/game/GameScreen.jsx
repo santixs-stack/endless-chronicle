@@ -25,7 +25,7 @@ import styles from './GameScreen.module.css';
 const XP_LEVELS = [0, 100, 250, 450, 700, 1000];
 
 export default function GameScreen() {
-  const { state, set, addJournal, addNpc, addCodex, updateGold, setPlayer } = useGame();
+  const { state, set, addJournal, addNpc, addCodex, updateGold, addCombatEvent, setPlayer } = useGame();
   const { saveToSlot } = useSaveSlots();
   const hasOpened = useRef(false);
   const lastAutoSave = useRef(0);
@@ -140,14 +140,29 @@ export default function GameScreen() {
 
       // XP and level ups
       processXP(parsed.xpAwards);
+      parsed.xpAwards.forEach(award => {
+        addCombatEvent({ turn: newTurn, type: 'xp', player: award.player, amount: award.amount });
+      });
 
-      // HP deltas
+      // HP deltas — inline combat events + update HP
       parsed.hpDeltas.forEach(delta => {
         const pi = state.players.findIndex(p => p.name.toLowerCase() === delta.target?.toLowerCase());
         if (pi >= 0) {
           const p = state.players[pi];
           const newHp = Math.max(0, Math.min(p.maxHp, p.hp + (delta.delta || 0)));
           setPlayer(pi, { hp: newHp });
+          // Log inline combat event
+          addCombatEvent({
+            turn: newTurn,
+            type: delta.delta < 0 ? 'damage' : 'heal',
+            target: p.name,
+            amount: Math.abs(delta.delta || 0),
+            hpBefore: p.hp,
+            hpAfter: newHp,
+            maxHp: p.maxHp,
+            weapon: delta.weapon || null,
+            roll: delta.roll || null,
+          });
           if (delta.delta < 0) showNotif(`💔 ${p.name} took ${Math.abs(delta.delta)} damage`, 'error');
           if (delta.delta > 0) showNotif(`💚 ${p.name} healed ${delta.delta} HP`, 'success');
         }

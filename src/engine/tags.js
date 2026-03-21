@@ -7,6 +7,7 @@
 export function parseAllTags(raw) {
   const result = {
     narrative:  raw,
+    image:      null,
     scene:      null,
     actions:    [],
     xpAwards:   [],
@@ -34,8 +35,18 @@ export function parseAllTags(raw) {
 
   let text = raw;
 
-  // Clarify — if present, return early (no narrative processed)
-  const clarifyM = text.match(/\[CLARIFY:\s*(.+?)\]/);
+  // Image scene data
+  const imageM = text.match(/\[IMAGE:(\{[\s\S]*?\})\]/);
+  if (imageM) { try { result.image = JSON.parse(imageM[1]); } catch(e) {
+    // Try to extract partial data if JSON is malformed
+    try {
+      const setting = imageM[1].match(/"setting"\s*:\s*"([^"]+)"/)?.[1];
+      const time    = imageM[1].match(/"time"\s*:\s*"([^"]+)"/)?.[1];
+      const mood    = imageM[1].match(/"mood"\s*:\s*"([^"]+)"/)?.[1];
+      if (setting) result.image = { setting, time: time||'day', mood: mood||'exciting' };
+    } catch {}
+  }}
+  text = text.replace(/\[IMAGE:\{[\s\S]*?\}\]/g, '').trim();
   if (clarifyM) {
     result.clarify = clarifyM[1].trim();
     result.narrative = '';
@@ -58,6 +69,7 @@ export function parseAllTags(raw) {
   text = text.replace(/\[STATS:[^\]]+\]/g, '').trim();
 
   // HP Deltas
+  // HP Deltas — [HPDELTA:{"target":"name","delta":-8,"weapon":"sword","roll":14}]
   const hpMatches = [...text.matchAll(/\[HPDELTA:(\{[^}]+\})\]/g)];
   hpMatches.forEach(m => { try { result.hpDeltas.push(JSON.parse(m[1])); } catch {} });
   text = text.replace(/\[HPDELTA:[^\]]+\]/g, '').trim();
@@ -140,7 +152,9 @@ export function parseAllTags(raw) {
   creatureMatches.forEach(m => { try { result.creatures.push(JSON.parse(m[1])); } catch {} });
   text = text.replace(/\[CREATURE:[^\]]+\]/g, '').trim();
 
+  // Strip any leftover tag fragments (stray ] [ characters)
   text = text.replace(/\s*\]\s*$/g, '').replace(/^\s*\[\s*/g, '').trim();
-result.narrative = text;
+
+  result.narrative = text;
   return result;
 }

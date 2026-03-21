@@ -72,6 +72,14 @@ PARTY (${playerCount} player${playerCount > 1 ? 's' : ''}):\n${partyDesc}
 ${turnInfo}
 
 TAGS — append after EVERY narrative response:
+[IMAGE:{"setting":"TYPE","time":"TIME","mood":"MOOD","weather":"WEATHER","fg":"foreground description","mg":"midground description","bg":"background description","details":["detail1","detail2"],"partySize":N,"inCombat":false,"enemy":"enemy name or null","label":"short scene label"}]
+  setting: forest|plains|village|dungeon|cave|desert|city|ruins|castle|mountain|ocean|space|snow|ship|tavern|road|swamp
+  time: day|night|dawn|dusk|cave|storm|space
+  mood: tense|peaceful|mysterious|exciting|dark|wondrous|funny|scary
+  weather: clear|rain|snow|fog|storm
+  details: array of specific visual elements present (e.g. "fire","treasure","door","water","bones","torch","stairs")
+  fg/mg/bg: brief descriptions of what's in each visual layer
+  Fill this accurately based on what's actually happening in the scene — every response gets a unique scene image.
 [SCENE:{"type":"TYPE","time":"TIME","weather":"WEATHER"}]
   type: forest|plains|village|dungeon|cave|desert|city|ruins|castle|mountain|ocean|swamp|space|snow
   time: day|night|dawn|dusk|storm|cave   weather: clear|rain|snow|fog|storm
@@ -89,7 +97,8 @@ When something important is discovered: [CODEX:{"title":"","category":"person|pl
 When gold changes: [GOLD:{"type":"gold","amount":N,"reason":""}]
 If input is too vague: [CLARIFY: one specific question under 20 words]
 Adventure mode HP: [STATS:{"health":N}]
-When HP changes per character: [HPDELTA:{"target":"Name","delta":-10,"type":"damage|heal"}]
+When HP changes per character: [HPDELTA:{"target":"Name","delta":-10,"weapon":"sword","roll":14,"type":"damage|heal"}]
+Include weapon (e.g. "sword", "fireball", "claws") and roll (dice result 1-20) whenever possible. Negative delta = damage, positive = healing.
 
 STORYTELLING RULES — CRITICAL:
 - LENGTH: Keep responses SHORT. Easy: 2–3 sentences MAX. Medium: 3–5 sentences. Hard/Advanced: 2 short paragraphs.

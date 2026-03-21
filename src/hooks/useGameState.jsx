@@ -29,6 +29,7 @@ const INITIAL_STATE = {
 
   // Sidebar data
   sharedInventory:  [],
+  combatLog:        [],
   npcs:             [],
   journal:          [],
   reputation:       [],
@@ -86,6 +87,8 @@ function gameReducer(state, action) {
         goldHistory: [...(state.goldHistory || []), { ...action }],
       };
     }
+    case 'ADD_COMBAT_EVENT':
+      return { ...state, combatLog: [...(state.combatLog || []), action.event] };
     case 'RESET':
       return {
         ...INITIAL_STATE,
@@ -109,6 +112,7 @@ export function GameProvider({ children }) {
   const addJournal = useCallback((entry) => dispatch({ type: 'ADD_JOURNAL', entry }), []);
   const addNpc = useCallback((npc) => dispatch({ type: 'ADD_NPC', npc }), []);
   const addCodex = useCallback((entry) => dispatch({ type: 'ADD_CODEX', entry }), []);
+  const addCombatEvent = useCallback((event) => dispatch({ type: 'ADD_COMBAT_EVENT', event }), []);
   const updateGold = useCallback((amount, reason) => dispatch({ type: 'UPDATE_GOLD', amount, reason }), []);
 
   const initGame = useCallback(() => {
@@ -118,7 +122,7 @@ export function GameProvider({ children }) {
   return (
     <GameContext.Provider value={{
       state, set, reset, setPlayer, pushMessage,
-      addJournal, addNpc, addCodex, updateGold, initGame,
+      addJournal, addNpc, addCodex, updateGold, addCombatEvent, initGame,
     }}>
       {children}
     </GameContext.Provider>
