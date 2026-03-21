@@ -38,7 +38,9 @@ export function buildSystemPrompt(state) {
   const nextIdx = (currentPlayerIdx + 1) % playerCount;
   const nextP = players[nextIdx];
   const turnInfo = playerCount > 1
-    ? `ACTING NOW: ${curP.name} (Player ${currentPlayerIdx + 1}) — write this turn from their perspective.\nNEXT TO ACT: ${nextP.name} (Player ${nextIdx + 1}) — end your response inviting them to act by name.`
+    ? `ACTING NOW: ${curP.name} (${curP.className}) — describe what happens to ${curP.name} specifically. Use their name, not "you".
+NEXT TO ACT: ${nextP.name} (${nextP.className}) — end your response by asking ${nextP.name} what they do.
+RULE: In multiplayer ALWAYS use character names. Never "you" or "your". Every action and consequence must name the character it happens to.`
     : `CURRENT PLAYER: ${curP.name}`;
 
   // Quest + world
@@ -101,11 +103,14 @@ When HP changes per character: [HPDELTA:{"target":"Name","delta":-10,"weapon":"s
 Include weapon (e.g. "sword", "fireball", "claws") and roll (dice result 1-20) whenever possible. Negative delta = damage, positive = healing.
 
 STORYTELLING RULES — CRITICAL:
-- LENGTH: Keep responses SHORT. Easy: 2–3 sentences MAX. Medium: 3–5 sentences. Hard/Advanced: 2 short paragraphs.
-- Write in second person. Vivid and immediate.
-- CONTEXT CUE: At the start of each response (not the first), add one bold sentence: **You're in [place]. [Brief recap].** 
-- End every response with a clear cliffhanger or open moment. Make the player desperate to act.
-- When multiple players: end by directly addressing the NEXT player by name.
-- Bold the single most exciting moment. Short punchy sentences. Strong verbs.
+- LENGTH: Keep responses SHORT. Easy: 4–6 sentences. Medium: 3–5 sentences. Hard/Advanced: 2 short paragraphs.
+${playerCount > 1
+  ? `- MULTIPLAYER VOICE: Always use player NAMES, never "you" or "your". Say "${curP.name} leaps down the stairs" not "you leap down the stairs". Every character must be referred to by name so players know who did what.
+- CONTEXT CUE: At the start of each response (not the first), add one bold sentence: **${curP.name} is in [place]. [Brief recap of what just happened].**
+- End every response with a cliffhanger, then directly ask ${nextP.name} what they do next by name.`
+  : `- Write in second person — vivid and immediate. Say "you" and "your".
+- CONTEXT CUE: At the start of each response (not the first), add one bold sentence: **You're in [place]. [Brief recap].**
+- End every response with a clear cliffhanger or open moment. Make the player desperate to act.`}
+- Bold the single most exciting moment per response. Short punchy sentences. Strong verbs.
 - NEVER say "I" — you are the world, not a person.${arcBlock}`;
 }
