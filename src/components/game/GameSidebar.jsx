@@ -2,9 +2,10 @@ import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import { showNotif } from '../ui/Notification.jsx';
+import { SFX } from './SoundEngine.js';
 import styles from './GameSidebar.module.css';
 
-export default function GameSidebar({ open, onClose, onSave, onSettings, onJournal, onExport, onRecap, onCloud }) {
+export default function GameSidebar({ open, onClose, onSave, onSettings, onJournal, onExport, onRecap, onCloud, onSearch, onCharSheet }) {
   const { state, set, reset } = useGame();
   const { saveToSlot, getAllSlots } = useSaveSlots();
   const curPlayerIdx = state.currentPlayerIdx || 0;
@@ -15,7 +16,9 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
     const slots = getAllSlots();
     const emptyIdx = slots.findIndex(s => !s);
     const idx = emptyIdx >= 0 ? emptyIdx : 0;
-    showNotif(saveToSlot(idx, state) ? `Saved to Slot ${idx + 1}` : 'Save failed', saveToSlot(idx, state) ? 'success' : 'error');
+    const ok = saveToSlot(idx, state);
+    showNotif(ok ? `Saved to Slot ${idx + 1}` : 'Save failed', ok ? 'success' : 'error');
+    if (ok) SFX.save();
   }
 
   function confirmNew() {
@@ -114,7 +117,9 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
           </span>
           <button className={styles.iconBtn} onClick={onSave}>💾 Save</button>
           <button className={styles.iconBtn} onClick={onCloud}>☁ Cloud Saves</button>
+          <button className={styles.iconBtn} onClick={onCharSheet}>🧙 Character Sheet</button>
           <button className={styles.iconBtn} onClick={onJournal}>📖 Journal</button>
+          <button className={styles.iconBtn} onClick={onSearch}>🔍 Search Story</button>
           <button className={styles.iconBtn} onClick={onRecap}>📺 Session Recap</button>
           <button className={styles.iconBtn} onClick={onExport}>📄 Export</button>
           <button className={styles.iconBtn} onClick={onSettings}>⚙ Settings</button>

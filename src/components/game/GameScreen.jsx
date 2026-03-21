@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
-import { callAPI } from '../../engine/api.js';
+import { callAPI, trimMessagesForContext, getContextStatus } from '../../engine/api.js';
 import { classifyError, withRetry } from '../../lib/recovery.jsx';
 import { buildSystemPrompt } from '../../engine/systemPrompt.js';
 import { parseAllTags } from '../../engine/tags.js';
 import { pickHiddenArc } from '../../data/hiddenArcs.js';
 import { autoTrackFromScene, startCombatMusic, endCombatMusic } from './MusicEngine.js';
+import { SFX, initAudio } from './SoundEngine.js';
 import { showNotif } from '../ui/Notification.jsx';
 import GameSidebar from './GameSidebar.jsx';
 import StoryWindow from './StoryWindow.jsx';
@@ -20,6 +21,8 @@ import JournalOverlay from '../overlays/JournalOverlay.jsx';
 import ExportOverlay from '../overlays/ExportOverlay.jsx';
 import SessionRecap from '../overlays/SessionRecap.jsx';
 import AuthOverlay from '../overlays/AuthOverlay.jsx';
+import SearchOverlay from '../overlays/SearchOverlay.jsx';
+import CharacterSheetOverlay from '../overlays/CharacterSheetOverlay.jsx';
 import styles from './GameScreen.module.css';
 
 // XP thresholds for level up
@@ -37,6 +40,8 @@ export default function GameScreen() {
   const [showExport,   setShowExport]   = useState(false);
   const [showRecap,    setShowRecap]    = useState(false);
   const [showCloud,    setShowCloud]    = useState(false);
+  const [showSearch,   setShowSearch]   = useState(false);
+  const [showCharSheet,setShowCharSheet]= useState(false);
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
   const [apiError,     setApiError]     = useState(null); // {title, message, retryable}
 
@@ -100,6 +105,7 @@ export default function GameScreen() {
         setPlayer(target, { xp: newXP, level: actualLevel });
         showNotif(`⬆ ${player.name} reached Level ${actualLevel}!`, 'success');
         addJournal(`${player.name} leveled up to Level ${actualLevel}!`);
+        SFX.levelUp();
       } else {
         setPlayer(target, { xp: newXP });
       }
@@ -108,6 +114,7 @@ export default function GameScreen() {
 
   // ── Main action handler ──
   async function handleAction(actionText) {
+    initAudio(); // wake up audio context on first interaction
     if (state.isLoading || !actionText.trim()) return;
     const actingPlayer = state.players[state.currentPlayerIdx];
     const tagged = state.playerCount > 1 ? `[${actingPlayer.name}'s turn]: ${actionText}` : actionText;
@@ -115,12 +122,26 @@ export default function GameScreen() {
     set({ messages: newMessages, isLoading: true, currentActions: [] });
 
     try {
-      const text = await callAPI(newMessages, buildSystemPrompt(state));
+      const sysPrompt = buildSystemPrompt(state);
+
+      // Trim context if approaching limit
+      const { messages: trimmedMsgs, trimmed, droppedTurns } = trimMessagesForContext(newMessages, sysPrompt);
+      if (trimmed) {
+        showNotif(`📜 Story compressed — ${droppedTurns} early turns summarized to save space`, 'info');
+      }
+
+      // Warn if still getting long
+      const ctxStatus = getContextStatus(trimmedMsgs, sysPrompt);
+      if (ctxStatus === 'warning') {
+        showNotif('📜 This adventure is getting very long — consider starting a new chapter', 'info');
+      }
+
+      const text = await withRetry(() => callAPI(trimmedMsgs, sysPrompt), 2);
       const parsed = parseAllTags(text);
       const newTurn = (state.turnCount || 0) + 1;
 
       const updates = {
-        messages: [...newMessages, { role: 'assistant', content: text }],
+        messages: [...trimmedMsgs, { role: 'assistant', content: text }],
         isLoading: false,
         turnCount: newTurn,
         currentActions: parsed.actions || [],
@@ -130,8 +151,8 @@ export default function GameScreen() {
       if (parsed.location)        updates.location    = parsed.location;
       if (parsed.milestone != null) updates.milestones = parsed.milestone;
       if (parsed.stats?.health != null) updates.stats = { ...state.stats, health: parsed.stats.health };
-      if (parsed.combat)          { updates.inCombat  = true;  startCombatMusic(); }
-      if (parsed.combatEnd)       { updates.inCombat  = false; updates.combatants = []; endCombatMusic(parsed.scene?.type || state.lastScene?.type, parsed.scene?.time || state.lastScene?.time, parsed.scene?.mood || state.lastScene?.mood); }
+      if (parsed.combat)    { updates.inCombat  = true;  startCombatMusic(); SFX.combatStart(); }
+      if (parsed.combatEnd) { updates.inCombat  = false; updates.combatants = []; endCombatMusic(parsed.scene?.type || state.lastScene?.type, parsed.scene?.time || state.lastScene?.time, parsed.scene?.mood || state.lastScene?.mood); SFX.combatEnd(); }
 
       set(updates);
 
@@ -142,7 +163,7 @@ export default function GameScreen() {
       if (state.playerCount > 1) set({ currentPlayerIdx: (state.currentPlayerIdx + 1) % state.playerCount });
 
       // Side effects
-      if (parsed.journal) addJournal(parsed.journal);
+      if (parsed.journal) { addJournal(parsed.journal); SFX.journal(); }
       parsed.npcs.forEach(npc => addNpc(npc));
       parsed.codex.forEach(entry => addCodex(entry));
       if (parsed.gold) updateGold(parsed.gold.amount, parsed.gold.reason);
@@ -151,6 +172,7 @@ export default function GameScreen() {
       processXP(parsed.xpAwards);
       parsed.xpAwards.forEach(award => {
         addCombatEvent({ turn: newTurn, type: 'xp', player: award.player, amount: award.amount });
+        SFX.xpGain();
       });
 
       // HP deltas — inline combat events + update HP
@@ -173,13 +195,26 @@ export default function GameScreen() {
             roll: delta.roll || null,
             crit: delta.crit || delta.roll === 20 || false,
           });
-          if (delta.delta < 0) showNotif(`💔 ${p.name} took ${Math.abs(delta.delta)} damage`, 'error');
-          if (delta.delta > 0) showNotif(`💚 ${p.name} healed ${delta.delta} HP`, 'success');
+          if (delta.delta < 0) {
+            showNotif(`💔 ${p.name} took ${Math.abs(delta.delta)} damage`, 'error');
+            if (delta.crit || delta.roll === 20) SFX.critHit();
+            else if (delta.roll === 1) SFX.fumble();
+            else SFX.hit();
+          }
+          if (delta.delta > 0) {
+            showNotif(`💚 ${p.name} healed ${delta.delta} HP`, 'success');
+            SFX.heal();
+          }
         }
       });
 
       // Quest complete
-      if (parsed.milestone >= 5) setTimeout(() => set({ screen: 'celebrate' }), 2000);
+      if (parsed.milestone >= 5) {
+        SFX.questComplete();
+        setTimeout(() => set({ screen: 'celebrate' }), 2000);
+      } else if (parsed.milestone > 0) {
+        SFX.milestone();
+      }
 
     } catch (err) {
       console.error(err);
@@ -241,6 +276,8 @@ export default function GameScreen() {
         onExport={() => setShowExport(true)}
         onRecap={() => setShowRecap(true)}
         onCloud={() => setShowCloud(true)}
+        onSearch={() => setShowSearch(true)}
+        onCharSheet={() => setShowCharSheet(true)}
       />
 
       <div className={styles.main}>
@@ -251,11 +288,13 @@ export default function GameScreen() {
         <InputArea onAction={handleAction} />
       </div>
 
-      {showSave     && <SaveDialog     onClose={() => setShowSave(false)} />}
-      {showSettings && <SettingsOverlay onClose={() => setShowSettings(false)} />}
-      {showJournal  && <JournalOverlay  onClose={() => setShowJournal(false)} />}
-      {showExport   && <ExportOverlay   onClose={() => setShowExport(false)} />}
-      {showRecap    && <SessionRecap    onClose={() => setShowRecap(false)} />}
+      {showSave     && <SaveDialog            onClose={() => setShowSave(false)} />}
+      {showSettings && <SettingsOverlay       onClose={() => setShowSettings(false)} />}
+      {showJournal  && <JournalOverlay        onClose={() => setShowJournal(false)} />}
+      {showExport   && <ExportOverlay         onClose={() => setShowExport(false)} />}
+      {showRecap    && <SessionRecap          onClose={() => setShowRecap(false)} />}
+      {showSearch   && <SearchOverlay         onClose={() => setShowSearch(false)} />}
+      {showCharSheet&& <CharacterSheetOverlay onClose={() => setShowCharSheet(false)} />}
     </div>
   );
 }
