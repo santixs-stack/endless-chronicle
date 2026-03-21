@@ -1,4 +1,4 @@
-import { useOnlineStatus } from '../../lib/recovery.js';
+import { useOnlineStatus } from '../../lib/recovery.jsx';
 import styles from './OfflineBanner.module.css';
 
 export default function OfflineBanner() {

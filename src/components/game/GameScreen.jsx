@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { callAPI } from '../../engine/api.js';
-import { classifyError, withRetry } from '../../lib/recovery.js';
+import { classifyError, withRetry } from '../../lib/recovery.jsx';
 import { buildSystemPrompt } from '../../engine/systemPrompt.js';
 import { parseAllTags } from '../../engine/tags.js';
 import { pickHiddenArc } from '../../data/hiddenArcs.js';
