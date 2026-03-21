@@ -195,7 +195,7 @@
 @media (max-width: 600px) { .genreGrid { grid-template-columns: repeat(3, 1fr); } }
 .genreBtn { background: var(--bg-input); border: 1px solid var(--border); border-radius: 7px; padding: 0.7rem 0.5rem; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
 .genreBtn:hover, .genreBtnActive { border-color: var(--accent); background: var(--mode-glow); }
-.genreBtnIcon { font-size: 1.4rem; }
+.genreBtnIcon { font-size: 1.4rem; display:flex; align-items:center; justify-content:center; height:36px; }
 .genreBtnLabel { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); text-align: center; letter-spacing: 0.06em; }
 
 .footer { padding-top: 0.5rem; }

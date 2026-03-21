@@ -11,6 +11,22 @@ import { SFX } from '../game/SoundEngine.js';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './CharacterCreateScreen.module.css';
 
+// Genre picker icons — confirmed working paths
+const GENRE_ICONS = {
+  fantasy:    'lorc/broadsword',
+  space:      'lorc/rocket',
+  ocean:      'lorc/anchor',
+  horror:     'lorc/ghost',
+  western:    'lorc/law-star',
+  postapoc:   'lorc/radioactive',
+  cyberpunk:  'lorc/android-mask',
+  mythology:  'lorc/zeus-sword',
+  fairytale:  'lorc/fairy',
+  ninja:      'lorc/throwing-star',
+  historical: 'lorc/roman-shield',
+};
+
+
 // ── Random preset name pools ───────────────
 const RANDOM_NAMES = {
   fantasy:    ['Eryn','Cael','Thora','Brin','Oskar','Lyra','Dex','Mira','Flynn','Zara'],
@@ -459,7 +475,7 @@ export default function CharacterCreateScreen() {
                 className={`${styles.genreBtn} ${g.id === genre ? styles.genreBtnActive : ''}`}
                 onClick={() => { setGenre(g.id); setShowGenrePicker(false); }}
               >
-                <span className={styles.genreBtnIcon}>{g.icon}</span>
+                <span className={styles.genreBtnIcon}><GameIcon path={GENRE_ICONS[g.id] || 'lorc/broadsword'} size={28} tint={g.id === genre ? 'accent' : 'muted'} /></span>
                 <span className={styles.genreBtnLabel}>{g.label}</span>
               </button>
             ))}
@@ -486,7 +502,7 @@ export default function CharacterCreateScreen() {
       {/* Genre detection banner */}
       <div className={styles.genreBanner}>
         <span className={styles.genreDetected}>
-          {genreIcon} Detected genre: <strong>{genreLabel}</strong>
+          <GameIcon path={GENRE_ICONS[genre] || 'lorc/broadsword'} size={14} tint="accent" style={{marginRight:'0.3rem'}}/> Detected genre: <strong>{genreLabel}</strong>
         </span>
         <button className={styles.changeGenre} onClick={() => setShowGenrePicker(true)}>
           Change genre →
