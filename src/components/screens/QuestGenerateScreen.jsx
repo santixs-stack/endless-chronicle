@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { callAPI } from '../../engine/api.js';
 import { STORY_GOALS } from '../../data/quests.js';
+import { GAME_ICONS } from '../../data/gameIcons.js';
+import GameIcon from '../ui/GameIcon.jsx';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './QuestGenerateScreen.module.css';
 
@@ -19,6 +21,26 @@ const LOADING_LINES = [
   (names, world) => `Weaving your characters into a story…`,
   (names, world) => `Almost ready…`,
 ];
+
+// Quest id → game icon path
+const QUEST_ICONS = {
+  dungeon:      'lorc/dungeon-gate',
+  rescue:       'lorc/imprisoned',
+  treasure:     'lorc/open-treasure-chest',
+  crash:        'lorc/rocket',
+  pirates:      'lorc/pirate-skull',
+  wildwest:     'delapouite/revolver',
+  dreamworld:   'lorc/moon',
+  spacemystery: 'lorc/ufo',
+  haunted:      'lorc/ghost',
+  gladiator:    'lorc/roman-shield',
+  wasteland:    'lorc/radioactive',
+  cybercity:    'lorc/hacking',
+  olympus:      'lorc/zeus-sword',
+  fairytale:    'lorc/fairy-wand',
+  shogun:       'lorc/torii-gate',
+  custom:       'lorc/scroll-quill',
+};
 
 export default function QuestGenerateScreen() {
   const { state, set } = useGame();
@@ -204,7 +226,11 @@ Respond ONLY with a JSON array of 4 objects, each with:
                 onClick={() => selectQuest(quest)}
               >
                 <div className={styles.questCardHeader}>
-                  <span className={styles.questIcon}>{quest.icon}</span>
+                  <span className={styles.questIcon}>
+                    {QUEST_ICONS[quest.id]
+                      ? <GameIcon path={QUEST_ICONS[quest.id]} size={28} tint="accent" />
+                      : quest.icon}
+                  </span>
                   <span className={styles.questTone}>{quest.tone}</span>
                 </div>
                 <div className={styles.questName}>{quest.name}</div>
@@ -253,7 +279,11 @@ Respond ONLY with a JSON array of 4 objects, each with:
                 className={styles.presetCard}
                 onClick={() => selectPreset(quest)}
               >
-                <span className={styles.presetIcon}>{quest.icon}</span>
+                <span className={styles.presetIcon}>
+                    {QUEST_ICONS[quest.id]
+                      ? <GameIcon path={QUEST_ICONS[quest.id]} size={20} tint="muted" />
+                      : quest.icon}
+                  </span>
                 <div className={styles.presetInfo}>
                   <div className={styles.presetName}>{quest.name}</div>
                   <div className={styles.presetTagline}>{quest.tagline}</div>

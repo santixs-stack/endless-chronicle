@@ -65,6 +65,11 @@ export default function SettingsOverlay({ onClose }) {
             </button>
           </div>
         )}
+
+        {/* Attribution */}
+        <div className={styles.attribution}>
+          Game icons by <a href="https://game-icons.net" target="_blank" rel="noreferrer" className={styles.attrLink}>game-icons.net</a> (CC BY 3.0)
+        </div>
       </div>
     </div>
   );

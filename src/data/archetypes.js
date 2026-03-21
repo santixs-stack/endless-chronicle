@@ -229,11 +229,13 @@ export function getArchetype(genreId, roleId) {
 // Get all 8 archetypes for a genre as array
 export function getGenreArchetypes(genreId) {
   const genre = ARCHETYPES[genreId] || ARCHETYPES.fantasy;
+  const icons = ARCHETYPE_ICONS[genreId] || ARCHETYPE_ICONS.fantasy;
   return ROLES.map(role => ({
     ...role,
     ...genre[role.id],
-    roleId: role.id,
+    roleId:   role.id,
     genreId,
+    gameIcon: icons[role.id] || null,
   }));
 }
 
@@ -241,3 +243,21 @@ export function getGenreArchetypes(genreId) {
 export function getGenreLabel(genreId) {
   return GENRES.find(g => g.id === genreId)?.label || 'Fantasy';
 }
+
+// ── Game icon paths per role per genre ────
+// Maps roleId → game-icons.net path per genre
+// Used by CharacterCreateScreen archetype cards
+
+export const ARCHETYPE_ICONS = {
+  fantasy:   { warrior:'lorc/broadsword',       mage:'lorc/wizard-staff',      rogue:'lorc/plain-dagger',    ranger:'lorc/bow-arrow',         healer:'lorc/caduceus',       leader:'lorc/holy-grail',      trickster:'lorc/lute',             wildcard:'lorc/oak-leaf'         },
+  space:     { warrior:'lorc/ray-gun',           mage:'lorc/gear-hammer',       rogue:'delapouite/laptop',    ranger:'lorc/rocket',            healer:'lorc/caduceus',       leader:'delapouite/medal-skull', trickster:'lorc/domino-mask',      wildcard:'lorc/alien-skull'      },
+  ocean:     { warrior:'lorc/cutlass',           mage:'lorc/tentacle',          rogue:'lorc/swap-bag',        ranger:'lorc/compass',           healer:'lorc/caduceus',       leader:'lorc/anchor',          trickster:'delapouite/coins',      wildcard:'lorc/mermaid'          },
+  horror:    { warrior:'lorc/stake',             mage:'lorc/pentacle',          rogue:'lorc/magnifying-glass',ranger:'delapouite/footprint',   healer:'lorc/third-eye',      leader:'lorc/all-seeing-eye',  trickster:'lorc/domino-mask',      wildcard:'lorc/werewolf'         },
+  western:   { warrior:'delapouite/revolver',    mage:'lorc/herbs',             rogue:'lorc/domino-mask',     ranger:'lorc/cowboy-holster',    healer:'lorc/caduceus',       leader:'delapouite/sheriff',   trickster:'lorc/card-play',        wildcard:'lorc/boot-stomp'       },
+  postapoc:  { warrior:'lorc/spiked-bat',        mage:'lorc/tesla-coil',        rogue:'lorc/swap-bag',        ranger:'delapouite/binoculars',  healer:'lorc/caduceus',       leader:'lorc/crossed-axes',    trickster:'delapouite/coins',      wildcard:'lorc/radioactive'      },
+  cyberpunk: { warrior:'lorc/katana',            mage:'lorc/brain-stem',        rogue:'delapouite/briefcase', ranger:'delapouite/drone',       healer:'lorc/scalpel',        leader:'lorc/crowned-skull',   trickster:'lorc/domino-mask',      wildcard:'lorc/android-mask'     },
+  mythology: { warrior:'lorc/zeus-sword',        mage:'lorc/crystal-ball',      rogue:'lorc/fox-head',        ranger:'lorc/deer-head',         healer:'lorc/ankh',           leader:'lorc/spartan-helmet',  trickster:'lorc/swap',             wildcard:'lorc/giant'            },
+  fairytale: { warrior:'lorc/broadsword',        mage:'lorc/fairy-wand',        rogue:'lorc/plain-dagger',    ranger:'lorc/wood-axe',          healer:'lorc/cauldron',       leader:'lorc/crown',           trickster:'lorc/jester-hat',       wildcard:'lorc/fairy'            },
+  ninja:     { warrior:'lorc/katana',            mage:'lorc/yin-yang',          rogue:'lorc/throwing-star',   ranger:'lorc/snatch',            healer:'lorc/herbs',          leader:'lorc/asian-lantern',   trickster:'lorc/drama-masks',      wildcard:'lorc/cowboy-holster'   },
+  historical:{ warrior:'lorc/roman-shield',      mage:'lorc/alchemy-jugs',      rogue:'lorc/cloak-and-dagger',ranger:'delapouite/binoculars',  healer:'lorc/caduceus',       leader:'lorc/war-flag',        trickster:'lorc/jester-hat',       wildcard:'lorc/skull-staff'      },
+};

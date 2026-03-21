@@ -5,6 +5,7 @@ import { GENRES, getGenreArchetypes, detectGenre } from '../../data/archetypes.j
 import { CHAR_PRESETS } from '../../data/presets.js';
 import { DND_CLASSES } from '../../data/classes.js';
 import { callAPI } from '../../engine/api.js';
+import GameIcon from '../ui/GameIcon.jsx';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './CharacterCreateScreen.module.css';
 
@@ -49,7 +50,12 @@ function randomizeName(genreId) {
 function ArchetypeCard({ archetype, onSelect }) {
   return (
     <button className={styles.archetypeCard} onClick={() => onSelect(archetype)}>
-      <div className={styles.archetypeIcon}>{archetype.icon}</div>
+      <div className={styles.archetypeIcon}>
+        {archetype.gameIcon
+          ? <GameIcon path={archetype.gameIcon} size={36} tint="accent" />
+          : <span style={{ fontSize: '1.8rem' }}>{archetype.icon}</span>
+        }
+      </div>
       <div className={styles.archetypeName}>{archetype.name}</div>
       <div className={styles.archetypeDesc}>{archetype.desc}</div>
     </button>

@@ -3,6 +3,7 @@ import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import { showNotif } from '../ui/Notification.jsx';
 import { SFX } from './SoundEngine.js';
+import GameIcon from '../ui/GameIcon.jsx';
 import styles from './GameSidebar.module.css';
 
 export default function GameSidebar({ open, onClose, onSave, onSettings, onJournal, onExport, onRecap, onCloud, onSearch, onCharSheet, onDebug }) {
@@ -115,16 +116,16 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
           <span className={`${styles.modeBadge} ${styles[state.mode]}`}>
             {state.mode === 'creative' ? 'Anything Goes' : 'Try Hard'}
           </span>
-          <button className={styles.iconBtn} onClick={onSave}>💾 Save</button>
-          <button className={styles.iconBtn} onClick={onCloud}>☁ Cloud Saves</button>
-          <button className={styles.iconBtn} onClick={onCharSheet}>🧙 Character Sheet</button>
-          <button className={styles.iconBtn} onClick={onJournal}>📖 Journal</button>
-          <button className={styles.iconBtn} onClick={onSearch}>🔍 Search Story</button>
-          <button className={styles.iconBtn} onClick={onRecap}>📺 Session Recap</button>
-          <button className={styles.iconBtn} onClick={onExport}>📄 Export</button>
-          <button className={styles.iconBtn} onClick={onSettings}>⚙ Settings</button>
-          <button className={styles.iconBtn} onClick={onDebug} style={{ opacity: 0.5, fontSize: '0.75rem' }}>🐛 Debug Log</button>
-          <button className={styles.iconBtn} onClick={confirmNew}>↩ New Game</button>
+          <button className={styles.iconBtn} onClick={onSave}><GameIcon path="lorc/floppy-disk" size={14} tint="muted"/> Save</button>
+          <button className={styles.iconBtn} onClick={onCloud}><GameIcon path="lorc/cloud-upload" size={14} tint="muted"/> Cloud Saves</button>
+          <button className={styles.iconBtn} onClick={onCharSheet}><GameIcon path="lorc/character-sheet" size={14} tint="muted"/> Character Sheet</button>
+          <button className={styles.iconBtn} onClick={onJournal}><GameIcon path="lorc/open-book" size={14} tint="muted"/> Journal</button>
+          <button className={styles.iconBtn} onClick={onSearch}><GameIcon path="lorc/magnifying-glass" size={14} tint="muted"/> Search Story</button>
+          <button className={styles.iconBtn} onClick={onRecap}><GameIcon path="lorc/film-strip" size={14} tint="muted"/> Session Recap</button>
+          <button className={styles.iconBtn} onClick={onExport}><GameIcon path="lorc/paper-arrow" size={14} tint="muted"/> Export</button>
+          <button className={styles.iconBtn} onClick={onSettings}><GameIcon path="lorc/cog" size={14} tint="muted"/> Settings</button>
+          <button className={styles.iconBtn} onClick={onDebug} style={{ opacity: 0.5, fontSize: '0.75rem' }}><GameIcon path="lorc/bug" size={14} tint="muted"/> Debug Log</button>
+          <button className={styles.iconBtn} onClick={confirmNew}><GameIcon path="lorc/clockwork" size={14} tint="muted"/> New Game</button>
         </div>
       </div>
     </>

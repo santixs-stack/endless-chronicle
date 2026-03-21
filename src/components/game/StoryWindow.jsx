@@ -3,6 +3,7 @@ import { useGame } from '../../hooks/useGameState.jsx';
 import { parseAllTags } from '../../engine/tags.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import SceneRenderer from './SceneRenderer.jsx';
+import GameIcon from '../ui/GameIcon.jsx';
 import styles from './StoryWindow.module.css';
 
 function fmt(text) {
@@ -45,8 +46,13 @@ function CombatEvent({ event }) {
               isFumble ? styles.nat1 :
               event.roll >= 15 ? styles.good : ''
             }`}>
-              🎲 {event.roll}
-              {isCrit ? ' NAT 20!' : isFumble ? ' NAT 1' : ''}
+              <GameIcon
+                path="lorc/dice-twenty-faces-twenty"
+                size={12}
+                tint={isCrit ? 'gold' : isFumble ? 'red' : event.roll >= 15 ? 'green' : 'muted'}
+              />
+              {' '}{event.roll}
+              {isCrit ? ' CRIT!' : isFumble ? ' FUMBLE' : ''}
             </span>
           )}
         </div>
@@ -73,7 +79,10 @@ function CombatEvent({ event }) {
           <span className={styles.combatTarget}>{event.target}</span>
           <span className={styles.combatAction}>heals {event.amount} HP</span>
           {event.roll != null && (
-            <span className={styles.diceResult}>🎲 {event.roll}</span>
+            <span className={styles.diceResult}>
+              <GameIcon path="lorc/dice-twenty-faces-twenty" size={12} tint="green" />
+              {' '}{event.roll}
+            </span>
           )}
         </div>
         <div className={styles.hpBarRow}>

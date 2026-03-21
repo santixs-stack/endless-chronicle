@@ -16,3 +16,7 @@
 .slider  { width: 100%; accent-color: var(--accent); }
 .dangerBtn { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; border: 1px solid #e05555; color: #e05555; border-radius: var(--radius-sm); padding: 0.45rem 1rem; cursor: pointer; transition: all 0.18s; }
 .dangerBtn:hover { background: rgba(224,85,85,0.1); }
+
+.attribution { font-family: var(--font-mono); font-size: 0.58rem; color: var(--text-dim); text-align: center; padding: 0.8rem 0 0.2rem; letter-spacing: 0.06em; }
+.attrLink { color: var(--accent); text-decoration: none; }
+.attrLink:hover { text-decoration: underline; }
