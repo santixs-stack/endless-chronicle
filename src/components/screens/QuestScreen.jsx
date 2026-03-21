@@ -93,7 +93,7 @@ export default function QuestScreen() {
       </div>
 
       <div className={styles.actions}>
-        <button className="btn-ghost" onClick={() => set({ screen: 'character', setupIdx: state.playerCount - 1 })}>
+        <button className="btn-ghost" onClick={() => set({ screen: 'players' })}>
           ← Back to Characters
         </button>
         <button className="btn-primary" disabled={!canProceed} onClick={() => set({ screen: 'world' })}>

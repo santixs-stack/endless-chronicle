@@ -4,6 +4,7 @@ import { CHAR_PRESETS } from '../../data/presets.js';
 import { DND_CLASSES } from '../../data/classes.js';
 import { PLAYER_COLORS, PLAYER_COLOR_NAMES } from '../../lib/constants.js';
 import { callAPI } from '../../engine/api.js';
+import { RL_PROMPTS, RL_LABELS } from '../../data/readingLevels.js';
 import StepBar from '../ui/StepBar.jsx';
 import { showNotif } from '../ui/Notification.jsx';
 import styles from './CharacterScreen.module.css';
@@ -119,6 +120,13 @@ export default function CharacterScreen() {
     setGenBS(true);
     try {
       const cls = DND_CLASSES.find(c => c.id === selectedClass);
+      const rl = state.readingLevel || '8th';
+      const rlGuide = {
+        '4th':    'Write at a 4th grade reading level for ages 7–10. Use short simple sentences and easy words. Write 4–5 sentences — make it fun, exciting, and full of personality. Every sentence should make a young reader gasp, laugh, or lean in closer.',
+        '8th':    'Write at a middle-grade level for ages 11–14. Clear prose, some interesting vocabulary. Think Percy Jackson or Harry Potter. 4–5 sentences.',
+        '12th':   'Write at a YA level for ages 14+. Polished prose, richer vocabulary, some complexity. 3–4 sentences.',
+        'college':'Write with literary sophistication — layered prose, deliberate word choice, complex imagery. 3–4 sentences.',
+      }[rl] || 'Write clearly for a general audience. 4–5 sentences.';
 
       // Build party context from already-created players
       const existingParty = (state.players || []).filter((p, i) => i < idx && p?.name);
@@ -134,6 +142,8 @@ export default function CharacterScreen() {
       const prompt = isMultiplayer
         ? `Write a vivid, specific 3-sentence backstory for this character that WEAVES IN their relationship with the other party members. Create a genuine connection — maybe they grew up together, share a past event, owe each other a debt, or have a complicated history. The connection should feel organic, not forced.
 
+Reading level: ${rlGuide}
+
 This character:
 Name: ${name || 'Unknown'}
 Age: ${age || 'Unknown'}  
@@ -145,21 +155,28 @@ The other party members they know:
 ${partyDesc}
 
 Quest they're all embarking on: ${state.goal?.name || 'an adventure'}
+${state.goal?.hint ? `Quest context: ${state.goal.hint}` : ''}
+${state.world?.world ? `Setting: ${state.world.world}` : ''}
 
-Write 3 sentences. Include at least one specific detail that connects this character to one of the other party members. Write only the backstory, no labels or headers.`
-        : `Write a vivid, specific 3-sentence backstory for this character. Personal and story-hook-rich.
+Write 3 sentences. Include at least one specific detail that connects this character to one of the other party members. Reference why this specific quest matters to them personally. Write only the backstory, no labels or headers.`
+        : `Write a vivid, specific 3-sentence backstory for this character. Personal and story-hook-rich. Include a specific reason why this quest matters to them personally.
+
+Reading level: ${rlGuide}
 
 Name: ${name || 'Unknown'}
 Age: ${age || 'Unknown'}
 Background: ${role}
 Class: ${cls?.name}
 Trait: ${trait || 'none'}
+Quest: ${state.goal?.name || 'an adventure'}
+${state.goal?.hint ? `Quest context: ${state.goal.hint}` : ''}
+${state.world?.world ? `Setting: ${state.world.world}` : ''}
 
 Write only the backstory.`;
 
       const text = await callAPI(
         [{ role: 'user', content: prompt }],
-        'You are a character backstory writer for a tabletop RPG. Write vivid, personal backstories with specific details. In multiplayer games, create meaningful connections between party members.'
+        `You are a character backstory writer for a tabletop RPG. Write vivid, personal backstories with specific details. In multiplayer games, create meaningful connections between party members. ${rlGuide}`
       );
       setBackstory(text.trim());
     } catch { showNotif('Backstory generation failed', 'error'); }
@@ -200,7 +217,7 @@ Write only the backstory.`;
     if (idx < state.playerCount - 1) {
       set({ players, setupIdx: idx + 1, activePresetId: null, _presetWorld: null, screen: 'presets' });
     } else {
-      set({ players, activePresetId: null, screen: 'quest' });
+      set({ players, activePresetId: null, screen: 'game' });
     }
   }
 
@@ -225,6 +242,20 @@ Write only the backstory.`;
     <div className="screen">
       <div className={styles.form}>
         <StepBar currentScreen="character" />
+
+        {/* Quest + reading level context bar */}
+        <div className={styles.contextBar}>
+          {state.goal && (
+            <span className={styles.contextItem}>
+              <span>{state.goal.icon || '⚔'}</span>
+              <span>{state.goal.name}</span>
+            </span>
+          )}
+          <span className={styles.contextItem}>
+            <span>📖</span>
+            <span>{RL_LABELS[state.readingLevel || '8th']}</span>
+          </span>
+        </div>
 
         <div className={styles.playerHeader}>
           <span className={styles.playerDot} style={{ background: color }} />
@@ -355,7 +386,7 @@ Write only the backstory.`;
         <div className={styles.actions}>
           <button className="btn-ghost" onClick={() => set({ screen: 'presets', activePresetId: null })}>← Back</button>
           <button className="btn-primary" onClick={save}>
-            {idx === state.playerCount - 1 ? 'Done — Choose Quest →' : `Next: Player ${idx + 2} →`}
+            {idx === state.playerCount - 1 ? 'Done — Begin Adventure! →' : `Next: Player ${idx + 2} →`}
           </button>
         </div>
       </div>

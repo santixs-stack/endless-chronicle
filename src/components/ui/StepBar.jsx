@@ -2,9 +2,9 @@ import styles from './StepBar.module.css';
 
 const STEPS = [
   { label: 'Players',    screens: ['players'] },
-  { label: 'Characters', screens: ['presets', 'character'] },
   { label: 'Quest',      screens: ['quest'] },
   { label: 'World',      screens: ['world'] },
+  { label: 'Characters', screens: ['presets', 'character'] },
 ];
 
 export default function StepBar({ currentScreen }) {

@@ -72,3 +72,7 @@
 .confirmAbility { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.5rem 0.7rem; margin-top: 0.3rem; }
 .confirmAbilityLabel { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 0.2rem; }
 .confirmAbility span:last-child { font-family: var(--font-body); font-size: 0.88rem; color: var(--text-muted); }
+
+/* ── CONTEXT BAR ── */
+.contextBar { display: flex; align-items: center; gap: 1rem; background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: var(--radius-sm); padding: 0.4rem 0.8rem; margin-bottom: 0.2rem; }
+.contextItem { display: flex; align-items: center; gap: 0.35rem; font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); letter-spacing: 0.06em; }

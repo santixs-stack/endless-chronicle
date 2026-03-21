@@ -21,7 +21,7 @@ export default function PresetsScreen() {
   }
 
   function goBack() {
-    if (idx === 0) set({ screen: 'players' });
+    if (idx === 0) set({ screen: 'world' });
     else set({ setupIdx: idx - 1, screen: 'presets' });
   }
 
