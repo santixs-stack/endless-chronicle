@@ -113,9 +113,6 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
         </div>
 
         <div className={styles.bottom}>
-          <span className={`${styles.modeBadge} ${styles[state.mode]}`}>
-            {state.mode === 'creative' ? 'Anything Goes' : 'Try Hard'}
-          </span>
           <button className={styles.iconBtn} onClick={onSave}><GameIcon path="lorc/floppy-disk" size={14} tint="muted"/> Save</button>
           <button className={styles.iconBtn} onClick={onCloud}><GameIcon path="lorc/cloud-upload" size={14} tint="muted"/> Cloud Saves</button>
           <button className={styles.iconBtn} onClick={onCharSheet}><GameIcon path="lorc/character-sheet" size={14} tint="muted"/> Character Sheet</button>
