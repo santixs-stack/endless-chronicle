@@ -549,19 +549,19 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
   if (type === 'forest' || type === 'plains' || type === 'swamp') {
     // Sky sun/moon
     if (time === 'night') {
-      svg.appendChild(rc.circle(W*0.82, H*0.15, 30, {
+      svg.appendChild(rc.circle(W*0.74, H*0.14, 30, {
         stroke:'#f5e68a', fill:'#fdf5b0', fillStyle:'solid', roughness:0.6
       }));
     } else if (time === 'day' || !time) {
-      svg.appendChild(rc.circle(W*0.82, H*0.12, 35, {
+      svg.appendChild(rc.circle(W*0.74, H*0.11, 35, {
         stroke:'#ffee44', fill: pal.sun || '#FFDD57', fillStyle:'solid', roughness:0.8
       }));
       // Sun rays
       for (let i = 0; i < 8; i++) {
         const a = (i/8)*Math.PI*2;
         svg.appendChild(rc.line(
-          W*0.82 + Math.cos(a)*20, H*0.12 + Math.sin(a)*20,
-          W*0.82 + Math.cos(a)*30, H*0.12 + Math.sin(a)*30,
+          W*0.74 + Math.cos(a)*20, H*0.11 + Math.sin(a)*20,
+          W*0.74 + Math.cos(a)*30, H*0.11 + Math.sin(a)*30,
           { stroke: pal.sun || '#FFDD57', strokeWidth: 2.5, roughness: 1.5 }
         ));
       }
@@ -610,6 +610,29 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
   }
 
   if (type === 'castle' || type === 'ruins') {
+    // Moon or sun — castle sky is always dark so use time to pick
+    if (time === 'night' || time === 'dusk' || !time || time === 'cave') {
+      // Moon — glowing behind the towers
+      svg.appendChild(rc.circle(W*0.68, H*0.14, 28, {
+        stroke:'#f5e68a', fill:'#fdf5b0', fillStyle:'solid', roughness:0.7
+      }));
+      // Crater texture
+      svg.appendChild(rc.circle(W*0.68-5, H*0.14+3, 8, {
+        stroke:'#d4c050', fill:'none', roughness:1.2, strokeWidth:1
+      }));
+      // Stars above the towers
+      for (let i = 0; i < 40; i++) {
+        const stx = sr()*W, sty = sr()*H*0.5;
+        const stz = sr()*1.5 + 0.3;
+        const starEl2 = svgEl('circle', { cx:stx, cy:sty, r:stz, fill:'#FFFDE7', opacity:String(0.3+sr()*0.5) });
+        svg.appendChild(starEl2);
+      }
+    } else {
+      // Day — a dim sun through the overcast sky
+      svg.appendChild(rc.circle(W*0.68, H*0.14, 22, {
+        stroke:'#9999cc', fill:'rgba(200,200,255,0.6)', fillStyle:'solid', roughness:0.8
+      }));
+    }
     // Distant towers
     for (let i = 0; i < 4; i++) {
       const tx = 60 + i * (W/4) + sr()*30-15;
@@ -791,24 +814,27 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
     else if (type === 'ocean')   y = H*0.62 + Math.sin(i*0.5)*8 + tr()*5;
     else if (type === 'desert')  y = H*0.63 + Math.sin(i*0.4)*12 + tr()*8;
     else if (type === 'dungeon' || type === 'cave') y = H*0.75 + tr()*3;
+    else if (type === 'castle' || type === 'ruins') y = H*0.66 + Math.sin(i*0.3)*6 + tr()*5;
     else                         y = H*0.65 + Math.sin(i*0.6)*12 + Math.sin(i*1.3)*6 + tr()*8;
     pts.push([x, y]);
   }
   const groundPath = `M 0 ${H} L ${pts.map(p=>`${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' L ')} L ${W} ${H} Z`;
+  // Stroke off for flat scenes (castle/ruins) to avoid razor line
+  const flatTerrain = type==='castle'||type==='ruins'||type==='dungeon'||type==='cave';
   svg.appendChild(rc.path(groundPath, {
-    stroke: shadeColor(pal.ground,-20),
+    stroke: flatTerrain ? 'none' : shadeColor(pal.ground,-20),
     fill: pal.ground,
     fillStyle: (type==='desert'||type==='snow'||type==='plains') ? 'solid' : 'hachure',
-    roughness: 1.8, strokeWidth: 2
+    roughness: flatTerrain ? 1.0 : 1.8, strokeWidth: flatTerrain ? 0 : 1.2
   }));
 
   // Ground detail layer (lighter, midground)
   const pts2 = pts.map(([x,y]) => [x, y + 15 + tr()*5]);
   const mid2 = `M 0 ${H} L ${pts2.map(p=>`${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' L ')} L ${W} ${H} Z`;
   svg.appendChild(rc.path(mid2, {
-    stroke: shadeColor(pal.mid || pal.ground, 10),
+    stroke: flatTerrain ? 'none' : shadeColor(pal.mid || pal.ground, 10),
     fill: pal.mid || pal.ground,
-    fillStyle: 'solid', roughness: 1.2, strokeWidth: 1
+    fillStyle: 'solid', roughness: flatTerrain ? 0.8 : 1.2, strokeWidth: flatTerrain ? 0 : 0.8
   }));
 
   // Foreground dark strip

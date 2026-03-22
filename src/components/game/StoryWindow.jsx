@@ -25,32 +25,32 @@ function cleanNarrative(text) {
 
 // ── Creature type → icon path ──────────────
 const CREATURE_ICONS = {
-  goblin:       'lorc/goblin-head',
-  goblin_archer:'lorc/goblin-head',
-  orc:          'lorc/orc-head',
-  skeleton:     'lorc/skeleton',
+  goblin:       'lorc/crossed-swords',
+  goblin_archer:'lorc/crossed-swords',
+  orc:          'lorc/battle-gear',
+  skeleton:     'lorc/crossed-swords',
   ghost:        'lorc/ghost',
   wraith:       'lorc/spectre',
-  zombie:       'lorc/shambling-zombie',
+  zombie:       'lorc/spectre',
   dragon:       'lorc/dragon-head',
-  troll:        'lorc/troll',
-  demon:        'lorc/demon-skull',
-  vampire:      'lorc/vampire-dracula',
+  troll:        'lorc/battle-axe',
+  demon:        'lorc/crowned-skull',
+  vampire:      'lorc/ghost',
   wolf:         'lorc/wolf-head',
-  spider:       'lorc/spider-face',
+  spider:       'lorc/rock',
   alien_grey:   'lorc/alien-skull',
   robot_drone:  'lorc/android-mask',
   kraken:       'lorc/octoman',
   bandit:       'lorc/hood',
   thief:        'lorc/hood',
   assassin:     'lorc/hood',
-  merchant:     'lorc/coins',
+  merchant:     'lorc/cauldron',
   mage_npc:     'lorc/wizard-staff',
-  elder:        'lorc/aged',
+  elder:        'lorc/open-book',
   knight:       'lorc/broadsword',
   guard:        'lorc/broadsword',
-  rat:          'lorc/rat',
-  bat:          'lorc/bat',
+  rat:          'lorc/plain-dagger',
+  bat:          'lorc/ghost',
 };
 
 const RELATIONSHIP_TINT = {
@@ -86,9 +86,9 @@ function NpcCard({ npc }) {
 
 // ── Scene change card ──────────────────────
 const SCENE_ICONS = {
-  dungeon:  'lorc/dungeon-gate',  cave:    'lorc/cave-entrance',
-  forest:   'lorc/pine-tree',     plains:  'lorc/grass',
-  castle:   'lorc/castle-emblem', ruins:   'lorc/ruins',
+  dungeon:  'lorc/crossed-swords',  cave:    'lorc/crystal-ball',
+  forest:   'lorc/pine-tree',     plains:  'lorc/high-shot',
+  castle:   'lorc/crown', ruins:   'lorc/crowned-skull',
   ocean:    'lorc/anchor',        space:   'lorc/alien-skull',
   village:  'lorc/open-book',     city:    'lorc/magnifying-glass',
   desert:   'lorc/plain-dagger',  mountain:'lorc/crossed-axes',
@@ -136,7 +136,7 @@ function CombatEvent({ event }) {
               isCrit ? styles.nat20 : isFumble ? styles.nat1 : event.roll >= 15 ? styles.good : ''
             }`}>
               <GameIcon
-                path="lorc/dice-twenty-faces-twenty"
+                path="lorc/crenulated-shield"
                 size={12}
                 tint={isCrit ? 'gold' : isFumble ? 'red' : event.roll >= 15 ? 'green' : 'muted'}
               />
@@ -169,7 +169,7 @@ function CombatEvent({ event }) {
           <span className={styles.combatAction}>heals {event.amount} HP</span>
           {event.roll != null && (
             <span className={styles.diceResult}>
-              <GameIcon path="lorc/dice-twenty-faces-twenty" size={12} tint="green" />
+              <GameIcon path="lorc/crenulated-shield" size={12} tint="green" />
               {' '}{event.roll}
             </span>
           )}
@@ -219,7 +219,7 @@ function ThinkingIndicator({ players }) {
       <div className={styles.thinkingOrbit}>
         {/* Central d20 */}
         <div className={styles.thinkingCenter}>
-          <GameIcon path="lorc/dice-twenty-faces-twenty" size={22} tint="accent" />
+          <GameIcon path="lorc/crenulated-shield" size={22} tint="accent" />
         </div>
         {/* Orbiting player icons */}
         {icons.slice(0, 4).map((p, i) => (
