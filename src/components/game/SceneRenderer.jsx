@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import rough from 'roughjs';
+import rough from '../../lib/rough.js';
 import styles from './SceneRenderer.module.css';
 
 // ═══════════════════════════════════════════
