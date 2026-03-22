@@ -73,3 +73,91 @@
 .errorActions { display: flex; gap: 0.8rem; }
 
 .footer { padding-top: 0.5rem; }
+
+/* ── Quest crafting overlay (mirrors WorldCraftingScreen) ── */
+.craftOverlay {
+  position: absolute; inset: 0; z-index: 10;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.craftInner {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1rem; text-align: center; padding: 2rem;
+}
+
+.craftRing {
+  position: relative; width: 120px; height: 120px; flex-shrink: 0;
+}
+
+.craftOrbitIcon {
+  position: absolute; top: 50%; left: 50%;
+  width: 22px; height: 22px; margin: -11px 0 0 -11px;
+  display: flex; align-items: center; justify-content: center;
+  animation: outerOrbit 12s linear infinite;
+  animation-delay: var(--delay, 0s);
+  transform: rotate(var(--angle, 0deg)) translateX(52px) rotate(calc(-1 * var(--angle, 0deg)));
+}
+
+.craftInnerOrbit {
+  position: absolute; top: 50%; left: 50%;
+  width: 16px; height: 16px; margin: -8px 0 0 -8px;
+  display: flex; align-items: center; justify-content: center;
+  animation: innerOrbit 8s linear infinite;
+  animation-delay: var(--delay, 0s);
+  transform: rotate(var(--angle, 0deg)) translateX(32px) rotate(calc(-1 * var(--angle, 0deg)));
+}
+
+.craftCenter {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.craftPulse {
+  position: absolute; width: 50px; height: 50px; border-radius: 50%;
+  border: 1px solid rgba(196,168,79,0.3);
+  animation: ringPulse 2.4s ease-out infinite;
+}
+
+.craftTitle {
+  font-family: var(--font-title); font-size: 1.1rem;
+  letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase;
+}
+
+.craftTitleAccent {
+  font-family: var(--font-title); font-size: 1.6rem;
+  letter-spacing: 0.18em; color: var(--accent); margin-top: -0.4rem;
+}
+
+.craftMsg {
+  font-family: var(--font-mono); font-size: 0.62rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--text-dim); animation: msgFade 0.6s ease; margin: 0;
+}
+
+.craftParty { display: flex; gap: 1.2rem; align-items: center; margin-top: 0.5rem; }
+
+.craftPlayer { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+
+.craftPlayerName {
+  font-family: var(--font-mono); font-size: 0.55rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--player-color, var(--accent)); opacity: 0.75;
+}
+
+@keyframes outerOrbit {
+  from { transform: rotate(var(--angle, 0deg)) translateX(52px) rotate(calc(-1 * var(--angle, 0deg))); }
+  to   { transform: rotate(calc(var(--angle, 0deg) + 360deg)) translateX(52px) rotate(calc(-1 * (var(--angle, 0deg) + 360deg))); }
+}
+@keyframes innerOrbit {
+  from { transform: rotate(var(--angle, 0deg)) translateX(32px) rotate(calc(-1 * var(--angle, 0deg))); }
+  to   { transform: rotate(calc(var(--angle, 0deg) - 360deg)) translateX(32px) rotate(calc(-1 * (var(--angle, 0deg) - 360deg))); }
+}
+@keyframes ringPulse {
+  0%  { transform: scale(1);   opacity: 0.5; }
+  60% { transform: scale(2.2); opacity: 0; }
+  100%{ transform: scale(2.2); opacity: 0; }
+}
+@keyframes msgFade { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+@keyframes fadeIn  { from{opacity:0} to{opacity:1} }

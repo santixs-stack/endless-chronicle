@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { PLAYER_COLORS } from '../../lib/constants.js';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { callAPI } from '../../engine/api.js';
 import { STORY_GOALS } from '../../data/quests.js';
@@ -7,6 +8,72 @@ import GameIcon from '../ui/GameIcon.jsx';
 import { SFX } from '../game/SoundEngine.js';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './QuestGenerateScreen.module.css';
+
+
+// ── Quest crafting loading screen ─────────
+// Matches the WorldCraftingScreen in GameScreen.
+const CRAFT_ICONS = [
+  'lorc/crystal-ball', 'lorc/open-book', 'lorc/crown',
+  'lorc/plain-dagger', 'delapouite/caduceus', 'lorc/anchor',
+  'lorc/wizard-staff', 'lorc/ghost', 'lorc/wolf-howl',
+  'lorc/crenulated-shield', 'lorc/crossed-axes', 'lorc/fairy-wand',
+];
+
+const CRAFT_MESSAGES = [
+  'The GM is weaving your world…',
+  'Crafting your quest hooks…',
+  'Reading the party scroll…',
+  'Summoning the chronicle…',
+  'The story is awakening…',
+];
+
+function QuestCraftingScreen({ players }) {
+  const [msgIdx, setMsgIdx] = React.useState(0);
+  React.useEffect(() => {
+    const t = setInterval(() => {
+      setMsgIdx(i => (i + 1) % CRAFT_MESSAGES.length);
+    }, 2200);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <div className={styles.craftOverlay}>
+      <div className={styles.craftInner}>
+        <div className={styles.craftRing}>
+          {CRAFT_ICONS.slice(0, 8).map((icon, i) => (
+            <div key={i} className={styles.craftOrbitIcon}
+              style={{ '--angle': `${i * 45}deg`, '--delay': `${i * 0.18}s` }}>
+              <GameIcon path={icon} size={18} tint="dim" />
+            </div>
+          ))}
+          {CRAFT_ICONS.slice(8, 12).map((icon, i) => (
+            <div key={i + 8} className={styles.craftInnerOrbit}
+              style={{ '--angle': `${i * 90 + 22}deg`, '--delay': `${i * 0.25 + 0.1}s` }}>
+              <GameIcon path={icon} size={13} tint="dim" />
+            </div>
+          ))}
+          <div className={styles.craftCenter}>
+            <div className={styles.craftPulse} />
+            <GameIcon path="lorc/crenulated-shield" size={32} tint="accent" />
+          </div>
+        </div>
+        <div className={styles.craftTitle}>The Endless</div>
+        <div className={styles.craftTitleAccent}>Chronicle</div>
+        <p className={styles.craftMsg} key={msgIdx}>{CRAFT_MESSAGES[msgIdx]}</p>
+        {players?.length > 0 && (
+          <div className={styles.craftParty}>
+            {players.map((p, i) => (
+              <div key={i} className={styles.craftPlayer}
+                style={{ '--player-color': p.color || PLAYER_COLORS[i] || '#c4a84f' }}>
+                <span className={styles.craftPlayerName}>{p.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ═══════════════════════════════════════════
 //  QUEST GENERATE SCREEN
@@ -189,25 +256,7 @@ Respond ONLY with a JSON array of 4 objects, each with:
         <span className={styles.partyWorld}>→ {worldName}</span>
       </div>
 
-      {loading && (
-        <div className={styles.loadingSection}>
-          <div className={styles.loadingSpinnerWrap}>
-            <div className={styles.loadingSpinner} />
-            <div className={styles.loadingSpinnerInner} />
-          </div>
-          <div className={styles.loadingTitle}>The GM is crafting your story…</div>
-          <div className={styles.loadingLine}>{currentLoadingLine}</div>
-          <div className={styles.loadingParty}>
-            {players.map((p, i) => (
-              <div key={i} className={styles.loadingCharCard}>
-                <span className={styles.loadingCharIcon}>{p.classIcon || '⚔'}</span>
-                <span className={styles.loadingCharName}>{p.name}</span>
-                <span className={styles.loadingCharClass}>{p.className}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {loading && <QuestCraftingScreen players={players} />}
 
       {!loading && (error || !generatedQuests) && (
         <div className={styles.errorSection}>
