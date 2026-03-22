@@ -296,24 +296,25 @@ export const SFX = {
 
   // 📜 Quest selected — dramatic sting
   questSelected() {
-    const m = master(0.5);
+    const m = master(0.4);
     if (!m) return;
     const { c, g } = m;
     const now = c.currentTime;
-    // Low rumble + rising tone
+    // Deep resonant tones rising — like a quest seal being broken
     [110, 165, 220].forEach((freq, i) => {
       const o = c.createOscillator();
-      o.type = 'sawtooth';
-      o.frequency.value = freq;
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, now + i * 0.06);
+      o.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 0.4);
       o.connect(g);
-      g.gain.setValueAtTime(0.4, now + i * 0.05);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-      o.start(now + i * 0.05);
-      o.stop(now + 0.55);
+      g.gain.setValueAtTime(0.25, now + i * 0.06);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      o.start(now + i * 0.06);
+      o.stop(now + 0.65);
     });
-    // High shimmer
-    playTone(880, 'triangle', 0.3, 0.2, 0.15);
-    playNoise(0.2, 0.15, 4000);
+    // Soft high chime
+    playTone(880, 'sine', 0.1, 0.25, 0.18);
+    playTone(659, 'sine', 0.08, 0.3, 0.28);
   },
 
   // ⏳ AI thinking — subtle shimmer tick
@@ -343,14 +344,38 @@ export const SFX = {
 
   // ✨ New game started — opening fanfare
   newGame() {
-    const notes = [261, 329, 392, 523, 659, 523, 659, 784, 1047];
-    notes.forEach((freq, i) => {
-      playTone(freq, 'triangle', 0.22, 0.22, i * 0.08);
+    const m = master(0.55);
+    if (!m) return;
+    const { c, g } = m;
+    const now = c.currentTime;
+
+    // Low mystical hum rising — like a spell awakening
+    const hum = c.createOscillator();
+    hum.type = 'sine';
+    hum.frequency.setValueAtTime(80, now);
+    hum.frequency.exponentialRampToValueAtTime(160, now + 1.2);
+    hum.connect(g);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(0.3, now + 0.3);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+    hum.start(now);
+    hum.stop(now + 1.85);
+
+    // Soft ascending shimmer notes — like pages turning or magic unraveling
+    const shimmer = [220, 277, 330, 440, 554, 659, 880];
+    shimmer.forEach((freq, i) => {
+      playTone(freq, 'sine', 0.08, 0.35, 0.1 + i * 0.12);
     });
-    [130, 196, 261].forEach((freq, i) => {
-      playTone(freq, 'sine', 0.5, 0.18, i * 0.1);
+
+    // Gentle high sparkle layer — very soft, not sharp
+    const sparkle = [1320, 1047, 880, 1047, 1320];
+    sparkle.forEach((freq, i) => {
+      playTone(freq, 'sine', 0.04, 0.2, 0.3 + i * 0.14);
     });
-    playNoise(1.2, 0.08, 8000);
+
+    // Soft low resonance — grounding the magic
+    playTone(110, 'triangle', 0.18, 0.9, 0);
+    playTone(165, 'triangle', 0.12, 0.7, 0.15);
   },
 };
 
