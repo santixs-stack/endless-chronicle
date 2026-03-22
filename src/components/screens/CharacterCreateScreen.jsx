@@ -22,8 +22,8 @@ const GENRE_ICONS = {
   cyberpunk:  'lorc/android-mask',
   mythology:  'lorc/zeus-sword',
   fairytale:  'lorc/fairy',
-  ninja:      'lorc/throwing-star',
-  historical: 'lorc/roman-shield',
+  ninja:      'lorc/plain-dagger',
+  historical: 'lorc/crossed-axes',
 };
 
 

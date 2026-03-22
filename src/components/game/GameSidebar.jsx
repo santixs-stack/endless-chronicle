@@ -113,12 +113,12 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
         </div>
 
         <div className={styles.bottom}>
-          <button className={styles.iconBtn} onClick={onSave}><GameIcon path="lorc/floppy-disk" size={14} tint="muted"/> Save</button>
-          <button className={styles.iconBtn} onClick={onCloud}><GameIcon path="lorc/cloud-upload" size={14} tint="muted"/> Cloud Saves</button>
-          <button className={styles.iconBtn} onClick={() => { SFX.overlayOpen(); onCharSheet(); }}><GameIcon path="lorc/character-sheet" size={14} tint="muted"/> Character Sheet</button>
+          <button className={styles.iconBtn} onClick={onSave}><GameIcon path="lorc/swap-bag" size={14} tint="muted"/> Save</button>
+          <button className={styles.iconBtn} onClick={onCloud}><GameIcon path="lorc/anchor" size={14} tint="muted"/> Cloud Saves</button>
+          <button className={styles.iconBtn} onClick={() => { SFX.overlayOpen(); onCharSheet(); }}><GameIcon path="lorc/open-book" size={14} tint="muted"/> Character Sheet</button>
           <button className={styles.iconBtn} onClick={() => { SFX.overlayOpen(); onJournal(); }}><GameIcon path="lorc/open-book" size={14} tint="muted"/> Journal</button>
           <button className={styles.iconBtn} onClick={() => { SFX.overlayOpen(); onSearch(); }}><GameIcon path="lorc/magnifying-glass" size={14} tint="muted"/> Search Story</button>
-          <button className={styles.iconBtn} onClick={() => { SFX.overlayOpen(); onRecap(); }}><GameIcon path="lorc/film-strip" size={14} tint="muted"/> Session Recap</button>
+          <button className={styles.iconBtn} onClick={() => { SFX.overlayOpen(); onRecap(); }}><GameIcon path="lorc/magnifying-glass" size={14} tint="muted"/> Session Recap</button>
           <button className={styles.iconBtn} onClick={() => { SFX.overlayOpen(); onExport(); }}><GameIcon path="lorc/paper-arrow" size={14} tint="muted"/> Export</button>
           <button className={styles.iconBtn} onClick={() => { SFX.overlayOpen(); onSettings(); }}><GameIcon path="lorc/cog" size={14} tint="muted"/> Settings</button>
           <button className={styles.iconBtn} onClick={onDebug} style={{ opacity: 0.5, fontSize: '0.75rem' }}><GameIcon path="lorc/bug" size={14} tint="muted"/> Debug Log</button>

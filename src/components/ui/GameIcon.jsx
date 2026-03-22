@@ -47,7 +47,15 @@ export default function GameIcon({
         verticalAlign: 'middle',
         ...style,
       }}
-      onError={e => { e.target.style.display = 'none'; }}
+      onError={e => {
+        // Replace missing icon with a neutral diamond placeholder
+        // so blank spaces are visible rather than silent
+        e.target.style.display = 'none';
+        const span = document.createElement('span');
+        span.style.cssText = `width:${size}px;height:${size}px;display:inline-flex;align-items:center;justify-content:center;opacity:0.25;font-size:${Math.round(size*0.7)}px;flex-shrink:0;vertical-align:middle;`;
+        span.textContent = '◆';
+        e.target.parentNode?.insertBefore(span, e.target);
+      }}
     />
   );
 }
