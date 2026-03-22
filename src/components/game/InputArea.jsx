@@ -146,8 +146,15 @@ export default function InputArea({ onAction }) {
       <div className={styles.turnRow}>
         <span className={styles.turnDot} style={{ background: color }} />
         <span className={styles.turnName} style={{ color }}>
-          {curPlayer ? `${curPlayer.name} (${curPlayer.className})` : ''}
+          {curPlayer
+            ? state.playerCount > 1
+              ? `${curPlayer.name}'s turn`
+              : curPlayer.name
+            : ''}
         </span>
+        {curPlayer && state.playerCount > 1 && !state.isLoading && (
+          <span className={styles.turnPrompt}>what do you do?</span>
+        )}
         <DiceAnimation active={state.isLoading} />
       </div>
 

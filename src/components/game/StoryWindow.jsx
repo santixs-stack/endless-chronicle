@@ -240,6 +240,25 @@ function ThinkingIndicator({ players }) {
   );
 }
 
+
+// ── Turn handoff card ──────────────────────
+// Shown between narrator blocks in multiplayer.
+// Tells the next player it's their turn without
+// the AI having to write it into the narrative.
+function TurnHandoff({ playerName, playerColor, playerIcon }) {
+  return (
+    <div className={styles.turnHandoff} style={{ '--player-color': playerColor }}>
+      <div className={styles.turnHandoffIcon}>
+        <GameIcon path={playerIcon || 'lorc/plain-dagger'} size={14} tint="muted" />
+      </div>
+      <span className={styles.turnHandoffName} style={{ color: playerColor }}>
+        {playerName}
+      </span>
+      <span className={styles.turnHandoffLabel}>— your turn</span>
+    </div>
+  );
+}
+
 // ── Main StoryWindow ───────────────────────
 export default function StoryWindow() {
   const { state } = useGame();
@@ -313,6 +332,24 @@ export default function StoryWindow() {
         timeline.push({ type: 'narrator', text: narrative, turn });
         if (npcByTurn[turn]?.length)    timeline.push({ type: 'npcs', npcs: npcByTurn[turn], turn });
         if (combatByTurn[turn]?.length) timeline.push({ type: 'combat', events: combatByTurn[turn], turn });
+
+        // In multiplayer: add a turn handoff card after each GM response
+        // showing which player acts next — so the AI doesn't need to say it
+        if ((state.playerCount || 1) > 1) {
+          const nextPIdx = playerTurnCount % state.playerCount;
+          const nextPlayer = state.players?.[nextPIdx];
+          if (nextPlayer) {
+            const genreIcons = ARCHETYPE_ICONS['fantasy'] || {};
+            const nextIcon = genreIcons[nextPlayer.class] || 'lorc/plain-dagger';
+            timeline.push({
+              type: 'turnHandoff',
+              playerName: nextPlayer.name,
+              playerColor: nextPlayer.color || '#c4a84f',
+              playerIcon: nextIcon,
+            });
+          }
+        }
+
         assistantCount++;
       }
     }
@@ -384,6 +421,15 @@ export default function StoryWindow() {
               {/* ── Scene change card ── */}
               {item.type === 'scene' && (
                 <SceneCard scene={item.scene} />
+              )}
+
+              {/* ── Turn handoff card ── */}
+              {item.type === 'turnHandoff' && (
+                <TurnHandoff
+                  playerName={item.playerName}
+                  playerColor={item.playerColor}
+                  playerIcon={item.playerIcon}
+                />
               )}
 
               {/* ── NPC introduction cards ── */}
