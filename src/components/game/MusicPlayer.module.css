@@ -1,34 +1,30 @@
-.toggleBtn {
-  display: flex; align-items: center; gap: 0.4rem;
-  font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.07em;
-  background: transparent; border: 1px solid var(--border); color: var(--text-dim);
-  border-radius: var(--radius-sm); padding: 0.22rem 0.65rem;
-  cursor: pointer; transition: var(--transition); margin: 0.3rem 1rem; width: fit-content;
+.wrap {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.25rem 1rem;
+  flex-shrink: 0;
 }
-.toggleBtn:hover { border-color: var(--accent); color: var(--accent); }
-.toggleActive { border-color: var(--accent); color: var(--accent); background: var(--mode-glow); }
-.trackLabel { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.liveDot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s ease infinite; flex-shrink: 0; }
 
-.bar    { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.4rem 1rem; background: var(--bg-panel); border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
-.barLabel { font-size: 0.9rem; flex-shrink: 0; margin-top: 0.2rem; }
-.groups { display: flex; flex-direction: column; gap: 0.35rem; flex: 1; }
-.group  { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-.groupLabel { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); min-width: 55px; }
-.trackRow { display: flex; flex-wrap: wrap; gap: 0.25rem; }
 .btn {
-  font-family: var(--font-mono); font-size: 0.56rem; letter-spacing: 0.04em;
-  padding: 0.15rem 0.42rem; background: transparent; border: 1px solid var(--border);
-  color: var(--text-dim); border-radius: 10px; cursor: pointer; transition: all 0.15s;
-  white-space: nowrap; display: flex; align-items: center; gap: 0.2rem;
+  display: flex; align-items: center; gap: 0.3rem;
+  font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em;
+  background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+  border-radius: var(--radius-sm); padding: 0.2rem 0.55rem;
+  cursor: pointer; transition: var(--transition); white-space: nowrap;
 }
 .btn:hover { border-color: var(--accent); color: var(--accent); }
-.active { border-color: var(--accent); color: var(--accent); background: var(--mode-glow); }
-.playingDot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s ease infinite; }
-.right  { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
-.volWrap { display: flex; align-items: center; gap: 0.3rem; }
-.volLabel { font-family: var(--font-mono); font-size: 0.56rem; color: var(--text-dim); }
-.vol    { width: 52px; accent-color: var(--accent); }
-.closeBtn { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.85rem; }
-.closeBtn:hover { color: var(--text); }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.on { border-color: rgba(196,168,79,0.4); color: var(--accent); }
+
+.icon { font-size: 0.75rem; }
+.label { }
+.dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+  animation: pulse 2s ease infinite;
+}
+
+.vol {
+  width: 60px; accent-color: var(--accent); cursor: pointer; opacity: 0.7;
+}
+.vol:hover { opacity: 1; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }

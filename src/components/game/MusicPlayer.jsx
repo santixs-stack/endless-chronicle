@@ -1,90 +1,59 @@
 import { useState, useEffect } from 'react';
-import { playTrack, stopMusic, setMusicVol, getMusicActive, TRACKS } from './MusicEngine.js';
+import { playTrack, stopMusic, setMusicVol, getMusicActive, getMusicVol } from './MusicEngine.js';
 import styles from './MusicPlayer.module.css';
 
-export default function MusicPlayer() {
-  const [active, setActive] = useState(getMusicActive());
-  const [open, setOpen] = useState(false);
+// ── Simple music control — on/off + volume only ──
+// Track selection is fully automatic based on scene/mood.
+// Users don't need to know what's playing — it just works.
 
-  // Poll for auto-track changes every 500ms
+export default function MusicPlayer() {
+  const [active, setActive]   = useState(getMusicActive());
+  const [vol, setVol]         = useState(getMusicVol());
+
+  // Sync active state when engine auto-switches tracks
   useEffect(() => {
     const t = setInterval(() => {
-      const cur = getMusicActive();
-      setActive(prev => prev !== cur ? cur : prev);
-    }, 500);
+      setActive(getMusicActive());
+    }, 600);
     return () => clearInterval(t);
   }, []);
 
-  function handleTrack(id) {
-    if (id === 'off') {
+  function toggle() {
+    if (active) {
       stopMusic();
       setActive(null);
-      return;
+    } else {
+      // Resume — engine will pick the right track from scene state
+      // If no scene yet, start with peaceful ambient
+      playTrack('peaceful');
+      setActive('peaceful');
     }
-    playTrack(id);
-    setActive(id);
   }
 
-  const label = active ? (TRACKS[active]?.label || active) : 'Music off';
-
-  if (!open) {
-    return (
-      <button
-        className={`${styles.toggleBtn} ${active ? styles.toggleActive : ''}`}
-        onClick={() => setOpen(true)}
-        title="Music controls"
-      >
-        🎵 <span className={styles.trackLabel}>{label}</span>
-        {active && <span className={styles.liveDot} />}
-      </button>
-    );
+  function handleVol(e) {
+    const v = parseFloat(e.target.value);
+    setVol(v);
+    setMusicVol(v);
   }
-
-  // Group tracks by category for display
-  const groups = [
-    { label: 'Towns & Villages', ids: ['village_day','village_night'] },
-    { label: 'Wilderness',       ids: ['forest_day','forest_night','plains_day','mountain','snow','swamp'] },
-    { label: 'Water & Sky',      ids: ['ocean_day','ocean_night','space'] },
-    { label: 'Dark Places',      ids: ['dungeon','cave','ruins','castle_day'] },
-    { label: 'Exotic',           ids: ['desert'] },
-    { label: 'Combat',           ids: ['battle','battle_boss'] },
-    { label: 'Mood',             ids: ['tension','peaceful','mysterious','emotional','triumphant','npc_theme','rest'] },
-  ];
 
   return (
-    <div className={styles.bar}>
-      <span className={styles.barLabel}>🎵</span>
-      <div className={styles.groups}>
-        {groups.map(g => (
-          <div key={g.label} className={styles.group}>
-            <span className={styles.groupLabel}>{g.label}</span>
-            <div className={styles.trackRow}>
-              {g.ids.map(id => (
-                <button
-                  key={id}
-                  className={`${styles.btn} ${active === id ? styles.active : ''}`}
-                  onClick={() => handleTrack(id)}
-                  title={TRACKS[id]?.label}
-                >
-                  {TRACKS[id]?.label || id}
-                  {active === id && <span className={styles.playingDot} />}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-        <button className={`${styles.btn} ${!active ? styles.active : ''}`} onClick={() => handleTrack('off')}>
-          ⏹ Off
-        </button>
-      </div>
-      <div className={styles.right}>
-        <div className={styles.volWrap}>
-          <span className={styles.volLabel}>Vol</span>
-          <input type="range" min="0" max="1" step="0.05" defaultValue="0.4"
-            className={styles.vol} onChange={e => setMusicVol(parseFloat(e.target.value))} />
-        </div>
-        <button className={styles.closeBtn} onClick={() => setOpen(false)}>✕</button>
-      </div>
+    <div className={styles.wrap}>
+      <button
+        className={`${styles.btn} ${active ? styles.on : ''}`}
+        onClick={toggle}
+        title={active ? 'Music on — click to turn off' : 'Music off — click to turn on'}
+      >
+        <span className={styles.icon}>{active ? '♪' : '♪'}</span>
+        <span className={styles.label}>{active ? 'ON' : 'OFF'}</span>
+        {active && <span className={styles.dot} />}
+      </button>
+      <input
+        type="range" min="0" max="1" step="0.05"
+        value={vol}
+        className={styles.vol}
+        onChange={handleVol}
+        title="Music volume"
+      />
     </div>
   );
 }

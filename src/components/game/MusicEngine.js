@@ -18,7 +18,7 @@ const N = {
 };
 
 let ctx = null, rev = null, masterGain = null;
-let musicVolume = 0.38, musicMuted = false;
+let musicVolume = 0.22, musicMuted = false;
 let currentTrackId = null, activeNodes = [], loopTimeout = null;
 let preCombatTrack = null, isPlaying = false, fadeTimeout = null;
 
@@ -45,7 +45,7 @@ function buildReverb(c) {
       d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.0);
   }
   const conv = c.createConvolver(); conv.buffer = buf;
-  const wet = c.createGain(); wet.gain.value = 0.2;
+  const wet = c.createGain(); wet.gain.value = 0.12;
   const dry = c.createGain(); dry.gain.value = 1.0;
   conv.connect(wet); wet.connect(masterGain); dry.connect(masterGain);
   return { send(node) { node.connect(conv); node.connect(dry); } };
@@ -261,7 +261,7 @@ export const TRACKS = {
   village_day: {
     label: '🏘 Village (Day)', bpm: 92, category: 'explore',
     voices: [
-      { instrument: 'flute', vol: 0.55, notes: [
+      { instrument: 'flute', vol: 0.29, notes: [
         N.G4,N.A4,N.B4,N.D5, N.B4,N.A4,N.G4,N.E4, N.A4,N.B4,N.D5,N.C5, N.B4,N.A4,N.G4,N._,
         N.D5,N.C5,N.B4,N.A4, N.G4,N.A4,N.B4,N.G4, N.A4,N.G4,N.Fs4,N.E4, N.G4,N._,N._,N._,
       ], durs: [
@@ -269,7 +269,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,0.5,
       ]},
       // Harmony — thirds below melody
-      { instrument: 'strings', vol: 0.45, notes: [
+      { instrument: 'strings', vol: 0.28, notes: [
         N.E4,N.Fs4,N.G4,N.B4, N.G4,N.Fs4,N.E4,N.C4, N.Fs4,N.G4,N.B4,N.A4, N.G4,N.Fs4,N.E4,N._,
         N.B3,N.A3,N.G3,N.Fs3, N.E3,N.Fs3,N.G3,N.E3, N.Fs3,N.E3,N.D3,N.C3, N.E3,N._,N._,N._,
       ], durs: [
@@ -277,14 +277,14 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,0.5,
       ]},
       // Harp alberti bass — 1 and 3 of chord
-      { instrument: 'harp', vol: 0.38, notes: [
+      { instrument: 'harp', vol: 0.24, notes: [
         N.G3,N.D4,N.G3,N.D4, N.G3,N.D4,N.G3,N.D4, N.D3,N.A3,N.D3,N.A3, N.D3,N.A3,N.D3,N.A3,
         N.G3,N.D4,N.G3,N.D4, N.C4,N.G3,N.C4,N.G3, N.D3,N.A3,N.D3,N.A3, N.G3,N.D4,N.G3,N.B3,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
-      { instrument: 'bass', vol: 0.5, notes: [
+      { instrument: 'bass', vol: 0.26, notes: [
         N.G2,N._,N.D3,N._, N.G2,N._,N.D3,N._, N.D2,N._,N.A2,N._, N.D2,N._,N.G2,N._,
         N.G2,N._,N.D3,N._, N.C3,N._,N.G2,N._, N.D2,N._,N.A2,N._, N.G2,N._,N.G2,N._,
       ], durs: [
@@ -297,14 +297,14 @@ export const TRACKS = {
   village_night: {
     label: '🏘 Village (Night)', bpm: 72, category: 'explore',
     voices: [
-      { instrument: 'flute', vol: 0.38, notes: [
+      { instrument: 'flute', vol: 0.24, notes: [
         N.F4,N._,N.G4,N.A4, N.Bb4,N.A4,N.G4,N._, N.F4,N.G4,N.A4,N.C5, N.Bb4,N._,N.A4,N._,
         N.G4,N._,N.A4,N.Bb4, N.C5,N.Bb4,N.A4,N.G4, N.F4,N._,N.G4,N._, N.F4,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 1,0.5,0.5,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,0.5,0.5,1, 2,2,2,2,
       ]},
-      { instrument: 'pad', vol: 0.55, notes: [
+      { instrument: 'pad', vol: 0.29, notes: [
         N.F3,N._,N.F3,N._, N.Bb2,N._,N.Bb2,N._, N.F3,N._,N.C4,N._, N.F3,N._,N.F3,N._,
         N.G3,N._,N.G3,N._, N.C4,N._,N.C4,N._, N.F3,N._,N.A3,N._, N.F3,N._,N.F3,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -315,7 +315,7 @@ export const TRACKS = {
         1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
         1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2,
       ]},
-      { instrument: 'bass', vol: 0.45, notes: [
+      { instrument: 'bass', vol: 0.28, notes: [
         N.F2,N._,N.F2,N._, N.Bb2,N._,N.F2,N._, N.F2,N._,N.C3,N._, N.F2,N._,N.F2,N._,
         N.G2,N._,N.G2,N._, N.C3,N._,N.G2,N._, N.F2,N._,N.A2,N._, N.F2,N._,N.F2,N._,
       ], durs: [
@@ -330,7 +330,7 @@ export const TRACKS = {
     label: '🌲 Forest (Day)', bpm: 76, category: 'explore',
     voices: [
       // Pentatonic melody — E A B D E (Ghibli feel)
-      { instrument: 'flute', vol: 0.58, notes: [
+      { instrument: 'flute', vol: 0.3, notes: [
         N.E4,N._,N.A4,N.B4, N.D5,N.B4,N.A4,N._, N.E4,N.A4,N.B4,N.D5, N.B4,N._,N.A4,N._,
         N.E4,N.D4,N.A3,N._, N.B3,N.A3,N.E3,N._, N.A3,N.B3,N.D4,N.E4, N.A4,N._,N._,N._,
       ], durs: [
@@ -338,7 +338,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 1,0.5,0.5,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
       // Strings — sustained chord tones, contrary motion to melody
-      { instrument: 'strings', vol: 0.42, notes: [
+      { instrument: 'strings', vol: 0.26, notes: [
         N.A3,N._,N.A3,N._, N.A3,N._,N.G3,N._, N.A3,N._,N.D4,N._, N.B3,N._,N.A3,N._,
         N.A3,N._,N.E3,N._, N.E3,N._,N.A3,N._, N.A3,N._,N.D4,N._, N.E4,N._,N._,N._,
       ], durs: [
@@ -353,7 +353,7 @@ export const TRACKS = {
         1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2,
         1,1,1,1, 1,1,1,1, 1,1,1,1, 4,4,4,4,
       ]},
-      { instrument: 'bass', vol: 0.42, notes: [
+      { instrument: 'bass', vol: 0.26, notes: [
         N.A2,N._,N.A2,N._, N.A2,N._,N.G2,N._, N.D3,N._,N.A2,N._, N.E2,N._,N.A2,N._,
         N.A2,N._,N.E2,N._, N.E2,N._,N.A2,N._, N.D3,N._,N.A2,N._, N.A2,N._,N.A2,N._,
       ], durs: [
@@ -373,7 +373,7 @@ export const TRACKS = {
         1,1,1,1, 1,1,2,2, 1,1,1,1, 4,4,4,4,
         1,1,1,1, 1,1,2,2, 1,1,1,1, 4,4,4,4,
       ]},
-      { instrument: 'pad', vol: 0.62, notes: [
+      { instrument: 'pad', vol: 0.32, notes: [
         N.D3,N._,N.D3,N._, N.C3,N._,N.C3,N._, N.Bb2,N._,N.Bb2,N._, N.A2,N._,N.A2,N._,
         N.F3,N._,N.F3,N._, N.Eb3,N._,N.Eb3,N._, N.D3,N._,N.D3,N._, N.A2,N._,N.A2,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
@@ -381,7 +381,7 @@ export const TRACKS = {
         N.F4,N._,N._,N._, N._,N.A4,N._,N._, N.G4,N._,N._,N._, N._,N._,N.E4,N._,
         N.F4,N._,N.C5,N._, N._,N._,N.Bb4,N._, N.A4,N._,N._,N._, N._,N._,N._,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.45, notes: [
+      { instrument: 'bass', vol: 0.28, notes: [
         N.D2,N._,N.D2,N._, N.C3,N._,N.C3,N._, N.Bb2,N._,N.Bb2,N._, N.A2,N._,N.A2,N._,
         N.F2,N._,N.F2,N._, N.Eb2,N._,N.Eb2,N._, N.D2,N._,N.D2,N._, N.A2,N._,N.A2,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
@@ -393,7 +393,7 @@ export const TRACKS = {
     label: '🌊 Ocean (Day)', bpm: 98, category: 'explore',
     voices: [
       // BREATHING melody — long notes, silences. Wind Waker reference.
-      { instrument: 'flute', vol: 0.55, notes: [
+      { instrument: 'flute', vol: 0.29, notes: [
         N.D4,N._,N.Fs4,N._, N.A4,N._,N._,N._, N.B4,N._,N.A4,N._, N.Fs4,N._,N._,N._,
         N.D4,N.E4,N.Fs4,N._, N.A4,N.B4,N._,N._, N.D5,N._,N.A4,N.Fs4, N.D4,N._,N._,N._,
       ], durs: [
@@ -401,7 +401,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
       // Harp — wave-like arpeggios, the signature ocean texture
-      { instrument: 'harp', vol: 0.45, notes: [
+      { instrument: 'harp', vol: 0.28, notes: [
         N.D3,N.Fs3,N.A3,N.D4, N.A3,N.Fs3,N.D3,N.Fs3, N.E3,N.A3,N.Cs4,N.E4, N.A3,N.E3,N.A2,N.E3,
         N.D3,N.A3,N.D4,N.Fs4, N.A3,N.D4,N.Fs4,N.A4, N.B2,N.Fs3,N.B3,N.D4, N.E3,N.A3,N.Cs4,N.E4,
       ], durs: [
@@ -409,11 +409,11 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
       // Strings — sustained chord pads underneath, like the deep ocean
-      { instrument: 'strings', vol: 0.38, notes: [
+      { instrument: 'strings', vol: 0.24, notes: [
         N.D3,N._,N.D3,N._, N.A3,N._,N.A3,N._, N.A3,N._,N.E3,N._, N.A3,N._,N.A3,N._,
         N.D3,N._,N.D3,N._, N.Fs3,N._,N.Fs3,N._, N.B2,N._,N.B2,N._, N.E3,N._,N.A3,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
-      { instrument: 'bass', vol: 0.48, notes: [
+      { instrument: 'bass', vol: 0.25, notes: [
         N.D2,N._,N.D2,N._, N.A2,N._,N.A2,N._, N.A2,N._,N.E2,N._, N.A2,N._,N.A2,N._,
         N.D2,N._,N.D2,N._, N.Fs2,N._,N.Fs2,N._, N.B2,N._,N.B2,N._, N.E2,N._,N.A2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
@@ -423,14 +423,14 @@ export const TRACKS = {
   ocean_night: {
     label: '🌊 Ocean (Night)', bpm: 66, category: 'explore',
     voices: [
-      { instrument: 'flute', vol: 0.38, notes: [
+      { instrument: 'flute', vol: 0.24, notes: [
         N.Fs4,N._,N._,N.A4, N.B4,N._,N.A4,N.Fs4, N.E4,N._,N._,N._, N.Fs4,N._,N._,N._,
         N.D4,N.Fs4,N.A4,N._, N.B4,N.A4,N.Fs4,N.E4, N.D4,N._,N._,N._, N.Fs4,N._,N._,N._,
       ], durs: [
         1,1,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2, 4,4,4,4,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 4,4,4,4, 4,4,4,4,
       ]},
-      { instrument: 'pad', vol: 0.52, notes: [
+      { instrument: 'pad', vol: 0.27, notes: [
         N.B3,N._,N.B3,N._, N.Fs3,N._,N.Fs3,N._, N.A3,N._,N.E3,N._, N.B3,N._,N.B3,N._,
         N.D4,N._,N.D4,N._, N.Fs3,N._,N.A3,N._, N.B3,N._,N.B3,N._, N.B3,N._,N.B3,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
@@ -438,7 +438,7 @@ export const TRACKS = {
         N.B4,N._,N.Fs4,N._, N.E4,N._,N._,N._, N.D4,N._,N.Fs4,N._, N.B4,N._,N._,N._,
         N.A4,N._,N._,N.B4, N.Cs5,N._,N._,N._, N.B4,N._,N.Fs4,N._, N.E4,N._,N._,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 2,2,2,2, 4,4,4,4, 2,2,2,2, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.42, notes: [
+      { instrument: 'bass', vol: 0.26, notes: [
         N.B2,N._,N.B2,N._, N.Fs2,N._,N.Fs2,N._, N.A2,N._,N.E2,N._, N.B2,N._,N.B2,N._,
         N.D3,N._,N.D3,N._, N.Fs3,N._,N.A3,N._, N.B2,N._,N.B2,N._, N.Fs2,N._,N.B2,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
@@ -450,7 +450,7 @@ export const TRACKS = {
     label: '💀 Dungeon', bpm: 64, category: 'explore',
     voices: [
       // Dark Locrian-flavored — A B C E G, sparse
-      { instrument: 'strings', vol: 0.55, notes: [
+      { instrument: 'strings', vol: 0.29, notes: [
         N.A3,N._,N._,N.C4, N.E4,N._,N.D4,N.C4, N.A3,N._,N._,N._, N.G3,N._,N.A3,N._,
         N.A3,N.C4,N.E4,N._, N.G4,N.E4,N.C4,N.A3, N.Gs3,N._,N.A3,N._, N.A3,N._,N._,N._,
       ], durs: [
@@ -458,7 +458,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,2, 4,4,4,4,
       ]},
       // Pad — sustained dissonant intervals (tritone from bass)
-      { instrument: 'pad', vol: 0.48, notes: [
+      { instrument: 'pad', vol: 0.25, notes: [
         N.Eb3,N._,N.Eb3,N._, N.D3,N._,N.D3,N._, N.C3,N._,N.C3,N._, N.Eb3,N._,N.Eb3,N._,
         N.Eb3,N._,N.E3,N._, N.G3,N._,N.G3,N._, N.D3,N._,N.Gs3,N._, N.A3,N._,N.A3,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
@@ -467,7 +467,7 @@ export const TRACKS = {
         N.A4,N._,N._,N._, N._,N._,N.G4,N._, N._,N.A4,N._,N._, N._,N._,N._,N.C5,
         N._,N._,N.Eb5,N._, N.A4,N._,N._,N._, N._,N._,N._,N.G4, N.A4,N._,N._,N._,
       ], durs: [2,2,4,4, 2,2,4,4, 2,2,2,2, 2,2,2,2, 2,2,4,4, 2,2,4,4, 2,2,2,2, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.58, notes: [
+      { instrument: 'bass', vol: 0.3, notes: [
         N.A2,N._,N.A2,N._, N.A2,N._,N.A2,N._, N.G2,N._,N.G2,N._, N.A2,N._,N.Eb3,N._,
         N.A2,N._,N.A2,N._, N.A2,N._,N.G2,N._, N.Gs2,N._,N.A2,N._, N.A2,N._,N.A2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -477,7 +477,7 @@ export const TRACKS = {
   cave: {
     label: '🕳 Cave', bpm: 50, category: 'explore',
     voices: [
-      { instrument: 'pad', vol: 0.65, notes: [
+      { instrument: 'pad', vol: 0.34, notes: [
         N.Fs3,N._,N.Fs3,N._, N.E3,N._,N.E3,N._, N.Cs3,N._,N.D3,N._, N.Fs3,N._,N.Fs3,N._,
         N.B2,N._,N.Cs3,N._, N.Fs3,N._,N.E3,N._, N.D3,N._,N.D3,N._, N.Fs3,N._,N.Cs3,N._,
       ], durs: [8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8]},
@@ -485,7 +485,7 @@ export const TRACKS = {
         N.Cs5,N._,N._,N._, N.B4,N._,N._,N._, N.Fs4,N._,N.A4,N._, N._,N.Cs5,N._,N._,
         N._,N._,N.B4,N._, N._,N.Cs5,N._,N._, N.A4,N._,N._,N._, N.Fs4,N._,N._,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.62, notes: [
+      { instrument: 'bass', vol: 0.32, notes: [
         N.Fs2,N._,N.Fs2,N._, N.E2,N._,N.E2,N._, N.Cs2,N._,N.D2,N._, N.Fs2,N._,N.Fs2,N._,
         N.B2,N._,N.Cs3,N._, N.Fs2,N._,N.E2,N._, N.D2,N._,N.D2,N._, N.Cs2,N._,N.Fs2,N._,
       ], durs: [8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8]},
@@ -496,21 +496,21 @@ export const TRACKS = {
   castle_day: {
     label: '🏰 Castle (Day)', bpm: 84, category: 'explore',
     voices: [
-      { instrument: 'brass', vol: 0.52, notes: [
+      { instrument: 'brass', vol: 0.27, notes: [
         N.D4,N.Fs4,N.A4,N.D5, N.A4,N.Fs4,N.D4,N._, N.E4,N.A4,N.Cs5,N.E5, N.Cs5,N.A4,N.E4,N._,
         N.Fs4,N.A4,N.B4,N.D5, N.B4,N.A4,N.Fs4,N._, N.G4,N.A4,N.B4,N.D5, N.A4,N._,N.D4,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 1,0.5,1,0.5,
       ]},
-      { instrument: 'strings', vol: 0.45, notes: [
+      { instrument: 'strings', vol: 0.28, notes: [
         N.D3,N.A3,N.D4,N.A3, N.D3,N.A3,N.Fs3,N._, N.A2,N.E3,N.A3,N.Cs4, N.A3,N.E3,N.A2,N._,
         N.D3,N.Fs3,N.B3,N.Fs3, N.D3,N.Fs3,N.A3,N._, N.G3,N.B3,N.D4,N.B3, N.A3,N._,N.D3,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 1,0.5,1,0.5,
       ]},
-      { instrument: 'bass', vol: 0.52, notes: [
+      { instrument: 'bass', vol: 0.27, notes: [
         N.D2,N._,N.A2,N._, N.D2,N._,N.Fs2,N._, N.A2,N._,N.E2,N._, N.A2,N._,N.E2,N._,
         N.D2,N._,N.D2,N._, N.D2,N._,N.A2,N._, N.G2,N._,N.D3,N._, N.A2,N._,N.D2,N._,
       ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2]},
@@ -520,14 +520,14 @@ export const TRACKS = {
   ruins: {
     label: '🏚 Ruins', bpm: 66, category: 'explore',
     voices: [
-      { instrument: 'flute', vol: 0.38, notes: [
+      { instrument: 'flute', vol: 0.24, notes: [
         N.D4,N.F4,N.A4,N._, N.G4,N.F4,N.Eb4,N._, N.D4,N._,N.C4,N._, N.Bb3,N._,N.A3,N._,
         N.D4,N._,N.F4,N._, N.A4,N.G4,N.F4,N.Eb4, N.D4,N.C4,N._,N._, N.D4,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 1,1,1,1, 1,1,2,2,
         1,1,1,1, 0.5,0.5,0.5,0.5, 1,1,2,2, 4,4,4,4,
       ]},
-      { instrument: 'pad', vol: 0.52, notes: [
+      { instrument: 'pad', vol: 0.27, notes: [
         N.D3,N._,N.F3,N._, N.A3,N._,N.G3,N._, N.Eb3,N._,N.A3,N._, N.D3,N._,N.D3,N._,
         N.D3,N._,N.F3,N._, N.D3,N._,N.Bb2,N._, N.A2,N._,N.C3,N._, N.D3,N._,N.D3,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -535,7 +535,7 @@ export const TRACKS = {
         N.F4,N._,N.A4,N._, N.G4,N._,N.Eb4,N._, N.D4,N._,N._,N._, N.A3,N._,N._,N._,
         N.F4,N._,N._,N._, N.D4,N._,N.Bb3,N._, N.A3,N._,N.C4,N._, N.D4,N._,N._,N._,
       ], durs: [1,1,1,1, 1,1,1,1, 2,2,4,4, 4,4,4,4, 2,2,2,2, 1,1,1,1, 1,1,1,1, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.48, notes: [
+      { instrument: 'bass', vol: 0.25, notes: [
         N.D2,N._,N.D2,N._, N.G2,N._,N.A2,N._, N.Eb2,N._,N.A2,N._, N.D2,N._,N.D2,N._,
         N.D2,N._,N.F2,N._, N.D2,N._,N.Bb2,N._, N.A2,N._,N.C3,N._, N.D2,N._,N.D2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -547,21 +547,21 @@ export const TRACKS = {
     label: '🏜 Desert', bpm: 88, category: 'explore',
     voices: [
       // Phrygian dominant E F G# A B C D — authentic Middle Eastern scale
-      { instrument: 'flute', vol: 0.52, notes: [
+      { instrument: 'flute', vol: 0.27, notes: [
         N.E4,N.F4,N.Gs4,N.A4, N.Gs4,N.F4,N.E4,N._, N.B4,N.A4,N.Gs4,N.F4, N.E4,N._,N._,N._,
         N.E4,N.F4,N.Gs4,N.B4, N.A4,N.Gs4,N.F4,N.E4, N.D4,N.F4,N.A4,N.Gs4, N.E4,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
-      { instrument: 'strings', vol: 0.42, notes: [
+      { instrument: 'strings', vol: 0.26, notes: [
         N.E3,N.B3,N.E4,N.B3, N.A3,N.E4,N.A3,N.E3, N.B2,N.Gs3,N.B3,N.E3, N.A2,N.E3,N.A3,N.E2,
         N.E3,N.A3,N.E3,N.A3, N.Gs3,N.E3,N.Gs3,N.E3, N.F3,N.A3,N.F3,N.A3, N.E3,N.E3,N.E3,N.E3,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
-      { instrument: 'bass', vol: 0.48, notes: [
+      { instrument: 'bass', vol: 0.25, notes: [
         N.E2,N._,N.A2,N._, N.E2,N._,N.B2,N._, N.E2,N._,N.A2,N._, N.E2,N._,N.E2,N._,
         N.E2,N._,N.A2,N._, N.E2,N._,N.Gs2,N._, N.A2,N._,N.F2,N._, N.E2,N._,N.E2,N._,
       ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2, 1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2]},
@@ -572,25 +572,25 @@ export const TRACKS = {
     label: '⛰ Mountain', bpm: 78, category: 'explore',
     voices: [
       // Big open Em — epic vistas, Skyrim-adjacent
-      { instrument: 'brass', vol: 0.5, notes: [
+      { instrument: 'brass', vol: 0.26, notes: [
         N.E4,N.G4,N.B4,N._, N.D5,N.B4,N.G4,N.E4, N.Fs4,N.A4,N.D5,N._, N.B4,N.G4,N.E4,N._,
         N.E4,N.B3,N.G4,N.B4, N.E5,N.D5,N.B4,N.G4, N.Fs4,N.E4,N.D4,N.B3, N.E4,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
-      { instrument: 'strings', vol: 0.48, notes: [
+      { instrument: 'strings', vol: 0.25, notes: [
         N.B3,N._,N.E4,N._, N.G4,N._,N.D4,N.B3, N.D4,N._,N.A3,N.Fs3, N.B3,N._,N.E3,N._,
         N.E3,N._,N.B3,N.G3, N.B4,N._,N.G4,N.E4, N.D4,N._,N.B3,N.Fs3, N.E3,N._,N._,N._,
       ], durs: [
         1,1,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 4,4,4,4,
       ]},
-      { instrument: 'pad', vol: 0.42, notes: [
+      { instrument: 'pad', vol: 0.26, notes: [
         N.E3,N._,N.E3,N._, N.G3,N._,N.D3,N._, N.D3,N._,N.A2,N._, N.B2,N._,N.E3,N._,
         N.E3,N._,N.B2,N._, N.E4,N._,N.G3,N._, N.D3,N._,N.Fs3,N._, N.E3,N._,N.E3,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.52, notes: [
+      { instrument: 'bass', vol: 0.27, notes: [
         N.E2,N._,N.B2,N._, N.G2,N._,N.D2,N._, N.D2,N._,N.A2,N._, N.B2,N._,N.E2,N._,
         N.E2,N._,N.B2,N._, N.E3,N._,N.G2,N._, N.D2,N._,N.Fs2,N._, N.E2,N._,N.E2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -601,11 +601,11 @@ export const TRACKS = {
     label: '🌌 Space', bpm: 55, category: 'explore',
     voices: [
       // Sparse — long silences, lonely feel
-      { instrument: 'bell', vol: 0.38, notes: [
+      { instrument: 'bell', vol: 0.24, notes: [
         N.A4,N._,N._,N._, N._,N._,N.E4,N._, N._,N.C5,N._,N._, N.A4,N._,N._,N._,
         N._,N._,N._,N.G4, N.E4,N._,N._,N._, N._,N.A4,N._,N.C5, N._,N._,N._,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 2,2,2,2, 4,4,4,4, 2,2,2,2, 8,8,8,8]},
-      { instrument: 'pad', vol: 0.5, notes: [
+      { instrument: 'pad', vol: 0.26, notes: [
         N.A2,N._,N.A2,N._, N.G2,N._,N.G2,N._, N.A2,N._,N.E3,N._, N.A2,N._,N.A2,N._,
         N.C3,N._,N.C3,N._, N.A2,N._,N.G2,N._, N.E3,N._,N.E3,N._, N.A2,N._,N.A2,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 8,8,8,8]},
@@ -614,7 +614,7 @@ export const TRACKS = {
         N.A5,N._,N._,N._, N._,N._,N._,N._, N.G5,N._,N._,N._, N.E5,N._,N._,N._,
         N._,N._,N._,N.A5, N._,N._,N._,N._, N._,N._,N.G5,N._, N._,N._,N._,N._,
       ], durs: [2,2,4,4, 4,4,4,4, 2,2,4,4, 4,4,4,4, 2,2,2,2, 4,4,4,4, 2,2,2,2, 8,8,8,8]},
-      { instrument: 'bass', vol: 0.42, notes: [
+      { instrument: 'bass', vol: 0.26, notes: [
         N.A2,N._,N.A2,N._, N.G2,N._,N.G2,N._, N.A2,N._,N.E2,N._, N.A2,N._,N.A2,N._,
         N.C3,N._,N.C3,N._, N.A2,N._,N.G2,N._, N.E2,N._,N.A2,N._, N.A2,N._,N.A2,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 8,8,8,8]},
@@ -624,21 +624,21 @@ export const TRACKS = {
   plains_day: {
     label: '🌾 Plains (Day)', bpm: 96, category: 'explore',
     voices: [
-      { instrument: 'flute', vol: 0.55, notes: [
+      { instrument: 'flute', vol: 0.29, notes: [
         N.C4,N.E4,N.G4,N.A4, N.G4,N.E4,N.C4,N.D4, N.E4,N.G4,N.A4,N.C5, N.B4,N.G4,N.E4,N._,
         N.C4,N.D4,N.E4,N.G4, N.A4,N.G4,N.E4,N.C4, N.D4,N.E4,N.Fs4,N.G4, N.A4,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
-      { instrument: 'strings_bright', vol: 0.42, notes: [
+      { instrument: 'strings_bright', vol: 0.26, notes: [
         N.E3,N.G3,N.C4,N.E3, N.F3,N.A3,N.C4,N.F3, N.G3,N.B3,N.D4,N.G3, N.C3,N.G3,N.E4,N.C3,
         N.C3,N.E3,N.G3,N.C4, N.A2,N.E3,N.A3,N.C4, N.D3,N.Fs3,N.A3,N.D4, N.C3,N.E3,N.G3,N.C3,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
-      { instrument: 'bass', vol: 0.48, notes: [
+      { instrument: 'bass', vol: 0.25, notes: [
         N.C2,N._,N.G2,N._, N.F2,N._,N.C3,N._, N.G2,N._,N.D3,N._, N.C2,N._,N.G2,N._,
         N.C2,N._,N.E2,N._, N.A2,N._,N.E3,N._, N.D2,N._,N.A2,N._, N.C2,N._,N.C2,N._,
       ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2, 1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2]},
@@ -648,7 +648,7 @@ export const TRACKS = {
   swamp: {
     label: '🌿 Swamp', bpm: 56, category: 'explore',
     voices: [
-      { instrument: 'pad', vol: 0.6, notes: [
+      { instrument: 'pad', vol: 0.31, notes: [
         N.C3,N._,N.C3,N._, N.Bb2,N._,N.Bb2,N._, N.Eb3,N._,N.Eb3,N._, N.C3,N._,N.C3,N._,
         N.Ab2,N._,N.Ab2,N._, N.Bb2,N._,N.Bb2,N._, N.C3,N._,N.Eb3,N._, N.G2,N._,N.C3,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
@@ -656,7 +656,7 @@ export const TRACKS = {
         N.C5,N._,N._,N._, N.Eb5,N._,N._,N._, N.Bb4,N._,N.C5,N._, N.G4,N._,N._,N._,
         N._,N._,N.Ab4,N._, N.Bb4,N._,N._,N._, N._,N.C5,N._,N._, N.G4,N._,N._,N._,
       ], durs: [2,2,4,4, 2,2,4,4, 2,2,2,4, 4,4,4,4, 2,2,2,4, 2,2,4,4, 2,2,2,4, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.55, notes: [
+      { instrument: 'bass', vol: 0.29, notes: [
         N.C2,N._,N.C2,N._, N.Bb2,N._,N.Bb2,N._, N.Eb2,N._,N.Eb2,N._, N.C2,N._,N.C2,N._,
         N.Ab2,N._,N.Ab2,N._, N.Bb2,N._,N.Bb2,N._, N.C2,N._,N.Eb2,N._, N.G2,N._,N.C2,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
@@ -681,11 +681,11 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,2,2,
         1,1,1,1, 1,1,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
-      { instrument: 'pad', vol: 0.48, notes: [
+      { instrument: 'pad', vol: 0.25, notes: [
         N.D3,N._,N.D3,N._, N.C3,N._,N.Bb2,N._, N.A2,N._,N.A2,N._, N.D3,N._,N.D3,N._,
         N.Bb3,N._,N.Bb3,N._, N.F3,N._,N.F3,N._, N.G3,N._,N.G3,N._, N.D3,N._,N.D3,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.4, notes: [
+      { instrument: 'bass', vol: 0.25, notes: [
         N.D2,N._,N.D2,N._, N.C3,N._,N.Bb2,N._, N.A2,N._,N.A2,N._, N.D2,N._,N.D2,N._,
         N.Bb2,N._,N.Bb2,N._, N.F2,N._,N.F2,N._, N.G2,N._,N.G2,N._, N.D2,N._,N.D2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -697,7 +697,7 @@ export const TRACKS = {
     label: '⚔ Battle', bpm: 162, category: 'combat',
     voices: [
       // Em hook: E E G A — B A G F# (the "anime battle" ascending shape)
-      { instrument: 'brass_bright', vol: 0.68, notes: [
+      { instrument: 'brass_bright', vol: 0.35, notes: [
         N.E4,N.E4,N.G4,N.A4, N.B4,N.A4,N.G4,N.Fs4,
         N.E4,N.Fs4,N.G4,N.A4, N.B4,N._,N.Ds4,N.E4,
         N.E4,N.G4,N.A4,N.B4, N.D5,N.B4,N.A4,N.G4,
@@ -709,7 +709,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 1,0.5,0.5,1,
       ]},
       // FIX: Strings now alternate chord tones — NOT monotone
-      { instrument: 'strings', vol: 0.55, notes: [
+      { instrument: 'strings', vol: 0.29, notes: [
         N.E3,N.G3,N.E3,N.G3, N.D3,N.G3,N.D3,N.G3,
         N.A3,N.E3,N.A3,N.E3, N.B3,N.Fs3,N.B3,N.Fs3,
         N.E3,N.B3,N.E3,N.B3, N.D3,N.A3,N.D3,N.A3,
@@ -733,7 +733,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
       // KICK — on beats 1 and 3 (1 = 1, 3 = 1 beat later since 0.5 dur)
-      { instrument: 'kick', vol: 0.7, notes: [
+      { instrument: 'kick', vol: 0.36, notes: [
         1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,1,0,
         1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,1,0,
       ], durs: [
@@ -743,7 +743,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
       // SNARE — on beats 2 and 4
-      { instrument: 'snare', vol: 0.55, notes: [
+      { instrument: 'snare', vol: 0.29, notes: [
         0,0,1,0, 1,0,0,0, 0,0,1,0, 1,0,0,0,
         0,0,1,0, 1,0,0,0, 0,0,1,0, 1,0,0,0,
       ], durs: [
@@ -752,7 +752,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
-      { instrument: 'bass', vol: 0.65, notes: [
+      { instrument: 'bass', vol: 0.34, notes: [
         N.E2,N.E2,N.G2,N.A2, N.B2,N.B2,N.A2,N.G2,
         N.A2,N.E2,N.A2,N.G2, N.B2,N.B2,N.B2,N.E2,
         N.E2,N.B2,N.E2,N.B2, N.D2,N.A2,N.D2,N.A2,
@@ -770,7 +770,7 @@ export const TRACKS = {
     label: '💀 Boss Battle', bpm: 182, category: 'combat',
     voices: [
       // Dm harmonic minor — intense chromatic tension
-      { instrument: 'brass_bright', vol: 0.75, notes: [
+      { instrument: 'brass_bright', vol: 0.39, notes: [
         N.D4,N._,N.A4,N.Cs5, N.D5,N._,N.A4,N.F4,
         N.D4,N.F4,N.A4,N.Cs4, N.D5,N.Cs5,N.A4,N.F4,
         N.Eb4,N._,N.Bb4,N.D5, N.Cs5,N._,N.Bb4,N.Gs4,
@@ -782,7 +782,7 @@ export const TRACKS = {
         0.5,0.5,0.25,0.25, 1,0.5,0.25,0.25,
       ]},
       // Strings — 16th note ostinato with varied pitches (not monotone)
-      { instrument: 'strings', vol: 0.62, notes: [
+      { instrument: 'strings', vol: 0.32, notes: [
         N.D3,N.F3,N.A3,N.D3, N.F3,N.A3,N.Cs4,N.F3,
         N.D3,N.A3,N.Bb3,N.D3, N.A3,N.E3,N.A3,N.E3,
         N.Eb3,N.Bb3,N.D4,N.Eb3, N.Cs4,N.Gs3,N.Cs4,N.Gs3,
@@ -794,7 +794,7 @@ export const TRACKS = {
         0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
       ]},
       // Kick: every beat (relentless boss feel)
-      { instrument: 'kick', vol: 0.75, notes: [
+      { instrument: 'kick', vol: 0.39, notes: [
         1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0,
         1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0,
       ], durs: [
@@ -803,7 +803,7 @@ export const TRACKS = {
         0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
         0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
       ]},
-      { instrument: 'snare', vol: 0.65, notes: [
+      { instrument: 'snare', vol: 0.34, notes: [
         0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0,
         0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0,
       ], durs: [
@@ -812,7 +812,7 @@ export const TRACKS = {
         0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
         0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
       ]},
-      { instrument: 'bass', vol: 0.72, notes: [
+      { instrument: 'bass', vol: 0.37, notes: [
         N.D2,N.D2,N.A2,N.F2, N.D2,N.Cs2,N.D2,N.A2,
         N.Bb2,N.Bb2,N.A2,N.A2, N.D2,N.D2,N.E2,N.E2,
         N.Eb2,N.Bb2,N.D3,N.Eb2, N.Cs3,N.Gs2,N.Cs3,N.Gs2,
@@ -833,12 +833,12 @@ export const TRACKS = {
     voices: [
       // FIX: Add tritone dissonance voice — the hallmark of Herrmann-style tension
       // Strings: chromatic rise A→Bb→B→C
-      { instrument: 'strings', vol: 0.52, notes: [
+      { instrument: 'strings', vol: 0.27, notes: [
         N.A3,N._,N._,N._, N.Bb3,N._,N._,N._, N.B3,N._,N._,N._, N.C4,N._,N.Bb3,N.A3,
         N.A3,N._,N._,N._, N.Bb3,N._,N._,N._, N.B3,N._,N.C4,N._, N.Cs4,N._,N.D4,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 1,1,1,1, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
       // FIX: Tritone voice — Eb above the A (the dissonance that makes it feel tense)
-      { instrument: 'pad', vol: 0.45, notes: [
+      { instrument: 'pad', vol: 0.28, notes: [
         N.Eb4,N._,N.Eb4,N._, N.E4,N._,N.E4,N._, N.F4,N._,N.F4,N._, N.Fs4,N._,N.Fs4,N._,
         N.Eb4,N._,N.Eb4,N._, N.E4,N._,N.E4,N._, N.F4,N._,N.Fs4,N._, N.G4,N._,N.Gs4,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
@@ -850,7 +850,7 @@ export const TRACKS = {
         1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
         1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
       ]},
-      { instrument: 'bass', vol: 0.55, notes: [
+      { instrument: 'bass', vol: 0.29, notes: [
         N.A2,N._,N.A2,N._, N.Bb2,N._,N.Bb2,N._, N.B2,N._,N.B2,N._, N.C3,N._,N.Bb2,N.A2,
         N.A2,N._,N.A2,N._, N.Bb2,N._,N.Bb2,N._, N.B2,N._,N.C3,N._, N.Cs3,N._,N.D3,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 1,1,1,1, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
@@ -860,25 +860,25 @@ export const TRACKS = {
   peaceful: {
     label: '🕊 Peaceful', bpm: 78, category: 'mood',
     voices: [
-      { instrument: 'flute', vol: 0.48, notes: [
+      { instrument: 'flute', vol: 0.25, notes: [
         N.F4,N.A4,N.C5,N._, N.A4,N.G4,N.F4,N.E4, N.G4,N.Bb4,N.C5,N._, N.A4,N.G4,N.F4,N._,
         N.C4,N.E4,N.G4,N.A4, N.G4,N.F4,N.E4,N.C4, N.F4,N.A4,N.C5,N.A4, N.F4,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
-      { instrument: 'harp', vol: 0.4, notes: [
+      { instrument: 'harp', vol: 0.25, notes: [
         N.F3,N.A3,N.C4,N.F3, N.C3,N.G3,N.C4,N.E3, N.F3,N.Bb3,N.D4,N.F3, N.C3,N.G3,N.C4,N.F3,
         N.A2,N.E3,N.A3,N.C4, N.Bb2,N.F3,N.Bb3,N.D4, N.F3,N.C4,N.F3,N.A3, N.C3,N.G3,N.C4,N.F3,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
-      { instrument: 'pad', vol: 0.38, notes: [
+      { instrument: 'pad', vol: 0.24, notes: [
         N.F3,N._,N.C4,N._, N.F3,N._,N.C3,N._, N.Bb2,N._,N.F3,N._, N.C3,N._,N.F3,N._,
         N.A2,N._,N.E3,N._, N.Bb2,N._,N.F3,N._, N.F3,N._,N.C4,N._, N.F3,N._,N.F3,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.42, notes: [
+      { instrument: 'bass', vol: 0.26, notes: [
         N.F2,N._,N.C3,N._, N.F2,N._,N.G2,N._, N.Bb2,N._,N.F2,N._, N.C3,N._,N.F2,N._,
         N.A2,N._,N.E3,N._, N.Bb2,N._,N.F2,N._, N.F2,N._,N.C3,N._, N.F2,N._,N.F2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -889,14 +889,14 @@ export const TRACKS = {
     label: '🔮 Mysterious', bpm: 70, category: 'mood',
     voices: [
       // B Locrian — ambiguous, unsettling
-      { instrument: 'bell', vol: 0.4, notes: [
+      { instrument: 'bell', vol: 0.25, notes: [
         N.B4,N._,N.D5,N.Fs5, N.E5,N._,N.D5,N._, N.B4,N._,N.Gs4,N.B4, N.Cs5,N._,N.A4,N._,
         N.B4,N.D5,N.Fs5,N._, N.E5,N.D5,N.B4,N._, N.A4,N._,N.Gs4,N._, N.B4,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,1.5,0.5,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,1,1, 2,2,2,2,
       ]},
-      { instrument: 'pad', vol: 0.52, notes: [
+      { instrument: 'pad', vol: 0.27, notes: [
         N.B3,N._,N.B3,N._, N.Gs3,N._,N.A3,N._, N.B3,N._,N.Cs4,N._, N.A3,N._,N.E3,N._,
         N.B3,N._,N.D4,N._, N.Fs4,N._,N.E4,N._, N.D4,N._,N.A3,N._, N.B3,N._,N.B3,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -904,7 +904,7 @@ export const TRACKS = {
         N.Fs5,N._,N._,N._, N.E5,N._,N.D5,N._, N.B4,N.D5,N._,N._, N.Cs5,N._,N._,N._,
         N._,N._,N.Fs5,N._, N.E5,N._,N._,N.B4, N.D5,N._,N.Cs5,N._, N.B4,N._,N._,N._,
       ], durs: [1,1,2,2, 1,1,1,1, 1,1,2,2, 4,4,4,4, 2,2,2,2, 1,1,1,1, 1,1,2,2, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.45, notes: [
+      { instrument: 'bass', vol: 0.28, notes: [
         N.B2,N._,N.B2,N._, N.Gs2,N._,N.A2,N._, N.B2,N._,N.Cs3,N._, N.A2,N._,N.E2,N._,
         N.B2,N._,N.D3,N._, N.Fs3,N._,N.E3,N._, N.D3,N._,N.A2,N._, N.B2,N._,N.B2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -915,14 +915,14 @@ export const TRACKS = {
     label: '💔 Emotional', bpm: 62, category: 'mood',
     voices: [
       // Am — the classic emotional minor
-      { instrument: 'strings_bright', vol: 0.62, notes: [
+      { instrument: 'strings_bright', vol: 0.32, notes: [
         N.A3,N.C4,N.E4,N._, N.D4,N.C4,N.B3,N.A3, N.G3,N.B3,N.E4,N.D4, N.C4,N.B3,N.A3,N._,
         N.F3,N.A3,N.C4,N._, N.E3,N.G3,N.B3,N._, N.A3,N.C4,N.E4,N.G4, N.A4,N._,N._,N._,
       ], durs: [
         0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1.5,
         0.5,0.5,0.5,0.5, 1,1,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
-      { instrument: 'pad', vol: 0.55, notes: [
+      { instrument: 'pad', vol: 0.29, notes: [
         N.A3,N._,N.E4,N._, N.F3,N._,N.C4,N._, N.G3,N._,N.D4,N._, N.A3,N._,N.E3,N._,
         N.F3,N._,N.C4,N._, N.E3,N._,N.B3,N._, N.A3,N._,N.E4,N._, N.A3,N._,N.A3,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -933,7 +933,7 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,2,
       ]},
-      { instrument: 'bass', vol: 0.48, notes: [
+      { instrument: 'bass', vol: 0.25, notes: [
         N.A2,N._,N.A2,N._, N.F2,N._,N.C3,N._, N.G2,N._,N.D3,N._, N.A2,N._,N.E3,N._,
         N.F2,N._,N.C3,N._, N.E2,N._,N.B2,N._, N.A2,N._,N.E3,N._, N.A2,N._,N.A2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -943,35 +943,35 @@ export const TRACKS = {
   triumphant: {
     label: '🏆 Triumphant', bpm: 112, category: 'mood',
     voices: [
-      { instrument: 'brass_bright', vol: 0.65, notes: [
+      { instrument: 'brass_bright', vol: 0.34, notes: [
         N.C4,N.E4,N.G4,N.C5, N.G4,N.E4,N.C4,N.E4, N.G4,N.A4,N.G4,N.F4, N.E4,N.D4,N.C4,N._,
         N.C4,N.E4,N.G4,N.C5, N.A4,N.G4,N.F4,N.E4, N.D4,N.F4,N.A4,N.D5, N.C5,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
-      { instrument: 'strings_bright', vol: 0.5, notes: [
+      { instrument: 'strings_bright', vol: 0.26, notes: [
         N.E3,N.G3,N.C4,N.E3, N.F3,N.A3,N.C4,N.F3, N.G3,N.B3,N.D4,N.G3, N.C3,N.G3,N.E4,N.C3,
         N.E3,N.C4,N.E3,N.C4, N.A3,N.E4,N.A3,N.C4, N.D3,N.A3,N.D4,N.Fs4, N.G3,N.B3,N.D4,N.G3,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
-      { instrument: 'bell', vol: 0.38, notes: [
+      { instrument: 'bell', vol: 0.24, notes: [
         N.G4,N._,N.C5,N._, N.E5,N._,N.D5,N._, N.C5,N._,N.E5,N._, N.G5,N._,N._,N._,
         N.G4,N._,N.C5,N.E5, N.A5,N._,N.G5,N.F5, N.E5,N._,N.D5,N._, N.C5,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,2,
         0.5,0.5,0.25,0.25, 0.25,0.25,0.25,0.25, 0.5,0.5,0.5,0.5, 2,2,2,2,
       ]},
-      { instrument: 'kick', vol: 0.55, notes: [
+      { instrument: 'kick', vol: 0.29, notes: [
         1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0,
         1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
-      { instrument: 'bass', vol: 0.55, notes: [
+      { instrument: 'bass', vol: 0.29, notes: [
         N.C2,N._,N.G2,N.E2, N.F2,N._,N.C3,N.A2, N.G2,N._,N.D3,N.B2, N.C2,N._,N.G2,N._,
         N.C2,N._,N.E2,N.G2, N.A2,N._,N.E3,N.C3, N.D2,N._,N.A2,N.Fs2, N.G2,N._,N.D3,N.G2,
       ], durs: [
@@ -984,25 +984,25 @@ export const TRACKS = {
   npc_theme: {
     label: '🧙 NPC', bpm: 82, category: 'mood',
     voices: [
-      { instrument: 'flute', vol: 0.48, notes: [
+      { instrument: 'flute', vol: 0.25, notes: [
         N.F4,N.A4,N.C5,N.A4, N.G4,N.Bb4,N.A4,N.G4, N.F4,N.G4,N.A4,N.C5, N.Bb4,N.A4,N.G4,N._,
         N.F4,N.A4,N.C5,N.D5, N.C5,N.Bb4,N.A4,N.G4, N.F4,N.A4,N.Bb4,N._, N.F4,N._,N._,N._,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 2,2,2,2,
       ]},
-      { instrument: 'harp', vol: 0.38, notes: [
+      { instrument: 'harp', vol: 0.24, notes: [
         N.F3,N.A3,N.C4,N.F3, N.G3,N.Bb3,N.D4,N.G3, N.A3,N.C4,N.E4,N.A3, N.F3,N.A3,N.C4,N.F3,
         N.F3,N.C4,N.F3,N.A3, N.G3,N.Bb3,N.D4,N.G3, N.F3,N.A3,N.Bb3,N.F3, N.F3,N.C4,N.F3,N.A3,
       ], durs: [
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
       ]},
-      { instrument: 'pad', vol: 0.38, notes: [
+      { instrument: 'pad', vol: 0.24, notes: [
         N.F3,N._,N.A3,N._, N.G3,N._,N.Bb3,N._, N.A3,N._,N.C4,N._, N.F3,N._,N.F3,N._,
         N.F3,N._,N.C4,N._, N.G3,N._,N.D4,N._, N.F3,N._,N.Bb3,N._, N.F3,N._,N.F3,N._,
       ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2, 1,1,1,1, 1,1,1,1, 1,1,1,1, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.42, notes: [
+      { instrument: 'bass', vol: 0.26, notes: [
         N.F2,N._,N.F2,N._, N.G2,N._,N.G2,N._, N.A2,N._,N.A2,N._, N.F2,N._,N.F2,N._,
         N.F2,N._,N.C3,N._, N.G2,N._,N.D3,N._, N.F2,N._,N.Bb2,N._, N.F2,N._,N.F2,N._,
       ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
@@ -1023,11 +1023,11 @@ export const TRACKS = {
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
         0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,2,
       ]},
-      { instrument: 'pad', vol: 0.42, notes: [
+      { instrument: 'pad', vol: 0.26, notes: [
         N.G3,N._,N.G3,N._, N.D3,N._,N.D3,N._, N.C3,N._,N.C3,N._, N.G3,N._,N.G3,N._,
         N.G3,N._,N.E3,N._, N.D3,N._,N.Fs3,N._, N.G3,N._,N.G3,N._, N.G3,N._,N.G3,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
-      { instrument: 'bass', vol: 0.38, notes: [
+      { instrument: 'bass', vol: 0.24, notes: [
         N.G2,N._,N.G2,N._, N.D2,N._,N.D2,N._, N.C3,N._,N.C3,N._, N.G2,N._,N.G2,N._,
         N.G2,N._,N.E2,N._, N.D2,N._,N.Fs2,N._, N.G2,N._,N.G2,N._, N.G2,N._,N.G2,N._,
       ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
