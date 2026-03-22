@@ -367,6 +367,7 @@ export default function StoryWindow() {
         turnCount={state.turnCount || 0}
         inCombat={state.inCombat || false}
         enemy={state.combatants?.find(c => c.relationship === 'enemy' || c.relationship === 'hostile')?.name || null}
+        npcs={state.npcs || []}
       />
 
       {state.inCombat && (

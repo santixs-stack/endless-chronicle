@@ -162,7 +162,21 @@ const PALETTE = {
   },
 };
 
-const getPal = (type) => PALETTE[type] || PALETTE.plains;
+function getPal(type, time) {
+  const base = PALETTE[type] || PALETTE.plains;
+  // City during day gets a lighter sky
+  if (type === 'city' && (time === 'day' || time === 'dawn' || time === 'dusk')) {
+    return {
+      ...base,
+      sky: time === 'dusk'
+        ? ['#4A1942','#8B3060','#C05040']
+        : time === 'dawn'
+          ? ['#3A4060','#6060A0','#9080C0']
+          : ['#2A3A6A','#3A4E8C','#5A6EAC'],  // day: deep city blue, still dramatic
+    };
+  }
+  return base;
+}
 
 // ── Draw a hand-drawn character ───────────
 // Each class gets a distinct illustrated silhouette
@@ -427,6 +441,21 @@ function svgEl(tag, attrs) {
   return el;
 }
 
+// ── Map creature type to a drawable character class ──────────────────────
+function creatureTypeToClass(creatureType) {
+  const map = {
+    merchant:   'healer',   elder:    'mage',
+    mage_npc:   'mage',     knight:   'warrior',
+    guard:      'warrior',  assassin: 'rogue',
+    thief:      'rogue',    bandit:   'rogue',
+    ghost:      'mage',     wraith:   'mage',
+    goblin:     'rogue',    orc:      'warrior',
+    vampire:    'rogue',    wolf:     'ranger',
+    dragon:     'warrior',  troll:    'warrior',
+  };
+  return map[creatureType] || 'healer';
+}
+
 // ── Draw full scene ────────────────────────
 function drawScene(svgEl2, scene, players, turnCount) {
   // Clear
@@ -438,7 +467,7 @@ function drawScene(svgEl2, scene, players, turnCount) {
   const weather = scene?.weather || 'clear';
   const inCombat = scene?.inCombat || false;
   const enemyName = scene?.enemy;
-  const pal = getPal(type);
+  const pal = getPal(type, time);
   const sr = mkRand(type.charCodeAt(0) * 1337);
   const tr = mkRand(turnCount * 997 + type.charCodeAt(0) * 31);
 
@@ -500,6 +529,26 @@ function drawScene(svgEl2, scene, players, turnCount) {
       drawCharacter(rc, svgEl2, cx, groundY, p.class || 'warrior',
         p.color || PLAYER_COLORS[i % PLAYER_COLORS.length],
         p.name || '', sr);
+    });
+  }
+
+  // ── Scene NPCs (friendly/neutral — not combat enemies) ──
+  const sceneNpcs = (mergedScene?.npcs || []).filter(n =>
+    n.relationship !== 'enemy' && n.relationship !== 'hostile'
+  ).slice(0, 2); // max 2 NPCs in scene at once to avoid clutter
+
+  if (sceneNpcs.length > 0) {
+    const npcSpacing = 55;
+    const npcStartX = W * 0.68;
+    sceneNpcs.forEach((npc, i) => {
+      const nx = npcStartX + i * npcSpacing;
+      // Map NPC role to a drawable class
+      const npcClass = npc.creatureType
+        ? creatureTypeToClass(npc.creatureType)
+        : 'healer';
+      // Friendly NPCs: muted warm color, slightly smaller
+      const npcColor = npc.relationship === 'ally' ? '#88BBFF' : '#C8B090';
+      drawCharacter(rc, svgEl2, nx, groundY, npcClass, npcColor, npc.name || '', sr);
     });
   }
 
@@ -982,7 +1031,7 @@ function drawSnowfall(svg, tr) {
 //  REACT COMPONENT
 // ═══════════════════════════════════════════
 
-export default function SceneRenderer({ scene, players, turnCount = 0, inCombat, enemy }) {
+export default function SceneRenderer({ scene, players, turnCount = 0, inCombat, enemy, npcs }) {
   const svgRef = useRef(null);
 
   // Merge enemy/combat into scene object for drawScene
@@ -990,6 +1039,7 @@ export default function SceneRenderer({ scene, players, turnCount = 0, inCombat,
     ...scene,
     inCombat: inCombat || scene?.inCombat || false,
     enemy: enemy || scene?.enemy || null,
+    npcs: npcs || [],
   };
 
   useEffect(() => {
@@ -999,7 +1049,7 @@ export default function SceneRenderer({ scene, players, turnCount = 0, inCombat,
     } catch(e) {
       console.warn('SceneRenderer error:', e);
     }
-  }, [scene?.type, scene?.time, scene?.weather, scene?.inCombat, scene?.enemy, players, turnCount, inCombat, enemy]);
+  }, [scene?.type, scene?.time, scene?.weather, scene?.inCombat, scene?.enemy, players, turnCount, inCombat, enemy, npcs]);
 
   return (
     <div className={styles.wrapper}>
