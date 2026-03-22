@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import { getStartingGear, getSpecial } from '../../data/startingGear.js';
-import { GENRES, getGenreArchetypes, detectGenre } from '../../data/archetypes.js';
+import { GENRES, getGenreArchetypes, detectGenre, ARCHETYPE_ICONS, ARCHETYPES } from '../../data/archetypes.js';
 import { CHAR_PRESETS } from '../../data/presets.js';
 import { DND_CLASSES } from '../../data/classes.js';
 import { callAPI } from '../../engine/api.js';
