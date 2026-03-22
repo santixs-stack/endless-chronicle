@@ -362,7 +362,8 @@ export default function CharacterCreateScreen() {
       motivation: `To prove what a ${archetype.name} can accomplish`,
       backstory: `${name} has built a reputation as a ${archetype.name}. ${randomFrom(RANDOM_BACKGROUNDS).charAt(0).toUpperCase() + randomFrom(RANDOM_BACKGROUNDS).slice(1)}.`,
       className: cls,
-      classIcon: archetype.icon,
+      archetypeName: archetype.name,   // e.g. "Netrunner", "Samurai", "Gunslinger"
+      classIcon: archetype.icon,       // emoji — replaced with game icon in handleConfirm
     };
     setPendingChar({ ...char, fromArchetype: true });
     setSubFlow('confirm');
@@ -381,6 +382,13 @@ export default function CharacterCreateScreen() {
   function handleConfirm(char) {
     
     const cls = DND_CLASSES.find(c => c.id === char.className) || DND_CLASSES[0];
+    // Use genre-aware game icon path for classIcon (used in scene renderer + story window)
+    const genreIconMap = ARCHETYPE_ICONS[genre] || ARCHETYPE_ICONS.fantasy || {};
+    const gameIconPath = genreIconMap[cls.id] || 'lorc/broadsword';
+    // Resolve archetype display name: archetype path sets it; freeform/chat path needs lookup
+    const resolvedArchetypeName = char.archetypeName ||
+      (ARCHETYPES[genre] || ARCHETYPES.fantasy)?.[char.roleId || 'mage']?.name ||
+      null;
     const newPlayer = {
       name: char.name,
       age: char.age,
@@ -391,8 +399,10 @@ export default function CharacterCreateScreen() {
       motivation: char.motivation,
       backstory: char.backstory,
       class: cls.id,
-      className: cls.name,
-      classIcon: char.classIcon || cls.icon,
+      // Display name: use archetypeName if set (e.g. "Netrunner"), else DnD class name
+      className: resolvedArchetypeName || cls.name,
+      archetypeName: resolvedArchetypeName || null,  // keep for scene renderer lookup
+      classIcon: gameIconPath,
       hp: cls.hp, maxHp: cls.hp,
       xp: 0, level: 1,
       color: PLAYER_COLORS[idx],
@@ -458,7 +468,8 @@ export default function CharacterCreateScreen() {
       name: randName,
       role: preset.char.role + ` — ${randBg}`,
       class: cls.id,
-      className: cls.name,
+      className: preset.char.className || cls.name,   // use preset's display name if set
+      archetypeName: preset.char.className || null,
       classIcon: preset.icon,
       hp: cls.hp, maxHp: cls.hp,
       xp: 0, level: 1,

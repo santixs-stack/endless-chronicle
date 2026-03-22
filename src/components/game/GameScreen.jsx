@@ -43,7 +43,7 @@ const CRAFT_ICONS = [
   'lorc/crystal-ball', 'lorc/open-book', 'lorc/crown',
   'lorc/plain-dagger', 'delapouite/caduceus', 'lorc/anchor',
   'lorc/wizard-staff', 'lorc/ghost', 'lorc/wolf-howl',
-  'lorc/dice-twenty-faces-twenty', 'lorc/crossed-axes', 'lorc/fairy-wand',
+  'lorc/crenulated-shield', 'lorc/crossed-axes', 'lorc/fairy-wand',
 ];
 
 const CRAFT_MESSAGES = [
@@ -108,7 +108,7 @@ function WorldCraftingScreen({ players }) {
           {/* Center */}
           <div className={styles.worldCraftCenter}>
             <div className={styles.worldCraftPulse} />
-            <GameIcon path="lorc/dice-twenty-faces-twenty" size={32} tint="accent" />
+            <GameIcon path="lorc/crenulated-shield" size={32} tint="accent" />
           </div>
         </div>
 

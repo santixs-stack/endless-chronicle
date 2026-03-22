@@ -290,6 +290,92 @@ function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
     // Legs
     svg.appendChild(rc.rectangle(cx-7, hy-8, 6, 10, opts(darkColor, { roughness: 0.8 })));
     svg.appendChild(rc.rectangle(cx+1, hy-8, 6, 10, opts(darkColor, { roughness: 0.8 })));
+  } else if (cls === 'netrunner') {
+    // Cyberpunk netrunner — sleek bodysuit, tactical visor, neon accents
+    // Legs - slim tactical
+    svg.appendChild(rc.rectangle(cx-7, hy-16, 6, 16, opts(shadeColor(color,-50), {roughness:0.8})));
+    svg.appendChild(rc.rectangle(cx+1,  hy-16, 6, 16, opts(shadeColor(color,-50), {roughness:0.8})));
+    // Body - form-fitting suit
+    svg.appendChild(rc.polygon([
+      [cx-8,hy-38],[cx+8,hy-38],[cx+7,hy-16],[cx-7,hy-16]
+    ], opts(shadeColor(color,-40), { roughness: 0.9 })));
+    // Neon strip lines on suit (use player color)
+    svg.appendChild(rc.line(cx-6, hy-36, cx-6, hy-20, { stroke: color, strokeWidth: 1.5, roughness: 1.2 }));
+    svg.appendChild(rc.line(cx+6, hy-36, cx+6, hy-20, { stroke: color, strokeWidth: 1.5, roughness: 1.2 }));
+    // Head
+    svg.appendChild(rc.ellipse(cx, hy-46, 13, 13, opts(shadeColor(color,-30))));
+    // Tactical visor strip
+    svg.appendChild(rc.rectangle(cx-6, hy-49, 12, 4, opts(shadeColor(color,-60), {roughness:0.5})));
+    svg.appendChild(rc.rectangle(cx-6, hy-49, 12, 4, { stroke:'none', fill: color, fillStyle:'solid', roughness:0.4 }));
+    // Neural implant dot
+    svg.appendChild(rc.circle(cx+4, hy-52, 3, { stroke: color, fill: color, fillStyle:'solid', roughness:0.5 }));
+    // Arms
+    svg.appendChild(rc.line(cx-8, hy-36, cx-14, hy-24, { stroke: shadeColor(color,-40), strokeWidth: 5, roughness: 1.2, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx+8, hy-36, cx+14, hy-22, { stroke: shadeColor(color,-40), strokeWidth: 5, roughness: 1.2, strokeLinecap:'round' }));
+    // Data jack cable from hand
+    svg.appendChild(rc.path(`M ${cx-14} ${hy-24} Q ${cx-22} ${hy-22} ${cx-24} ${hy-16}`, { stroke: color, strokeWidth: 1, fill: 'none', roughness: 2 }));
+
+  } else if (cls === 'gunslinger') {
+    // Western gunslinger — duster coat, cowboy hat, revolver
+    // Legs with trouser stripe
+    svg.appendChild(rc.rectangle(cx-8, hy-18, 6, 18, opts(shadeColor(color,-40), {roughness:1.5})));
+    svg.appendChild(rc.rectangle(cx+2,  hy-18, 6, 18, opts(shadeColor(color,-40), {roughness:1.5})));
+    // Boot spurs
+    svg.appendChild(rc.line(cx-8, hy, cx-12, hy+2, { stroke: '#888', strokeWidth: 1.5, roughness: 1 }));
+    // Duster coat
+    svg.appendChild(rc.polygon([
+      [cx-9,hy-36],[cx+9,hy-36],[cx+11,hy-10],[cx+15,hy-6],[cx+14,hy],[cx+8,hy-8],
+      [cx-8,hy-8],[cx-14,hy],[cx-15,hy-6],[cx-11,hy-10]
+    ], opts(shadeColor(color,-30), { roughness: 2.2 })));
+    // Vest/shirt
+    svg.appendChild(rc.rectangle(cx-5, hy-34, 10, 14, opts(shadeColor(color,-10), {roughness:1})));
+    // Head
+    svg.appendChild(rc.ellipse(cx, hy-44, 14, 14, opts(shadeColor(color,-10))));
+    // Stubble/face
+    svg.appendChild(rc.line(cx-4, hy-39, cx+4, hy-39, { stroke: shadeColor(color,-30), strokeWidth: 1.5, roughness: 2 }));
+    // Cowboy hat - brim + crown
+    svg.appendChild(rc.ellipse(cx, hy-50, 22, 5, opts(shadeColor(color,-50), {roughness:1.5})));
+    svg.appendChild(rc.rectangle(cx-7, hy-62, 14, 12, opts(shadeColor(color,-50), {roughness:1.5})));
+    // Hat crease
+    svg.appendChild(rc.line(cx-6, hy-62, cx+6, hy-62, { stroke: shadeColor(color,-60), strokeWidth: 1, roughness: 2 }));
+    // Arms
+    svg.appendChild(rc.line(cx-9, hy-34, cx-14, hy-22, { stroke: shadeColor(color,-30), strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx+9, hy-34, cx+16, hy-20, { stroke: shadeColor(color,-30), strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    // Revolver
+    svg.appendChild(rc.rectangle(cx+16, hy-22, 7, 3, opts('#666', {roughness:0.8})));
+    svg.appendChild(rc.circle(cx+17, hy-20, 4, { stroke:'#444', fill:'#333', fillStyle:'solid', roughness:0.8 }));
+
+  } else if (cls === 'samurai') {
+    // Samurai — armored do, kabuto helmet, katana
+    // Legs - hakama wide pants
+    svg.appendChild(rc.polygon([[cx-9,hy-18],[cx+9,hy-18],[cx+13,hy],[cx-13,hy]], opts(shadeColor(color,-20), {roughness:2.0})));
+    // Body armor plates
+    svg.appendChild(rc.polygon([
+      [cx-9,hy-38],[cx+9,hy-38],[cx+10,hy-18],[cx-10,hy-18]
+    ], opts(shadeColor(color,-40), { roughness: 1.2 })));
+    // Armor lacing lines
+    svg.appendChild(rc.line(cx-8, hy-36, cx+8, hy-36, { stroke: color, strokeWidth: 1.2, roughness: 1.5 }));
+    svg.appendChild(rc.line(cx-8, hy-30, cx+8, hy-30, { stroke: color, strokeWidth: 1.2, roughness: 1.5 }));
+    svg.appendChild(rc.line(cx-8, hy-24, cx+8, hy-24, { stroke: color, strokeWidth: 1.2, roughness: 1.5 }));
+    // Shoulder guards (sode)
+    svg.appendChild(rc.rectangle(cx-16, hy-40, 8, 12, opts(shadeColor(color,-40), {roughness:1.5})));
+    svg.appendChild(rc.rectangle(cx+8,  hy-40, 8, 12, opts(shadeColor(color,-40), {roughness:1.5})));
+    // Arms
+    svg.appendChild(rc.line(cx-12, hy-38, cx-16, hy-22, { stroke: shadeColor(color,-40), strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx+12, hy-38, cx+18, hy-20, { stroke: shadeColor(color,-40), strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    // Head
+    svg.appendChild(rc.ellipse(cx, hy-46, 13, 13, opts(shadeColor(color,-20))));
+    // Kabuto helmet
+    svg.appendChild(rc.polygon([
+      [cx-8,hy-50],[cx+8,hy-50],[cx+7,hy-46],[cx-7,hy-46]
+    ], opts(shadeColor(color,-50), {roughness:1.2})));
+    svg.appendChild(rc.path(`M ${cx-8} ${hy-50} Q ${cx} ${hy-60} ${cx+8} ${hy-50}`, opts(shadeColor(color,-50), {roughness:1.5})));
+    // Face guard (menpo) — lower face
+    svg.appendChild(rc.rectangle(cx-5, hy-46, 10, 4, opts(shadeColor(color,-40), {roughness:0.8})));
+    // Katana
+    svg.appendChild(rc.line(cx+18, hy-20, cx+28, hy-42, { stroke: '#e8e8d0', strokeWidth: 2, roughness: 0.6 }));
+    svg.appendChild(rc.ellipse(cx+21, hy-26, 5, 2, { stroke:'#a08020', fill:'none', roughness:1, strokeWidth:1.5 }));
+
   } else if (cls === 'pirate' || cls === 'buccaneer') {
     svg.appendChild(rc.polygon([
       [cx-7,hy-32],[cx+7,hy-32],[cx+8,hy],[cx-8,hy]
@@ -462,6 +548,67 @@ function creatureTypeToClass(creatureType) {
   return map[creatureType] || 'healer';
 }
 
+
+// ── Resolve character class to visual type ───────────────────────────────
+// Maps archetype display names (Netrunner, Samurai, Gunslinger) and DnD
+// class ids to the closest visual representation in drawCharacter.
+function resolveCharacterClass(classId, className) {
+  const nameMap = {
+    // Cyberpunk
+    'netrunner': 'netrunner', 'hacker': 'netrunner', 'cyber': 'netrunner',
+    'street samurai': 'warrior', 'cyber soldier': 'warrior',
+    'fixer': 'rogue', 'corpo agent': 'rogue',
+    'tech': 'mage', 'techie': 'mage',
+    'medtech': 'healer', 'ripper doc': 'healer',
+    'face': 'bard',
+    // Western
+    'gunslinger': 'gunslinger', 'sheriff': 'gunslinger', 'cowboy': 'gunslinger',
+    'outlaw': 'rogue', 'desperado': 'rogue',
+    'bounty hunter': 'ranger', 'trapper': 'ranger',
+    'frontier doctor': 'healer', 'snake oil': 'healer',
+    // Ninja / Samurai
+    'samurai': 'samurai', 'ronin': 'samurai', 'shogun': 'samurai',
+    'ninja': 'rogue', 'shinobi': 'rogue', 'kunoichi': 'rogue',
+    'onmyoji': 'mage', 'yamabushi': 'healer',
+    // Post-Apocalyptic
+    'raider': 'warrior', 'scavenger': 'rogue',
+    'wasteland doc': 'healer', 'mechanic': 'mage',
+    'mutant': 'warrior',
+    // Mythology
+    'demigod': 'warrior', 'hero': 'warrior', 'titan': 'warrior',
+    'oracle': 'mage', 'seer': 'mage',
+    'champion': 'warrior', 'trickster god': 'rogue',
+    // Fairy tale
+    'knight errant': 'warrior', 'prince': 'warrior', 'princess': 'healer',
+    'witch': 'mage', 'fairy godmother': 'mage',
+    'rogue prince': 'rogue', 'shapeshifter': 'rogue',
+    // Historical
+    'gladiator': 'warrior', 'legionary': 'warrior', 'centurion': 'warrior',
+    'viking': 'warrior', 'berserker': 'warrior',
+    'court mage': 'mage', 'alchemist': 'mage',
+    // Ocean
+    'pirate': 'pirate', 'buccaneer': 'pirate', 'corsair': 'pirate',
+    'sea captain': 'pirate', 'privateer': 'pirate',
+    'navigator': 'ranger', 'harpooner': 'ranger',
+    // Space
+    'space ranger': 'spaceranger', 'pilot': 'spaceranger',
+    'android': 'spaceranger', 'cyborg': 'spaceranger',
+    'xenobiologist': 'mage', 'engineer': 'mage',
+  };
+
+  // Check display name first (className like "Netrunner")
+  if (className) {
+    const key = className.toLowerCase();
+    if (nameMap[key]) return nameMap[key];
+    // Partial match
+    for (const [k, v] of Object.entries(nameMap)) {
+      if (key.includes(k) || k.includes(key)) return v;
+    }
+  }
+  // Fall back to DnD class id
+  return classId || 'warrior';
+}
+
 // ── Draw full scene ────────────────────────
 function drawScene(svgEl2, scene, players, turnCount) {
   // Clear
@@ -532,7 +679,11 @@ function drawScene(svgEl2, scene, players, turnCount) {
     const offsetX = inCombat ? -60 : 0;
     players.forEach((p, i) => {
       const cx = startX + i * spacing + offsetX;
-      drawCharacter(rc, svgEl2, cx, groundY, p.class || 'warrior',
+      // Resolve archetype name to visual class
+      // p.class is the DnD class id (mage/warrior/rogue etc)
+      // but we want genre-flavored visuals
+      const pClass = resolveCharacterClass(p.class, p.className);
+      drawCharacter(rc, svgEl2, cx, groundY, pClass,
         p.color || PLAYER_COLORS[i % PLAYER_COLORS.length],
         p.name || '', sr);
     });
