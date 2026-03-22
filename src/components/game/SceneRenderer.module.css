@@ -1,5 +1,9 @@
-.wrapper { width:100%; height:220px; flex-shrink:0; overflow:hidden; position:relative; background:#020810; }
-.svg     { display:block; width:100%; height:100%; }
+.wrapper {
+  width:100%; height:300px; flex-shrink:0; overflow:hidden; position:relative;
+  background:#020810;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.svg { display:block; width:100%; height:100%; }
 
 /* Stars */
 .twinkle { animation: twinkle 3s ease infinite; }

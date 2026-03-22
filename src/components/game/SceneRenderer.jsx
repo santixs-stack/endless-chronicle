@@ -1,730 +1,990 @@
-import { useMemo } from 'react';
+import { useEffect, useRef } from 'react';
+import rough from 'roughjs/bundled/rough.esm.js';
 import styles from './SceneRenderer.module.css';
-import { W as ART_W, H as ART_H } from './artStyle.js';
-import { ARCHETYPE_ICONS } from '../../data/archetypes.js';
 
 // ═══════════════════════════════════════════
-//  SCENE RENDERER v4 — Icon-enriched
-//  Characters rendered from game-icons.net
-//  SVGs via <image> + SVG color filters.
-//  Scene atmosphere icon as bg watermark.
-//  Enemy icons in combat.
+//  SCENE RENDERER v5 — Children's Book Style
+//  Built with rough.js for hand-drawn art.
+//  Every shape is sketchy, warm, illustrated.
+//  Characters are drawn figures, not badges.
+//  Like a picture book — exciting to reveal.
 // ═══════════════════════════════════════════
 
-const W = ART_W, H = ART_H;
-const ICON_BASE = '/icons/icons/ffffff/transparent/1x1';
+const W = 640, H = 300;
 
 function mkRand(seed) {
   let s = (seed | 0) + 1;
   return () => { s = (s * 16807 + 7) % 2147483647; return (s - 1) / 2147483646; };
 }
 
-// ── Sky / palette (unchanged) ─────────────
-const SKY = {
-  day:   [['#2856a8',0],['#4a7fcc',45],['#93c0ee',100]],
-  night: [['#020810',0],['#040e1e',50],['#0a1830',100]],
-  dawn:  [['#6b1008',0],['#c04020',30],['#f09040',70],['#fad090',100]],
-  dusk:  [['#3a0828',0],['#8c1840',35],['#d05040',65],['#e89060',100]],
-  cave:  [['#020208',0],['#06040e',50],['#0c0818',100]],
-  storm: [['#10121e',0],['#1e2030',50],['#2c2e40',100]],
+// ── Children's book color palettes ───────
+// Warm, saturated, illustrator-quality
+const PALETTE = {
+  forest: {
+    sky:    ['#7EC8E3','#ADE3F5','#E8F7F0'],
+    ground: '#4A7C3F',
+    mid:    '#2D5A27',
+    far:    '#1A3A18',
+    accent: '#F4C430',
+    trunk:  '#5C3A1E',
+    leaf:   ['#3D8B37','#5aad52','#2d6b28'],
+    sun:    '#FFDD57',
+  },
+  dungeon: {
+    sky:    ['#1a0a2e','#2d1050','#1a0a2e'],
+    ground: '#3a2d4a',
+    mid:    '#2a1e38',
+    far:    '#160f22',
+    accent: '#FF8C42',
+    stone:  ['#4a4060','#3a3050','#2a2040'],
+    torch:  '#FF6B35',
+    crystal:'#7B6CFF',
+  },
+  plains: {
+    sky:    ['#5BC0F5','#87CEEB','#C5E8F5'],
+    ground: '#6B8F3A',
+    mid:    '#5a7a30',
+    far:    '#486328',
+    accent: '#FFD700',
+    grass:  ['#7AA83C','#8ab840','#6a9830'],
+    road:   '#C4A882',
+    sun:    '#FFF176',
+  },
+  ocean: {
+    sky:    ['#1E90FF','#4FACF7','#87CEEB'],
+    ground: '#1565C0',
+    mid:    '#1976D2',
+    far:    '#0D47A1',
+    accent: '#FFD700',
+    wave:   '#42A5F5',
+    foam:   '#E3F2FD',
+    sand:   '#F5DEB3',
+  },
+  castle: {
+    sky:    ['#1A237E','#283593','#3949AB'],
+    ground: '#4A148C',
+    mid:    '#37006E',
+    far:    '#1a0040',
+    accent: '#FFD700',
+    stone:  ['#607D8B','#546E7A','#455A64'],
+    torch:  '#FF6B35',
+    flag:   '#F44336',
+  },
+  village: {
+    sky:    ['#FF9A3C','#FFB347','#FFCC80'],
+    ground: '#558B2F',
+    mid:    '#33691E',
+    far:    '#1B5E20',
+    accent: '#FFE082',
+    roof:   '#C62828',
+    wall:   '#EFEBE9',
+    chimney:'#6D4C41',
+  },
+  space: {
+    sky:    ['#0D0221','#130B2E','#0D0221'],
+    ground: '#1A0A2E',
+    mid:    '#0f0620',
+    far:    '#070314',
+    accent: '#7DF9FF',
+    star:   '#FFFDE7',
+    planet: ['#FF6B6B','#4ECDC4','#95E1D3','#F38181','#A8E063','#6C63FF'],
+    glow:   '#7DF9FF',
+  },
+  cave: {
+    sky:    ['#0d0d1a','#111128','#0d0d1a'],
+    ground: '#2D2040',
+    mid:    '#1E1530',
+    far:    '#100C1E',
+    accent: '#7B6CFF',
+    crystal:['#7B6CFF','#9F92FF','#5a4eff'],
+    drip:   '#4444aa',
+    glow:   '#6055ff',
+  },
+  desert: {
+    sky:    ['#FF7043','#FF8A65','#FFB74D'],
+    ground: '#C4873A',
+    mid:    '#A0692A',
+    far:    '#7D4F1A',
+    accent: '#FFD54F',
+    sand:   ['#D4A055','#C49040','#B8802A'],
+    cactus: '#4CAF50',
+    sun:    '#FFE57F',
+  },
+  mountain: {
+    sky:    ['#1565C0','#1976D2','#42A5F5'],
+    ground: '#546E7A',
+    mid:    '#37474F',
+    far:    '#263238',
+    accent: '#80CBC4',
+    snow:   '#F5F5F5',
+    pine:   '#1B5E20',
+    rock:   ['#78909C','#607D8B','#546E7A'],
+  },
+  swamp: {
+    sky:    ['#1B5E20','#2E7D32','#388E3C'],
+    ground: '#2E4A1E',
+    mid:    '#1E3A12',
+    far:    '#122808',
+    accent: '#8BC34A',
+    water:  '#4CAF50',
+    moss:   '#558B2F',
+    fog:    'rgba(100,180,80,0.25)',
+  },
+  snow: {
+    sky:    ['#B0C4DE','#C9D8E8','#E8EFF5'],
+    ground: '#E8EEF5',
+    mid:    '#D0DCE8',
+    far:    '#B8CCE0',
+    accent: '#5C9ED4',
+    tree:   '#2E4A1E',
+    snowcap:'#FFFFFF',
+    ice:    '#B0E0FF',
+  },
+  ruins: {
+    sky:    ['#4A0E6B','#6B1FA3','#3A0A5A'],
+    ground: '#3D2B4A',
+    mid:    '#2A1E38',
+    far:    '#1A1028',
+    accent: '#C06EFF',
+    stone:  ['#5A4870','#4A3860','#3A2850'],
+    vine:   '#2D5A18',
+    glow:   '#9B59FF',
+  },
+  city: {
+    sky:    ['#1A1A2E','#2D2D4A','#1A1A2E'],
+    ground: '#1E1E2E',
+    mid:    '#141422',
+    far:    '#0D0D18',
+    accent: '#FF6B35',
+    neon:   ['#FF6B35','#FF4CCD','#00FFFF'],
+    build:  ['#2D2D4A','#252538','#1A1A2E'],
+    window: '#FFEE55',
+  },
 };
 
-const PAL = {
-  dungeon:  { g:['#181424','#221c30','#2c2440'], light:'#ff8830', accent:'#c4a84f', fog:'.7',  stars:false },
-  cave:     { g:['#0c0814','#100c1c','#160e24'], light:'#4060ff', accent:'#5595e0', fog:'.85', stars:false },
-  forest:   { g:['#0e2a08','#1a4010','#266018'], light:'#c8e890', accent:'#6dbb7c', fog:'.4',  stars:false },
-  plains:   { g:['#284010','#3a5818','#4c7020'], light:'#ffe080', accent:'#c4a84f', fog:'.2',  stars:false },
-  castle:   { g:['#1a1630','#22203e','#2a284c'], light:'#a870ff', accent:'#a87ed4', fog:'.5',  stars:true  },
-  ruins:    { g:['#201a2c','#2a2438','#342e44'], light:'#c080ff', accent:'#a87ed4', fog:'.55', stars:true  },
-  ocean:    { g:['#041020','#082040','#0c3060'], light:'#40b0ff', accent:'#5595e0', fog:'.3',  stars:false },
-  space:    { g:['#04020c','#06040e','#0a0818'], light:'#8060ff', accent:'#5595e0', fog:'.15', stars:true  },
-  village:  { g:['#1c2c10','#283c18','#344c20'], light:'#ffa040', accent:'#c4a84f', fog:'.2',  stars:true  },
-  city:     { g:['#101020','#181828','#202032'], light:'#ff6040', accent:'#e05555', fog:'.4',  stars:true  },
-  desert:   { g:['#7a5018','#9a6820','#ba8028'], light:'#ffc040', accent:'#e09030', fog:'.25', stars:false },
-  mountain: { g:['#202838','#2c3448','#384058'], light:'#80c0ff', accent:'#5595e0', fog:'.35', stars:true  },
-  swamp:    { g:['#0e1c0a','#162814','#1e341c'], light:'#60c040', accent:'#6dbb7c', fog:'.7',  stars:false },
-  snow:     { g:['#a8c0d0','#c0d8e8','#d8eef8'], light:'#c0e0ff', accent:'#5595e0', fog:'.4',  stars:true  },
-};
+const getPal = (type) => PALETTE[type] || PALETTE.plains;
 
-// ── Scene atmosphere icons ────────────────
-// Large faint watermark icon for each scene type
-const SCENE_ATM_ICONS = {
-  dungeon:  'lorc/dungeon-gate',   cave:     'lorc/cave-entrance',
-  forest:   'lorc/pine-tree',      plains:   'lorc/grass',
-  castle:   'lorc/castle-emblem',  ruins:    'lorc/ruins',
-  ocean:    'lorc/anchor',         space:    'lorc/alien-skull',
-  village:  'lorc/open-book',      city:     'lorc/magnifying-glass',
-  desert:   'lorc/plain-dagger',   mountain: 'lorc/crossed-axes',
-  swamp:    'lorc/cauldron',       snow:     'lorc/fluffy-trefoil',
-  tavern:   'lorc/open-book',      road:     'lorc/plain-dagger',
-  ship:     'lorc/anchor',
-};
+// ── Draw a hand-drawn character ───────────
+// Each class gets a distinct illustrated silhouette
+function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
+  const R = r; // local seeded random
+  const opts = (fill, extra = {}) => ({
+    stroke: color, strokeWidth: 2,
+    fill, fillStyle: 'solid',
+    roughness: 1.4, bowing: 0.8,
+    ...extra
+  });
+  const darkColor = shadeColor(color, -40);
+  const hy = groundY; // hip y
 
-// ── Creature icons ────────────────────────
-const CREATURE_ICONS = {
-  goblin:'lorc/goblin-head',       goblin_archer:'lorc/goblin-head',
-  orc:'lorc/orc-head',             skeleton:'lorc/skeleton',
-  ghost:'lorc/ghost',              wraith:'lorc/spectre',
-  zombie:'lorc/shambling-zombie',  dragon:'lorc/dragon-head',
-  troll:'lorc/troll',              demon:'lorc/demon-skull',
-  vampire:'lorc/vampire-dracula',  wolf:'lorc/wolf-head',
-  spider:'lorc/spider-face',       alien_grey:'lorc/alien-skull',
-  robot_drone:'lorc/android-mask', kraken:'lorc/octoman',
-  bandit:'lorc/hood',              thief:'lorc/hood',
-  assassin:'lorc/hood',            merchant:'lorc/coins',
-  mage_npc:'lorc/wizard-staff',    elder:'lorc/aged',
-  knight:'lorc/broadsword',        guard:'lorc/broadsword',
-  rat:'lorc/rat',                  bat:'lorc/bat',
-};
+  // Ground shadow
+  const shadowEl = rc.ellipse(cx, groundY + 2, 28, 6, {
+    stroke: 'none', fill: 'rgba(0,0,0,0.25)',
+    fillStyle: 'solid', roughness: 1
+  });
+  svg.appendChild(shadowEl);
 
-// ── Color hex → feColorMatrix values ──────
-// Converts a hex color to an SVG filter that tints white pixels
-function hexToColorMatrix(hex) {
-  const r = parseInt(hex.slice(1,3),16)/255;
-  const g = parseInt(hex.slice(3,5),16)/255;
-  const b = parseInt(hex.slice(5,7),16)/255;
-  return `${r} 0 0 0 0  ${g} 0 0 0 0  ${b} 0 0 0 0  0 0 0 1 0`;
+  if (cls === 'warrior') {
+    // Body — stocky, armored
+    svg.appendChild(rc.rectangle(cx - 8, hy - 32, 16, 22, opts(darkColor)));
+    // Head with helmet
+    svg.appendChild(rc.ellipse(cx, hy - 40, 14, 14, opts(color)));
+    svg.appendChild(rc.rectangle(cx - 7, hy - 48, 14, 10, opts(darkColor, { roughness: 0.8 })));
+    // Shield (left)
+    svg.appendChild(rc.rectangle(cx - 20, hy - 36, 10, 18, opts(color, { roughness: 1.8 })));
+    // Sword (right)
+    const swordPts = [[cx+12, hy-50],[cx+14, hy-50],[cx+14, hy-18],[cx+12, hy-18]];
+    svg.appendChild(rc.polygon(swordPts, { stroke: '#aaa', fill: '#ddd', fillStyle:'solid', roughness: 0.9, strokeWidth: 1.5 }));
+    // Legs
+    svg.appendChild(rc.rectangle(cx - 7, hy - 10, 6, 12, opts(darkColor)));
+    svg.appendChild(rc.rectangle(cx + 1, hy - 10, 6, 12, opts(darkColor)));
+  } else if (cls === 'mage' || cls === 'wizard') {
+    // Robe — long and flowing
+    svg.appendChild(rc.polygon([
+      [cx-8,hy-32],[cx+8,hy-32],[cx+10,hy],[cx-10,hy]
+    ], opts(color, { roughness: 2.0 })));
+    // Head
+    svg.appendChild(rc.ellipse(cx, hy - 40, 13, 13, opts(color)));
+    // Tall pointy hat
+    svg.appendChild(rc.polygon([
+      [cx-8,hy-46],[cx+8,hy-46],[cx,hy-66]
+    ], opts(darkColor, { roughness: 1.5 })));
+    // Staff
+    svg.appendChild(rc.line(cx+14, hy-5, cx+14, hy-58, { stroke: '#8B4513', strokeWidth: 2.5, roughness: 1.5 }));
+    // Orb on staff
+    svg.appendChild(rc.circle(cx+14, hy-62, 10, { stroke: '#fff', fill: '#9B59FF', fillStyle: 'solid', roughness: 0.8 }));
+  } else if (cls === 'rogue' || cls === 'thief') {
+    // Slim, crouched slightly
+    svg.appendChild(rc.polygon([
+      [cx-6,hy-30],[cx+6,hy-30],[cx+7,hy],[cx-7,hy]
+    ], opts(darkColor, { roughness: 1.8 })));
+    // Hooded head
+    svg.appendChild(rc.ellipse(cx, hy - 38, 12, 12, opts(color)));
+    svg.appendChild(rc.polygon([
+      [cx-10,hy-42],[cx+10,hy-42],[cx+6,hy-30],[cx-6,hy-30]
+    ], opts(darkColor, { roughness: 2.2 })));
+    // Daggers (both hands)
+    svg.appendChild(rc.line(cx+10, hy-28, cx+18, hy-40, { stroke: '#ccc', strokeWidth: 2, roughness: 0.8 }));
+    svg.appendChild(rc.line(cx-10, hy-28, cx-18, hy-40, { stroke: '#ccc', strokeWidth: 2, roughness: 0.8 }));
+    // Legs
+    svg.appendChild(rc.line(cx-4, hy, cx-6, hy+10, { stroke: darkColor, strokeWidth: 4, roughness: 1.5 }));
+    svg.appendChild(rc.line(cx+4, hy, cx+6, hy+10, { stroke: darkColor, strokeWidth: 4, roughness: 1.5 }));
+  } else if (cls === 'ranger' || cls === 'archer') {
+    // Lean, bow raised
+    svg.appendChild(rc.rectangle(cx - 6, hy - 34, 12, 24, opts(color, { roughness: 1.6 })));
+    // Head with hood
+    svg.appendChild(rc.ellipse(cx, hy - 42, 13, 13, opts(color)));
+    svg.appendChild(rc.polygon([
+      [cx-9,hy-46],[cx+9,hy-46],[cx+5,hy-34],[cx-5,hy-34]
+    ], opts(shadeColor(color,-20), { roughness: 1.9 })));
+    // Bow (arc)
+    const bowPath = `M ${cx-16} ${hy-52} Q ${cx-24} ${hy-38} ${cx-16} ${hy-22}`;
+    svg.appendChild(rc.path(bowPath, { stroke: '#8B4513', strokeWidth: 2, fill: 'none', roughness: 1.5 }));
+    svg.appendChild(rc.line(cx-16, hy-52, cx-16, hy-22, { stroke: '#8B4513', strokeWidth: 1, roughness: 0.5 }));
+    // Arrow
+    svg.appendChild(rc.line(cx-14, hy-38, cx+8, hy-38, { stroke: '#8B4513', strokeWidth: 1.5, roughness: 0.6 }));
+    // Legs
+    svg.appendChild(rc.line(cx-3, hy-10, cx-4, hy+10, { stroke: color, strokeWidth: 5, roughness: 1 }));
+    svg.appendChild(rc.line(cx+3, hy-10, cx+5, hy+10, { stroke: color, strokeWidth: 5, roughness: 1 }));
+  } else if (cls === 'healer' || cls === 'paladin') {
+    // Robed, cross emblem
+    svg.appendChild(rc.polygon([
+      [cx-7,hy-32],[cx+7,hy-32],[cx+8,hy],[cx-8,hy]
+    ], opts(color, { roughness: 1.5 })));
+    svg.appendChild(rc.ellipse(cx, hy - 40, 13, 13, opts(color)));
+    // Halo
+    svg.appendChild(rc.ellipse(cx, hy - 50, 20, 6, { stroke: '#FFD700', strokeWidth: 1.5, fill: 'none', roughness: 2.0 }));
+    // Staff with cross
+    svg.appendChild(rc.line(cx+12, hy, cx+12, hy-55, { stroke: '#FFD700', strokeWidth: 2.5, roughness: 1.2 }));
+    svg.appendChild(rc.line(cx+6, hy-45, cx+18, hy-45, { stroke: '#FFD700', strokeWidth: 2.5, roughness: 1.2 }));
+  } else if (cls === 'spaceranger' || cls === 'pilot') {
+    // Space suit - round helmet, chunky suit
+    svg.appendChild(rc.rectangle(cx-9, hy-30, 18, 22, opts(color, { roughness: 0.8 })));
+    // Helmet - round
+    svg.appendChild(rc.circle(cx, hy-40, 20, { stroke: color, fill: shadeColor(color,-20), fillStyle:'solid', roughness: 0.7 }));
+    // Visor
+    svg.appendChild(rc.ellipse(cx, hy-40, 12, 9, { stroke:'none', fill:'rgba(100,200,255,0.5)', fillStyle:'solid', roughness: 0.5 }));
+    // Thruster pack
+    svg.appendChild(rc.rectangle(cx-12, hy-26, 5, 12, opts(darkColor, { roughness: 0.8 })));
+    svg.appendChild(rc.rectangle(cx+7, hy-26, 5, 12, opts(darkColor, { roughness: 0.8 })));
+    // Legs
+    svg.appendChild(rc.rectangle(cx-7, hy-8, 6, 10, opts(darkColor, { roughness: 0.8 })));
+    svg.appendChild(rc.rectangle(cx+1, hy-8, 6, 10, opts(darkColor, { roughness: 0.8 })));
+  } else if (cls === 'pirate' || cls === 'buccaneer') {
+    svg.appendChild(rc.polygon([
+      [cx-7,hy-32],[cx+7,hy-32],[cx+8,hy],[cx-8,hy]
+    ], opts(darkColor, { roughness: 1.8 })));
+    svg.appendChild(rc.ellipse(cx, hy - 40, 13, 13, opts(color)));
+    // Tricorn hat
+    svg.appendChild(rc.polygon([
+      [cx-12,hy-46],[cx+12,hy-46],[cx+8,hy-58],[cx-8,hy-58]
+    ], opts('#1a1a1a', { roughness: 1.5 })));
+    // Cutlass
+    svg.appendChild(rc.line(cx+10, hy-28, cx+22, hy-46, { stroke: '#ddd', strokeWidth: 2.5, roughness: 0.8 }));
+    svg.appendChild(rc.ellipse(cx+10, hy-28, 8, 4, { stroke:'#888', fill:'none', roughness: 1 }));
+  } else {
+    // Default — generic adventurer
+    svg.appendChild(rc.polygon([
+      [cx-7,hy-30],[cx+7,hy-30],[cx+8,hy],[cx-8,hy]
+    ], opts(color, { roughness: 1.8 })));
+    svg.appendChild(rc.ellipse(cx, hy - 40, 13, 14, opts(color)));
+    svg.appendChild(rc.line(cx-14, hy-28, cx-7, hy-22, { stroke: color, strokeWidth: 3, roughness: 1.5 }));
+    svg.appendChild(rc.line(cx+14, hy-28, cx+7, hy-22, { stroke: color, strokeWidth: 3, roughness: 1.5 }));
+    svg.appendChild(rc.line(cx-4, hy, cx-5, hy+10, { stroke: color, strokeWidth: 4, roughness: 1.5 }));
+    svg.appendChild(rc.line(cx+4, hy, cx+5, hy+10, { stroke: color, strokeWidth: 4, roughness: 1.5 }));
+  }
+
+  // Name label
+  if (name) {
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', cx);
+    text.setAttribute('y', groundY + 18);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', color);
+    text.setAttribute('font-family', 'monospace');
+    text.setAttribute('font-size', '8');
+    text.setAttribute('letter-spacing', '1');
+    text.setAttribute('opacity', '0.9');
+    text.textContent = name.toUpperCase().slice(0, 8);
+    svg.appendChild(text);
+  }
 }
 
-export default function SceneRenderer({ scene, players, turnCount = 0 }) {
-  const type    = scene?.type    || 'plains';
-  const time    = scene?.time    || 'night';
+// ── Draw enemy creature ────────────────────
+function drawEnemy(rc, svg, cx, groundY, creatureType) {
+  const opts = (fill, extra = {}) => ({
+    stroke: '#cc2222', strokeWidth: 2.5,
+    fill, fillStyle: 'solid',
+    roughness: 2.2, bowing: 1.2,
+    ...extra
+  });
+
+  // Glow aura
+  const glow = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  glow.setAttribute('cx', cx); glow.setAttribute('cy', groundY - 20);
+  glow.setAttribute('rx', 28); glow.setAttribute('ry', 32);
+  glow.setAttribute('fill', 'rgba(200,30,30,0.12)');
+  svg.appendChild(glow);
+
+  // Shadow
+  svg.appendChild(rc.ellipse(cx, groundY + 2, 36, 8, {
+    stroke:'none', fill:'rgba(0,0,0,0.3)', fillStyle:'solid', roughness: 1
+  }));
+
+  const type = creatureType || 'goblin';
+
+  if (type === 'goblin' || type === 'goblin_archer') {
+    // Goblin — short, hunched, big ears
+    svg.appendChild(rc.polygon([[cx-8,groundY-10],[cx+8,groundY-10],[cx+9,groundY],[cx-9,groundY]], opts('#2d5e1e')));
+    svg.appendChild(rc.ellipse(cx, groundY-22, 16, 15, opts('#3a7a25')));
+    // Big ears
+    svg.appendChild(rc.ellipse(cx-12, groundY-22, 8, 11, opts('#4a9a30', {roughness:2.5})));
+    svg.appendChild(rc.ellipse(cx+12, groundY-22, 8, 11, opts('#4a9a30', {roughness:2.5})));
+    // Eyes — red glowing
+    svg.appendChild(rc.circle(cx-4, groundY-23, 4, {stroke:'none', fill:'#ff3300', fillStyle:'solid', roughness:0.5}));
+    svg.appendChild(rc.circle(cx+4, groundY-23, 4, {stroke:'none', fill:'#ff3300', fillStyle:'solid', roughness:0.5}));
+    // Weapon
+    svg.appendChild(rc.line(cx+10, groundY-5, cx+20, groundY-35, {stroke:'#8B4513', strokeWidth:3, roughness:1.8}));
+  } else if (type === 'dragon') {
+    // Dragon — big, intimidating
+    svg.appendChild(rc.polygon([[cx-20,groundY],[cx+20,groundY],[cx+15,groundY-50],[cx-15,groundY-50]], opts('#8B0000', {roughness:2.5})));
+    svg.appendChild(rc.ellipse(cx, groundY-55, 30, 22, opts('#A00000')));
+    // Wings
+    svg.appendChild(rc.polygon([[cx-15,groundY-40],[cx-50,groundY-60],[cx-40,groundY-30]], opts('#660000', {roughness:3})));
+    svg.appendChild(rc.polygon([[cx+15,groundY-40],[cx+50,groundY-60],[cx+40,groundY-30]], opts('#660000', {roughness:3})));
+    // Eyes
+    svg.appendChild(rc.circle(cx-8, groundY-57, 5, {stroke:'none', fill:'#ff8800', fillStyle:'solid', roughness:0.5}));
+    svg.appendChild(rc.circle(cx+8, groundY-57, 5, {stroke:'none', fill:'#ff8800', fillStyle:'solid', roughness:0.5}));
+    // Fire breath line
+    svg.appendChild(rc.line(cx+20, groundY-55, cx+55, groundY-40, {stroke:'#FF6600', strokeWidth:4, roughness:2}));
+    svg.appendChild(rc.line(cx+20, groundY-55, cx+58, groundY-50, {stroke:'#FF3300', strokeWidth:2, roughness:2.5}));
+  } else if (type === 'skeleton') {
+    // Skeleton — bony, thin, intimidating
+    svg.appendChild(rc.line(cx, groundY, cx, groundY-30, {stroke:'#e8dcc8', strokeWidth:4, roughness:2}));
+    svg.appendChild(rc.ellipse(cx, groundY-38, 14, 16, {stroke:'#e8dcc8', fill:'#d4c8a8', fillStyle:'solid', roughness:2.2}));
+    svg.appendChild(rc.line(cx-12, groundY-26, cx-2, groundY-22, {stroke:'#e8dcc8', strokeWidth:3, roughness:2}));
+    svg.appendChild(rc.line(cx+12, groundY-26, cx+2, groundY-22, {stroke:'#e8dcc8', strokeWidth:3, roughness:2}));
+    svg.appendChild(rc.line(cx-5, groundY, cx-7, groundY+12, {stroke:'#e8dcc8', strokeWidth:3, roughness:2}));
+    svg.appendChild(rc.line(cx+5, groundY, cx+7, groundY+12, {stroke:'#e8dcc8', strokeWidth:3, roughness:2}));
+    // Eye sockets
+    svg.appendChild(rc.circle(cx-4, groundY-39, 3, {stroke:'none', fill:'#000', fillStyle:'solid', roughness:0.5}));
+    svg.appendChild(rc.circle(cx+4, groundY-39, 3, {stroke:'none', fill:'#000', fillStyle:'solid', roughness:0.5}));
+  } else if (type === 'wolf') {
+    // Wolf — four-legged, low to ground
+    svg.appendChild(rc.polygon([[cx-20,groundY-8],[cx+18,groundY-8],[cx+20,groundY],[cx-22,groundY]], opts('#4a4040', {roughness:2.5})));
+    // Head
+    svg.appendChild(rc.ellipse(cx+22, groundY-14, 18, 14, opts('#5a5050')));
+    // Ears
+    svg.appendChild(rc.polygon([[cx+18,groundY-20],[cx+22,groundY-32],[cx+26,groundY-20]], opts('#3a3030', {roughness:2.5})));
+    svg.appendChild(rc.polygon([[cx+28,groundY-20],[cx+32,groundY-30],[cx+35,groundY-18]], opts('#3a3030', {roughness:2.5})));
+    // Tail (curled up)
+    const tailPath = `M ${cx-20} ${groundY-10} Q ${cx-35} ${groundY-30} ${cx-25} ${groundY-32}`;
+    svg.appendChild(rc.path(tailPath, {stroke:'#5a5050', strokeWidth:4, fill:'none', roughness:2}));
+    // Eye
+    svg.appendChild(rc.circle(cx+28, groundY-14, 3, {stroke:'none', fill:'#ff4400', fillStyle:'solid', roughness:0.5}));
+  } else if (type === 'ghost' || type === 'wraith') {
+    // Ghost — wispy, floating
+    const ghostPath = `M ${cx-14} ${groundY} Q ${cx-18} ${groundY-20} ${cx-12} ${groundY-30} Q ${cx-14} ${groundY-48} ${cx} ${groundY-50} Q ${cx+14} ${groundY-48} ${cx+12} ${groundY-30} Q ${cx+18} ${groundY-20} ${cx+14} ${groundY} Q ${cx+10} ${groundY+8} ${cx+5} ${groundY+4} Q ${cx} ${groundY+10} ${cx-5} ${groundY+4} Q ${cx-10} ${groundY+8} ${cx-14} ${groundY}`;
+    svg.appendChild(rc.path(ghostPath, {stroke:'rgba(180,180,255,0.8)', fill:'rgba(150,150,255,0.35)', fillStyle:'solid', roughness:3.0, strokeWidth:2}));
+    svg.appendChild(rc.circle(cx-5, groundY-38, 5, {stroke:'none', fill:'#000', fillStyle:'solid', roughness:0.5}));
+    svg.appendChild(rc.circle(cx+5, groundY-38, 5, {stroke:'none', fill:'#000', fillStyle:'solid', roughness:0.5}));
+  } else {
+    // Generic enemy — menacing shape
+    svg.appendChild(rc.polygon([[cx-12,groundY],[cx+12,groundY],[cx+10,groundY-38],[cx-10,groundY-38]], opts('#660000', {roughness:2.5})));
+    svg.appendChild(rc.ellipse(cx, groundY-46, 18, 16, opts('#880000')));
+    svg.appendChild(rc.circle(cx-5, groundY-47, 4, {stroke:'none', fill:'#ff2200', fillStyle:'solid', roughness:0.5}));
+    svg.appendChild(rc.circle(cx+5, groundY-47, 4, {stroke:'none', fill:'#ff2200', fillStyle:'solid', roughness:0.5}));
+  }
+
+  // Enemy name label
+  if (creatureType) {
+    const label = creatureType.replace(/_/g,' ').toUpperCase().slice(0,12);
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', cx); text.setAttribute('y', groundY + 20);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', '#ff4444');
+    text.setAttribute('font-family', 'monospace');
+    text.setAttribute('font-size', '8');
+    text.setAttribute('letter-spacing', '1');
+    text.textContent = label;
+    svg.appendChild(text);
+  }
+}
+
+// ── Color helper ───────────────────────────
+function shadeColor(hex, pct) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, Math.max(0, (n>>16) + pct));
+  const g = Math.min(255, Math.max(0, ((n>>8)&0xff) + pct));
+  const b = Math.min(255, Math.max(0, (n&0xff) + pct));
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+
+// ── SVG helper ─────────────────────────────
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// ── Draw full scene ────────────────────────
+function drawScene(svgEl2, scene, players, turnCount) {
+  // Clear
+  while (svgEl2.firstChild) svgEl2.removeChild(svgEl2.firstChild);
+
+  const rc = rough.svg(svgEl2);
+  const type = scene?.type || 'plains';
+  const time = scene?.time || 'day';
   const weather = scene?.weather || 'clear';
-  const mood    = scene?.mood    || '';
   const inCombat = scene?.inCombat || false;
-  const enemy   = scene?.enemy   || null;
+  const enemyName = scene?.enemy;
+  const pal = getPal(type);
+  const sr = mkRand(type.charCodeAt(0) * 1337);
+  const tr = mkRand(turnCount * 997 + type.charCodeAt(0) * 31);
 
-  const pal     = PAL[type]  || PAL.plains;
-  const sky     = SKY[time]  || SKY.night;
-  const r       = useMemo(() => mkRand(turnCount * 997 + type.charCodeAt(0) * 31), [turnCount, type]);
-  const rStatic = useMemo(() => mkRand(type.charCodeAt(0) * 1337), [type]);
-  const uid     = `s${turnCount}${type.slice(0,2)}`;
+  // ── Defs (gradients, filters, paper texture) ──
+  const defs = svgEl('defs', {});
 
-  // ── Stars ─────────────────────────────────
-  const stars = useMemo(() => {
-    if (!pal.stars && time !== 'night') return [];
-    const sr = mkRand(turnCount * 7 + 99);
-    return Array.from({ length: 80 }, (_, i) => ({
-      x: sr() * W, y: sr() * H * 0.55,
-      r: sr() * 1.6 + 0.2, op: sr() * 0.6 + 0.25, twinkle: sr() > 0.6,
-    }));
-  }, [pal.stars, time, turnCount]);
+  // Sky gradient
+  const skyGrad = svgEl('linearGradient', { id:'skyG', x1:'0', y1:'0', x2:'0', y2:'1' });
+  const [s1, s2, s3] = pal.sky;
+  skyGrad.appendChild(Object.assign(svgEl('stop', {}), {}).setAttribute ? (() => {
+    const s = svgEl('stop', { offset:'0%', 'stop-color': s1 }); return s;
+  })() : null);
+  [s1, s2, s3 || s2].forEach((c, i) => {
+    const stop = svgEl('stop', { offset:`${i*50}%`, 'stop-color': c });
+    skyGrad.appendChild(stop);
+  });
+  defs.appendChild(skyGrad);
 
-  // ── Clouds ────────────────────────────────
-  const clouds = useMemo(() => {
-    if (type === 'dungeon' || type === 'cave' || type === 'space') return [];
-    const cr = mkRand(turnCount * 13 + 77);
-    const count = weather === 'storm' ? 6 : weather === 'cloudy' ? 4 : 2;
-    return Array.from({ length: count }, (_, i) => ({
-      x: cr() * W * 1.4 - W * 0.2, y: cr() * H * 0.3 + 5,
-      w: 60 + cr() * 100, h: 18 + cr() * 22,
-      op: weather === 'storm' ? 0.5 + cr() * 0.3 : 0.12 + cr() * 0.15,
-      speed: 20 + cr() * 40,
-    }));
-  }, [type, weather, turnCount]);
+  // Paper texture filter — the key to the book feel
+  const filt = svgEl('filter', { id:'paper', x:'0', y:'0', width:'100%', height:'100%' });
+  const turb = svgEl('feTurbulence', { type:'fractalNoise', baseFrequency:'0.65', numOctaves:'3', stitchTiles:'stitch', result:'noise' });
+  const disp = svgEl('feDisplacementMap', { in:'SourceGraphic', in2:'noise', scale:'3', xChannelSelector:'R', yChannelSelector:'G' });
+  filt.appendChild(turb); filt.appendChild(disp);
+  defs.appendChild(filt);
 
-  // ── Background elements ───────────────────
-  const bgElements = useMemo(() => {
-    const br = mkRand(type.charCodeAt(0) * 77 + turnCount);
-    const els = [];
-    if (type === 'castle' || type === 'ruins') {
-      for (let i = 0; i < 4; i++) {
-        const x = 60 + i * (W/4) + br()*40-20, h = 55+br()*70, w = 22+br()*18;
-        els.push({ type:'tower', x, h, w, windows: Math.floor(br()*3)+1 });
-      }
-      els.push({ type:'wall', y: H*0.48 });
-    }
-    if (type === 'city') {
-      for (let i = 0; i < 14; i++) {
-        const x = i*(W/12)+br()*20-10, h = 30+br()*110, w = 24+br()*32;
-        els.push({ type:'building', x, h, w, floors: Math.floor(h/14) });
-      }
-    }
-    if (type === 'space') {
-      for (let i = 0; i < 4; i++) {
-        els.push({ type:'planet', x:40+br()*(W-80), y:10+br()*(H*0.45), r:8+br()*35, hue:Math.floor(br()*360), rings:br()>0.5 });
-      }
-      els.push({ type:'station', x:W*0.7, y:H*0.18 });
-    }
-    if (type === 'ocean') {
-      els.push({ type:'ship', x:W*0.7+br()*100-50, y:H*0.48 });
-      els.push({ type:'lighthouse', x:W*0.15+br()*40 });
-    }
-    if (type === 'desert') {
-      els.push({ type:'pyramid', x:W*0.65+br()*60-30, y:H*0.52 });
-      for (let i = 0; i < 3; i++) els.push({ type:'dune', x:br()*W, y:H*0.4+br()*20, w:80+br()*120, h:25+br()*30 });
-    }
-    if (type === 'mountain') {
-      for (let i = 0; i < 5; i++) els.push({ type:'peak', x:br()*W, h:60+br()*90 });
-    }
-    if (type === 'village') {
-      for (let i = 0; i < 5; i++) els.push({ type:'cottage', x:40+i*(W/5)+br()*30-15, y:H*0.58-br()*15, lit:br()>0.4 });
-      els.push({ type:'windmill', x:W*0.8, y:H*0.52 });
-    }
-    return els;
-  }, [type, turnCount]);
+  // Warm vignette gradient
+  const vig = svgEl('radialGradient', { id:'vig', cx:'50%', cy:'50%', r:'70%' });
+  const vs1 = svgEl('stop', { offset:'0%', 'stop-color':'transparent' });
+  const vs2 = svgEl('stop', { offset:'100%', 'stop-color':'rgba(20,5,0,0.45)' });
+  vig.appendChild(vs1); vig.appendChild(vs2);
+  defs.appendChild(vig);
 
-  // ── Terrain ───────────────────────────────
-  const terrain = useMemo(() => {
-    const tr = mkRand(type.charCodeAt(0) * 77 + Math.floor(turnCount/3));
-    const steps = 28;
-    const pts = Array.from({ length: steps+1 }, (_, i) => {
-      const x = (i/steps)*W;
-      let y;
-      if (type==='mountain')            y = H*0.5+Math.sin(i*0.85)*48+Math.sin(i*1.7)*18+tr()*14;
-      else if (type==='dungeon'||type==='cave') y = H*0.72+tr()*6;
-      else if (type==='ocean')          y = H*0.54+Math.sin(i*0.55+turnCount*0.15)*9+tr()*4;
-      else if (type==='desert')         y = H*0.6+Math.sin(i*0.4)*18+tr()*10;
-      else if (type==='snow')           y = H*0.62+Math.sin(i*0.5)*10+tr()*8;
-      else                              y = H*0.63+Math.sin(i*0.65)*16+Math.sin(i*1.3)*8+tr()*10;
-      return { x, y };
+  svgEl2.appendChild(defs);
+
+  // ── Sky ──
+  const sky = svgEl('rect', { x:0, y:0, width:W, height:H, fill:'url(#skyG)' });
+  svgEl2.appendChild(sky);
+
+  // ── Scene-specific background elements ──
+  drawBackground(rc, svgEl2, type, time, pal, sr, tr, turnCount);
+
+  // ── Ground ──
+  drawGround(rc, svgEl2, type, pal, sr, tr, W, H);
+
+  // ── Weather ──
+  if (weather === 'rain' || weather === 'storm') drawRain(svgEl2, tr);
+  if (weather === 'snow' || type === 'snow') drawSnowfall(svgEl2, tr);
+
+  // ── Characters ──
+  const groundY = H - 65;
+  if (players?.length > 0) {
+    const PLAYER_COLORS = ['#c4a84f','#5595e0','#6dbb7c','#e05555','#a87ed4','#e09030'];
+    const spacing = Math.min(80, W / (players.length + 2));
+    const startX = W / 2 - (spacing * (players.length - 1)) / 2;
+    // In combat — shift party left to face enemy
+    const offsetX = inCombat ? -60 : 0;
+    players.forEach((p, i) => {
+      const cx = startX + i * spacing + offsetX;
+      drawCharacter(rc, svgEl2, cx, groundY, p.class || 'warrior',
+        p.color || PLAYER_COLORS[i % PLAYER_COLORS.length],
+        p.name || '', sr);
     });
-    return { pts, d:`M0,${H} L${pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L')} L${W},${H} Z` };
-  }, [type, turnCount]);
+  }
 
-  // ── Props ─────────────────────────────────
-  const props = useMemo(() => {
-    const pr = mkRand(turnCount*53+type.charCodeAt(0)*19);
-    const list = [];
-    if (type==='forest'||type==='plains'||type==='swamp') {
-      for (let i=0;i<12;i++) {
-        const x=pr()*W, baseY=terrain.pts[Math.round((x/W)*28)]?.y||H*0.63;
-        list.push({ type:'tree', x, y:baseY, h:32+pr()*65, w:14+pr()*22, dead:type==='swamp'&&pr()>0.6 });
-      }
-    }
-    if (type==='dungeon'||type==='cave') {
-      for (let i=0;i<8;i++) {
-        const x=20+pr()*(W-40);
-        list.push({ type:'stalactite', x, len:15+pr()*45 });
-        list.push({ type:'stalagmite', x:x+pr()*20-10, y:H*0.72, len:8+pr()*25 });
-        if (i<4) list.push({ type:'crystal', x:pr()*W, y:H*0.65+pr()*20, h:10+pr()*25 });
-      }
-      [W*0.15,W*0.45,W*0.75].forEach(x=>list.push({ type:'torch', x }));
-    }
-    if (type==='ocean') {
-      for (let i=0;i<6;i++) list.push({ type:'wave', x:pr()*W, y:H*0.5+pr()*20, len:30+pr()*50 });
-      for (let i=0;i<3;i++) list.push({ type:'rock', x:pr()*W, y:H*0.55+pr()*15 });
-    }
-    if (type==='space') {
-      for (let i=0;i<12;i++) list.push({ type:'asteroid', x:pr()*W, y:pr()*H*0.7, r:2+pr()*8 });
-      for (let i=0;i<3;i++) list.push({ type:'nebula', x:pr()*W, y:pr()*H*0.6, r:20+pr()*50, hue:pr()*360 });
-    }
-    if (type==='desert') {
-      for (let i=0;i<5;i++) {
-        const x=pr()*W; list.push({ type:'cactus', x, y:terrain.pts[Math.round((x/W)*28)]?.y||H*0.6 });
-      }
-    }
-    if (type==='snow') {
-      for (let i=0;i<8;i++) {
-        const x=pr()*W, baseY=terrain.pts[Math.round((x/W)*28)]?.y||H*0.62;
-        list.push({ type:'snowtree', x, y:baseY, h:20+pr()*45 });
-      }
-    }
-    if ((type==='dungeon'||type==='ruins')&&pr()>0.5) list.push({ type:'chest', x:W*0.3+pr()*W*0.4, y:H*0.7 });
-    if ((type==='castle'||type==='ruins')&&pr()>0.6) list.push({ type:'portal', x:W*0.5+pr()*100-50, y:H*0.6 });
-    return list;
-  }, [type, turnCount, terrain.pts]);
-
-  // ── Weather particles ─────────────────────
-  const weatherParticles = useMemo(() => {
-    if (weather==='rain'||weather==='storm') {
-      const wr=mkRand(turnCount*41);
-      return { type:'rain', drops:Array.from({length:50},()=>({ x:wr()*W, y:wr()*H, len:8+wr()*12, op:0.2+wr()*0.4 })) };
-    }
-    if (weather==='snow') {
-      const sr=mkRand(turnCount*37);
-      return { type:'snow', flakes:Array.from({length:40},()=>({ x:sr()*W, y:sr()*H, r:1+sr()*2.5, op:0.4+sr()*0.5 })) };
-    }
-    if (type==='dungeon'||type==='cave') {
-      const er=mkRand(turnCount*23);
-      return { type:'embers', sparks:Array.from({length:15},()=>({ x:er()*W, y:H*0.3+er()*H*0.4, r:0.8+er()*1.5, op:0.3+er()*0.5 })) };
-    }
-    if (type==='swamp') {
-      const br=mkRand(turnCount*19);
-      return { type:'bubbles', list:Array.from({length:10},()=>({ x:br()*W, y:H*0.6+br()*0.3*H, r:2+br()*5, op:0.2+br()*0.4 })) };
-    }
-    return null;
-  }, [weather, type, turnCount]);
-
-  // ── Character positions with icons ────────
-  const charData = useMemo(() => {
-    if (!players?.length) return [];
-    const baseY = terrain.pts[14]?.y || H*0.65;
-    const spacing = Math.min(70, W/(players.length+1));
-    const startX = W/2 - (spacing*(players.length-1))/2;
-    // Get archetype icons — try player's genre first, fall back to fantasy
-    return players.map((p, i) => {
-      const genreIcons = ARCHETYPE_ICONS['fantasy'] || {};
-      const iconPath = genreIcons[p.class] || 'lorc/plain-dagger';
-      return {
-        x: startX + i*spacing,
-        y: baseY,
-        iconPath,
-        color: p.color || '#c4a84f',
-        name: p.name || '',
-        filterId: `char${uid}${i}`,
-      };
+  // ── Enemy (in combat) ──
+  if (inCombat && enemyName) {
+    const creatureType = enemyName.toLowerCase().replace(/\s+/g, '_');
+    drawEnemy(rc, svgEl2, W * 0.78, groundY, creatureType);
+    // VS flash
+    const vs = svgEl('text', {
+      x: W * 0.58, y: groundY - 25,
+      'text-anchor':'middle', fill:'#FFD700',
+      'font-family':'serif', 'font-size':'14',
+      'font-weight':'bold', 'letter-spacing':'4',
+      opacity:'0.8',
     });
-  }, [players, terrain.pts, uid]);
+    vs.textContent = 'VS';
+    svgEl2.appendChild(vs);
+  }
 
-  // ── Enemy data ────────────────────────────
-  const enemyData = useMemo(() => {
-    if (!inCombat && !enemy) return null;
-    const baseY = terrain.pts[22]?.y || H*0.65;
-    // Detect creature type from scene or enemy name
-    const creatureType = scene?.enemy?.toLowerCase?.().replace(/\s+/g,'_') || 'goblin';
-    const iconPath = CREATURE_ICONS[creatureType] || 'lorc/goblin-head';
-    return { x: W*0.78, y: baseY, iconPath, name: enemy || 'Enemy' };
-  }, [inCombat, enemy, terrain.pts, scene]);
+  // ── Foreground grass/rocks ──
+  drawForeground(rc, svgEl2, type, pal, tr, W, H);
 
-  // ── Foreground tufts ──────────────────────
-  const fgElements = useMemo(() => {
-    const fr=mkRand(turnCount*29+type.charCodeAt(0)*7);
-    return Array.from({length:8},()=>{
-      const x=fr()*W;
-      if (type==='forest'||type==='plains'||type==='village') return { type:'tuft', x, y:H-8-fr()*12 };
-      if (type==='dungeon'||type==='cave') return { type:'pebble', x, y:H-4-fr()*6 };
-      return null;
-    }).filter(Boolean);
-  }, [type, turnCount]);
+  // ── Paper texture overlay ──
+  const paper = svgEl('rect', {
+    x:0, y:0, width:W, height:H,
+    fill:'rgba(255,240,210,0.04)',
+    filter:'url(#paper)',
+  });
+  svgEl2.appendChild(paper);
 
-  const fogOp = weather==='fog'?0.7:weather==='storm'?0.4:parseFloat(pal.fog)*0.6;
-  const atmIcon = SCENE_ATM_ICONS[type];
+  // ── Warm vignette ──
+  const vignette = svgEl('rect', { x:0, y:0, width:W, height:H, fill:'url(#vig)' });
+  svgEl2.appendChild(vignette);
+
+  // ── Scene label ──
+  const label = svgEl('text', {
+    x: W-8, y: H-8,
+    'text-anchor':'end', fill:'rgba(255,255,255,0.3)',
+    'font-family':'monospace', 'font-size':'8', 'letter-spacing':'2',
+  });
+  label.textContent = `${type.toUpperCase()} · ${time.toUpperCase()}`;
+  svgEl2.appendChild(label);
+}
+
+// ── Background elements per scene type ────
+function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
+  if (type === 'forest' || type === 'plains' || type === 'swamp') {
+    // Sky sun/moon
+    if (time === 'night') {
+      svg.appendChild(rc.circle(W*0.82, H*0.15, 30, {
+        stroke:'#f5e68a', fill:'#fdf5b0', fillStyle:'solid', roughness:0.6
+      }));
+    } else if (time === 'day' || !time) {
+      svg.appendChild(rc.circle(W*0.82, H*0.12, 35, {
+        stroke:'#ffee44', fill: pal.sun || '#FFDD57', fillStyle:'solid', roughness:0.8
+      }));
+      // Sun rays
+      for (let i = 0; i < 8; i++) {
+        const a = (i/8)*Math.PI*2;
+        svg.appendChild(rc.line(
+          W*0.82 + Math.cos(a)*20, H*0.12 + Math.sin(a)*20,
+          W*0.82 + Math.cos(a)*30, H*0.12 + Math.sin(a)*30,
+          { stroke: pal.sun || '#FFDD57', strokeWidth: 2.5, roughness: 1.5 }
+        ));
+      }
+    }
+
+    // Background trees (far, lighter)
+    for (let i = 0; i < 14; i++) {
+      const x = sr() * W;
+      const h = 40 + sr() * 50;
+      const shade = pal.leaf ? pal.leaf[Math.floor(sr() * pal.leaf.length)] : '#2D5A27';
+      svg.appendChild(rc.ellipse(x, H*0.55 - h*0.4, h*0.6, h*0.7, {
+        stroke: shadeColor(shade, -20), fill: shadeColor(shade, 10),
+        fillStyle: 'solid', roughness: 2.5, bowing: 0.5, strokeWidth: 1
+      }));
+    }
+  }
+
+  if (type === 'dungeon' || type === 'cave') {
+    // Stone wall blocks
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 12; col++) {
+        const stoneColor = pal.stone ? pal.stone[Math.floor(sr() * pal.stone.length)] : '#4a4060';
+        svg.appendChild(rc.rectangle(
+          col * (W/11) + sr()*4-2, row * 40 + sr()*3-1,
+          W/11 - 3, 40 - 3,
+          { stroke: shadeColor(stoneColor, -30), fill: stoneColor, fillStyle:'hachure', roughness:1.8, strokeWidth:1.5 }
+        ));
+      }
+    }
+    // Stalactites
+    for (let i = 0; i < 10; i++) {
+      const x = sr() * W;
+      const len = 15 + sr() * 45;
+      svg.appendChild(rc.polygon([[x-6,0],[x+6,0],[x,len]], {
+        stroke: pal.stone ? pal.stone[0] : '#4a4060',
+        fill: pal.stone ? shadeColor(pal.stone[0], 10) : '#5a5070',
+        fillStyle: 'hachure', roughness: 1.8, strokeWidth: 1.5
+      }));
+    }
+    // Torches
+    [W*0.2, W*0.5, W*0.8].forEach(tx => {
+      svg.appendChild(rc.rectangle(tx-3, H*0.45, 6, 16, { stroke:'#5C3A1E', fill:'#6B4423', fillStyle:'solid', roughness:1 }));
+      svg.appendChild(rc.ellipse(tx, H*0.43, 12, 16, { stroke:pal.torch, fill:pal.torch, fillStyle:'solid', roughness:2.5 }));
+      svg.appendChild(rc.ellipse(tx, H*0.42, 7, 10, { stroke:'#ffe080', fill:'#ffe080', fillStyle:'solid', roughness:2 }));
+    });
+  }
+
+  if (type === 'castle' || type === 'ruins') {
+    // Distant towers
+    for (let i = 0; i < 4; i++) {
+      const tx = 60 + i * (W/4) + sr()*30-15;
+      const th = 60 + sr() * 70;
+      const tw = 28 + sr() * 16;
+      const stone = pal.stone ? pal.stone[i%pal.stone.length] : '#607D8B';
+      svg.appendChild(rc.rectangle(tx-tw/2, H*0.65-th, tw, th, {
+        stroke: shadeColor(stone,-20), fill: stone, fillStyle:'hachure', roughness:2.0, strokeWidth:1.5
+      }));
+      // Battlements
+      for (let b = 0; b < 4; b++) {
+        svg.appendChild(rc.rectangle(tx-tw/2+b*(tw/4), H*0.65-th-10, tw/4-2, 10, {
+          stroke: shadeColor(stone,-20), fill: stone, fillStyle:'solid', roughness:1.5
+        }));
+      }
+      // Lit windows
+      if (sr() > 0.3) {
+        svg.appendChild(rc.ellipse(tx, H*0.65-th+15, 8, 12, {
+          stroke:'none', fill:'rgba(255,200,80,0.8)', fillStyle:'solid', roughness:0.8
+        }));
+      }
+    }
+  }
+
+  if (type === 'space') {
+    // Stars - lots of them, different sizes
+    for (let i = 0; i < 120; i++) {
+      const sx = sr() * W, sy = sr() * H * 0.75;
+      const sz = sr() * 2.5 + 0.3;
+      const starEl = svgEl('circle', { cx: sx, cy: sy, r: sz, fill: '#FFFDE7', opacity: String(0.4 + sr()*0.6) });
+      svg.appendChild(starEl);
+    }
+    // Nebula cloud
+    for (let i = 0; i < 4; i++) {
+      const nx = sr()*W, ny = sr()*H*0.6;
+      const colors = ['rgba(107,63,255,0.15)','rgba(255,63,107,0.12)','rgba(63,255,200,0.1)'];
+      const nebulaEl = svgEl('ellipse', {
+        cx: nx, cy: ny, rx: 60+sr()*80, ry: 30+sr()*40,
+        fill: colors[i%colors.length]
+      });
+      svg.appendChild(nebulaEl);
+    }
+    // Planets — sketchy and colorful
+    const planetColors = pal.planet || ['#FF6B6B','#4ECDC4','#A8E063'];
+    for (let i = 0; i < 4; i++) {
+      const px = 50 + sr()*(W-100), py = 20 + sr()*(H*0.5);
+      const pr2 = 12 + sr()*35;
+      const pc = planetColors[i%planetColors.length];
+      svg.appendChild(rc.circle(px, py, pr2*2, {
+        stroke: shadeColor(pc,-30), fill: pc, fillStyle:'solid', roughness:1.2
+      }));
+      // Planet ring sometimes
+      if (sr() > 0.5) {
+        svg.appendChild(rc.ellipse(px, py, pr2*3.2, pr2*0.6, {
+          stroke: shadeColor(pc,-20), fill:'none', roughness:1.5, strokeWidth:2
+        }));
+      }
+      // Crater marks
+      if (sr() > 0.4) {
+        svg.appendChild(rc.circle(px + pr2*0.3, py - pr2*0.2, (pr2*0.25)*2, {
+          stroke: shadeColor(pc,-40), fill:'none', roughness:1, strokeWidth:1
+        }));
+      }
+    }
+    // Spaceship silhouette
+    const sx2 = W*0.75, sy2 = H*0.18;
+    svg.appendChild(rc.ellipse(sx2, sy2, 55, 18, { stroke:'#aaa', fill:'#555', fillStyle:'solid', roughness:1.2 }));
+    svg.appendChild(rc.ellipse(sx2, sy2-8, 25, 14, { stroke:'#aaa', fill:'#888', fillStyle:'solid', roughness:1 }));
+    svg.appendChild(rc.ellipse(sx2+10, sy2+2, 10, 4, { stroke:'none', fill:'rgba(100,200,255,0.6)', fillStyle:'solid', roughness:0.8 }));
+  }
+
+  if (type === 'ocean') {
+    // Horizon and sun
+    if (time === 'day') {
+      svg.appendChild(rc.circle(W*0.75, H*0.25, 40, {
+        stroke:'#FFD700', fill:'#FFEE55', fillStyle:'solid', roughness:0.8
+      }));
+    }
+    // Distant ship
+    const shipX = W*0.65 + sr()*60-30, shipY = H*0.48;
+    svg.appendChild(rc.polygon([[shipX-22,shipY],[shipX+22,shipY],[shipX+18,shipY+10],[shipX-18,shipY+10]], {
+      stroke:'#4a3020', fill:'#5a4028', fillStyle:'solid', roughness:1.8
+    }));
+    svg.appendChild(rc.line(shipX, shipY, shipX, shipY-32, { stroke:'#4a3020', strokeWidth:2, roughness:1.5 }));
+    svg.appendChild(rc.polygon([[shipX,shipY-32],[shipX+20,shipY-20],[shipX,shipY-18]], {
+      stroke:'#8a7060', fill:'rgba(200,180,150,0.5)', fillStyle:'solid', roughness:1.5
+    }));
+    // Waves
+    for (let i = 0; i < 8; i++) {
+      const wy = H*0.52 + sr()*30, wx = sr()*W;
+      const wl = 30 + sr()*60;
+      const wavePath = `M ${wx} ${wy} Q ${wx+wl/2} ${wy-8} ${wx+wl} ${wy}`;
+      svg.appendChild(rc.path(wavePath, {
+        stroke: pal.wave || '#42A5F5', fill:'none', strokeWidth:2, roughness:2.0
+      }));
+    }
+  }
+
+  if (type === 'village') {
+    // Sunset/sunrise color sky base
+    // Cottages in background
+    for (let i = 0; i < 5; i++) {
+      const hx = 50 + i*(W/5) + sr()*20-10;
+      const hy2 = H*0.55 - sr()*15;
+      const lit = sr() > 0.35;
+      // Wall
+      svg.appendChild(rc.rectangle(hx-20, hy2-25, 40, 28, {
+        stroke: shadeColor(pal.wall||'#EFEBE9', -20), fill: pal.wall||'#EFEBE9',
+        fillStyle:'solid', roughness:1.8
+      }));
+      // Roof
+      svg.appendChild(rc.polygon([[hx-24,hy2-25],[hx+24,hy2-25],[hx,hy2-48]], {
+        stroke: shadeColor(pal.roof||'#C62828', -20), fill: pal.roof||'#C62828',
+        fillStyle:'hachure', roughness:2.0
+      }));
+      // Window
+      if (lit) {
+        svg.appendChild(rc.rectangle(hx-6, hy2-20, 10, 8, {
+          stroke:'#aaa', fill:'rgba(255,200,80,0.85)', fillStyle:'solid', roughness:0.8
+        }));
+      }
+      // Chimney
+      svg.appendChild(rc.rectangle(hx+10, hy2-52, 7, 18, {
+        stroke:'#5C3A1E', fill: pal.chimney||'#6D4C41', fillStyle:'solid', roughness:1.5
+      }));
+    }
+  }
+
+  if (type === 'desert') {
+    // Hot sun
+    svg.appendChild(rc.circle(W*0.8, H*0.12, 38, {
+      stroke:pal.sun||'#FFE57F', fill:pal.sun||'#FFE57F', fillStyle:'solid', roughness:0.7
+    }));
+    // Heat haze ellipses
+    for (let i = 0; i < 3; i++) {
+      svg.appendChild(svgEl('ellipse', {
+        cx: sr()*W, cy: String(H*0.55), rx: String(60+sr()*80), ry: '8',
+        fill: 'rgba(255,200,100,0.08)'
+      }));
+    }
+    // Pyramids
+    const px = W*0.6 + sr()*50-25;
+    svg.appendChild(rc.polygon([[px-50,H*0.62],[px+50,H*0.62],[px,H*0.32]], {
+      stroke: shadeColor(pal.sand?pal.sand[0]:'#D4A055', -30),
+      fill: pal.sand?pal.sand[0]:'#D4A055',
+      fillStyle:'hachure', roughness:2.0
+    }));
+  }
+
+  if (type === 'mountain') {
+    // Multiple peaks
+    const peaks = [
+      { x: W*0.15, h: 100 },
+      { x: W*0.4, h: 140 },
+      { x: W*0.65, h: 110 },
+      { x: W*0.88, h: 90 },
+    ];
+    peaks.forEach(({ x, h }) => {
+      const rk = pal.rock ? pal.rock[Math.floor(sr()*pal.rock.length)] : '#78909C';
+      svg.appendChild(rc.polygon([[x-h*0.55, H*0.68],[x+h*0.55, H*0.68],[x, H*0.68-h]], {
+        stroke: shadeColor(rk,-20), fill: rk, fillStyle:'hachure', roughness:2.5
+      }));
+      // Snow cap
+      svg.appendChild(rc.polygon([
+        [x-h*0.15, H*0.68-h*0.62],[x+h*0.15, H*0.68-h*0.62],[x, H*0.68-h]
+      ], { stroke:'#ddd', fill:'#EFEFEF', fillStyle:'solid', roughness:2.0 }));
+    });
+  }
+}
+
+// ── Ground drawing ─────────────────────────
+function drawGround(rc, svg, type, pal, sr, tr, W, H) {
+  // Terrain silhouette
+  const pts = [];
+  for (let i = 0; i <= 20; i++) {
+    const x = (i/20) * W;
+    let y;
+    if (type === 'mountain')     y = H*0.55 + Math.sin(i*0.9)*30 + tr()*10;
+    else if (type === 'ocean')   y = H*0.62 + Math.sin(i*0.5)*8 + tr()*5;
+    else if (type === 'desert')  y = H*0.63 + Math.sin(i*0.4)*12 + tr()*8;
+    else if (type === 'dungeon' || type === 'cave') y = H*0.75 + tr()*3;
+    else                         y = H*0.65 + Math.sin(i*0.6)*12 + Math.sin(i*1.3)*6 + tr()*8;
+    pts.push([x, y]);
+  }
+  const groundPath = `M 0 ${H} L ${pts.map(p=>`${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' L ')} L ${W} ${H} Z`;
+  svg.appendChild(rc.path(groundPath, {
+    stroke: shadeColor(pal.ground,-20),
+    fill: pal.ground,
+    fillStyle: (type==='desert'||type==='snow'||type==='plains') ? 'solid' : 'hachure',
+    roughness: 1.8, strokeWidth: 2
+  }));
+
+  // Ground detail layer (lighter, midground)
+  const pts2 = pts.map(([x,y]) => [x, y + 15 + tr()*5]);
+  const mid2 = `M 0 ${H} L ${pts2.map(p=>`${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' L ')} L ${W} ${H} Z`;
+  svg.appendChild(rc.path(mid2, {
+    stroke: shadeColor(pal.mid || pal.ground, 10),
+    fill: pal.mid || pal.ground,
+    fillStyle: 'solid', roughness: 1.2, strokeWidth: 1
+  }));
+
+  // Foreground dark strip
+  svg.appendChild(rc.rectangle(0, H-45, W, 50, {
+    stroke: shadeColor(pal.far || pal.ground, -20),
+    fill: pal.far || shadeColor(pal.ground, -30),
+    fillStyle:'solid', roughness:1.0, strokeWidth:0
+  }));
+
+  // Mid-scene trees/props
+  if (type === 'forest' || type === 'plains') {
+    for (let i = 0; i < 8; i++) {
+      const tx = tr() * W;
+      const baseY = pts[Math.round((tx/W)*20)]?.[1] || H*0.65;
+      const th = 45 + tr()*60;
+      const leafColor = pal.leaf ? pal.leaf[i%pal.leaf.length] : '#3D8B37';
+      // Trunk
+      svg.appendChild(rc.rectangle(tx-3, baseY-th*0.35, 6, th*0.4, {
+        stroke: pal.trunk||'#5C3A1E', fill: shadeColor(pal.trunk||'#5C3A1E',10),
+        fillStyle:'solid', roughness:2.0
+      }));
+      // Canopy — multiple overlapping circles for lush look
+      [[0,-th*0.7,th*0.5],[-12,-th*0.55,th*0.38],[12,-th*0.55,th*0.38]].forEach(([dx,dy,r]) => {
+        svg.appendChild(rc.circle(tx+dx, baseY+dy, r*2, {
+          stroke: shadeColor(leafColor,-15), fill: leafColor,
+          fillStyle:'solid', roughness:2.8, bowing:0.5
+        }));
+      });
+      // Highlight on top of canopy
+      svg.appendChild(rc.ellipse(tx, baseY-th*0.75, th*0.35, th*0.22, {
+        stroke:'none', fill: shadeColor(leafColor, 20),
+        fillStyle:'solid', roughness:2.5, opacity:0.6
+      }));
+    }
+  }
+
+  if (type === 'dungeon' || type === 'cave') {
+    // Stalagmites
+    for (let i = 0; i < 6; i++) {
+      const sx = tr() * W;
+      const sy = pts[Math.round((sx/W)*20)]?.[1] || H*0.72;
+      const sl = 10 + tr()*22;
+      const stone = pal.stone ? pal.stone[i%pal.stone.length] : '#4a4060';
+      svg.appendChild(rc.polygon([[sx-5,sy],[sx+5,sy],[sx,sy-sl]], {
+        stroke: shadeColor(stone,-20), fill: stone,
+        fillStyle:'hachure', roughness:2.0
+      }));
+    }
+    if (type === 'cave') {
+      // Crystal formations
+      for (let i = 0; i < 5; i++) {
+        const cx = tr()*W, cy = pts[Math.round((cx/W)*20)]?.[1] || H*0.7;
+        const ch = 15 + tr()*30;
+        const cc = pal.crystal ? pal.crystal[i%pal.crystal.length] : '#7B6CFF';
+        [[0,ch],[-8,ch*0.7],[8,ch*0.75]].forEach(([dx,h]) => {
+          svg.appendChild(rc.polygon([[cx+dx-4,cy],[cx+dx+4,cy],[cx+dx,cy-h]], {
+            stroke: shadeColor(cc,-20), fill: cc,
+            fillStyle:'solid', roughness:1.0, strokeWidth:1.5
+          }));
+        });
+      }
+    }
+  }
+
+  if (type === 'desert') {
+    // Cacti
+    for (let i = 0; i < 5; i++) {
+      const cx = tr() * W;
+      const cy = pts[Math.round((cx/W)*20)]?.[1] || H*0.63;
+      svg.appendChild(rc.rectangle(cx-4, cy-30, 8, 32, {stroke:'#2E7D32', fill: pal.cactus||'#4CAF50', fillStyle:'solid', roughness:1.8}));
+      svg.appendChild(rc.rectangle(cx-14, cy-22, 10, 4, {stroke:'#2E7D32', fill: pal.cactus||'#4CAF50', fillStyle:'solid', roughness:1.5}));
+      svg.appendChild(rc.rectangle(cx+4, cy-18, 10, 4, {stroke:'#2E7D32', fill: pal.cactus||'#4CAF50', fillStyle:'solid', roughness:1.5}));
+    }
+  }
+
+  if (type === 'snow') {
+    // Snow-laden pine trees
+    for (let i = 0; i < 7; i++) {
+      const tx = tr()*W, baseY = pts[Math.round((tx/W)*20)]?.[1] || H*0.62;
+      const th = 30 + tr()*50;
+      svg.appendChild(rc.polygon([[tx-th*0.5,baseY],[tx+th*0.5,baseY],[tx,baseY-th]], {
+        stroke:'#1B3A1E', fill: pal.tree||'#2E4A1E', fillStyle:'solid', roughness:2.2
+      }));
+      // Snow on tree
+      svg.appendChild(rc.polygon([[tx-th*0.4,baseY-th*0.3],[tx+th*0.4,baseY-th*0.3],[tx,baseY-th]], {
+        stroke:'#ddd', fill:'white', fillStyle:'solid', roughness:2.5
+      }));
+    }
+    // Snowdrift mounds
+    for (let i = 0; i < 6; i++) {
+      const sx = tr()*W, sy = pts[Math.round((sx/W)*20)]?.[1] || H*0.62;
+      svg.appendChild(rc.ellipse(sx, sy+5, 40+tr()*30, 14, {
+        stroke:'#ddd', fill:'#F0F4F8', fillStyle:'solid', roughness:2.0
+      }));
+    }
+  }
+}
+
+// ── Foreground elements ────────────────────
+function drawForeground(rc, svg, type, pal, tr, W, H) {
+  for (let i = 0; i < 5; i++) {
+    const fx = tr() * W;
+    if (type === 'forest' || type === 'plains' || type === 'village') {
+      // Grass tufts
+      const gc = pal.leaf ? pal.leaf[0] : '#3D8B37';
+      for (let j = 0; j < 3; j++) {
+        svg.appendChild(rc.line(fx+j*4-4, H-8, fx+j*4-4+tr()*4-2, H-18-tr()*8, {
+          stroke: gc, strokeWidth: 2, roughness: 2.0
+        }));
+      }
+    } else if (type === 'dungeon' || type === 'cave') {
+      svg.appendChild(rc.circle(fx, H-8, 5, {
+        stroke: pal.stone?pal.stone[0]:'#4a4060',
+        fill: pal.stone?shadeColor(pal.stone[0],15):'#6a6080',
+        fillStyle:'solid', roughness:2.5
+      }));
+    }
+  }
+}
+
+// ── Weather ────────────────────────────────
+function drawRain(svg, tr) {
+  for (let i = 0; i < 60; i++) {
+    const rx = tr()*W, ry = tr()*H;
+    const line = svgEl('line', {
+      x1: rx, y1: ry, x2: String(rx-3), y2: String(ry+12),
+      stroke:'rgba(150,190,255,0.4)', 'stroke-width':'1'
+    });
+    svg.appendChild(line);
+  }
+}
+
+function drawSnowfall(svg, tr) {
+  for (let i = 0; i < 40; i++) {
+    const sx = tr()*W, sy = tr()*H;
+    const sf = svgEl('circle', {
+      cx: sx, cy: sy, r: String(1.5 + tr()*2),
+      fill:'rgba(255,255,255,0.7)'
+    });
+    svg.appendChild(sf);
+  }
+}
+
+// ═══════════════════════════════════════════
+//  REACT COMPONENT
+// ═══════════════════════════════════════════
+
+export default function SceneRenderer({ scene, players, turnCount = 0, inCombat, enemy }) {
+  const svgRef = useRef(null);
+
+  // Merge enemy/combat into scene object for drawScene
+  const mergedScene = {
+    ...scene,
+    inCombat: inCombat || scene?.inCombat || false,
+    enemy: enemy || scene?.enemy || null,
+  };
+
+  useEffect(() => {
+    if (!svgRef.current) return;
+    try {
+      drawScene(svgRef.current, mergedScene, players, turnCount);
+    } catch(e) {
+      console.warn('SceneRenderer error:', e);
+    }
+  }, [scene?.type, scene?.time, scene?.weather, scene?.inCombat, scene?.enemy, players, turnCount, inCombat, enemy]);
 
   return (
     <div className={styles.wrapper}>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className={styles.svg}>
-        <defs>
-          {/* Gradients */}
-          <linearGradient id={`sky${uid}`} x1="0" y1="0" x2="0" y2="1">
-            {sky.map(([c,o],i) => <stop key={i} offset={`${o}%`} stopColor={c}/>)}
-          </linearGradient>
-          <linearGradient id={`gnd${uid}`} x1="0" y1="0" x2="0" y2="1">
-            {pal.g.map((c,i) => <stop key={i} offset={`${(i/(pal.g.length-1))*100}%`} stopColor={c}/>)}
-          </linearGradient>
-          <linearGradient id={`fog${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#080610" stopOpacity="0"/>
-            <stop offset="50%"  stopColor="#080610" stopOpacity={fogOp*0.5}/>
-            <stop offset="100%" stopColor="#080610" stopOpacity={fogOp}/>
-          </linearGradient>
-          <radialGradient id={`amb${uid}`} cx="50%" cy="100%" r="65%">
-            <stop offset="0%"   stopColor={pal.light} stopOpacity=".16"/>
-            <stop offset="100%" stopColor={pal.light} stopOpacity="0"/>
-          </radialGradient>
-          <radialGradient id={`torch${uid}`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor={pal.light} stopOpacity=".35"/>
-            <stop offset="100%" stopColor={pal.light} stopOpacity="0"/>
-          </radialGradient>
-
-          {/* Filters */}
-          <filter id={`glow${uid}`}><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <filter id={`sglow${uid}`}><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <filter id={`softblur${uid}`}><feGaussianBlur stdDeviation="2"/></filter>
-          <filter id={`blurmed${uid}`}><feGaussianBlur stdDeviation="5"/></filter>
-
-          {/* Per-character color filters — tints white icon to player color */}
-          {charData.map(cp => (
-            <filter key={cp.filterId} id={cp.filterId}>
-              <feColorMatrix type="matrix" values={hexToColorMatrix(cp.color)}/>
-            </filter>
-          ))}
-
-          {/* Enemy red tint */}
-          <filter id={`enemy${uid}`}>
-            <feColorMatrix type="matrix" values="0.88 0 0 0 0  0.33 0 0 0 0  0.33 0 0 0 0  0 0 0 1 0"/>
-          </filter>
-
-          {/* Accent tint for atmosphere icon */}
-          <filter id={`atm${uid}`}>
-            <feColorMatrix type="matrix" values={hexToColorMatrix(pal.accent)}/>
-          </filter>
-        </defs>
-
-        {/* ── Sky ── */}
-        <rect width={W} height={H} fill={`url(#sky${uid})`}/>
-
-        {/* ── Stars ── */}
-        {stars.map((s,i) => (
-          <circle key={i} cx={s.x} cy={s.y} r={s.r} fill="white" opacity={s.op}
-            className={s.twinkle ? styles.twinkle : undefined}
-            style={s.twinkle ? {animationDelay:`${(i*0.31)%4}s`} : undefined}/>
-        ))}
-
-        {/* ── Space nebula ── */}
-        {type==='space' && (
-          <g opacity=".25">
-            <ellipse cx={W*0.3} cy={H*0.2} rx={120} ry={40} fill="#6040ff" filter={`url(#softblur${uid})`}/>
-            <ellipse cx={W*0.75} cy={H*0.35} rx={90} ry={35} fill="#ff4080" filter={`url(#softblur${uid})`}/>
-          </g>
-        )}
-
-        {/* ── Moon ── */}
-        {(time==='night'||time==='cave') && (
-          <g filter={`url(#sglow${uid})`}>
-            <circle cx={W*0.84} cy={H*0.18} r={18} fill="#e8d870" opacity=".92"/>
-            <circle cx={W*0.84+6} cy={H*0.18-4} r={13} fill={sky[0][0]} opacity=".55"/>
-            <circle cx={W*0.84-4} cy={H*0.18+3} r={3} fill="#d0c050" opacity=".4"/>
-            <circle cx={W*0.84+5} cy={H*0.18+6} r={2} fill="#d0c050" opacity=".3"/>
-          </g>
-        )}
-
-        {/* ── Sun (dawn/dusk) ── */}
-        {(time==='dawn'||time==='dusk') && (
-          <g filter={`url(#sglow${uid})`}>
-            <circle cx={W*0.15} cy={H*0.38} r={22} fill={time==='dawn'?'#ffaa28':'#ff8030'} opacity=".9"/>
-            {Array.from({length:8},(_,i)=>{
-              const a=(i/8)*Math.PI*2;
-              return <line key={i} x1={W*0.15+Math.cos(a)*25} y1={H*0.38+Math.sin(a)*25}
-                x2={W*0.15+Math.cos(a)*35} y2={H*0.38+Math.sin(a)*35}
-                stroke={time==='dawn'?'#ffaa28':'#ff8030'} strokeWidth="1.5" opacity=".5"/>;
-            })}
-          </g>
-        )}
-
-        {/* ── Sun (day) ── */}
-        {time==='day' && (
-          <g filter={`url(#sglow${uid})`}>
-            <circle cx={W*0.82} cy={H*0.13} r={20} fill="#ffee60" opacity=".96"/>
-            {Array.from({length:8},(_,i)=>{
-              const a=(i/8)*Math.PI*2;
-              return <line key={i} x1={W*0.82+Math.cos(a)*23} y1={H*0.13+Math.sin(a)*23}
-                x2={W*0.82+Math.cos(a)*33} y2={H*0.13+Math.sin(a)*33}
-                stroke="#ffee60" strokeWidth="2" opacity=".4"/>;
-            })}
-          </g>
-        )}
-
-        {/* ── Clouds ── */}
-        {clouds.map((cl,i) => (
-          <g key={i} className={styles.driftCloud} style={{animationDuration:`${cl.speed}s`,animationDelay:`${i*-8}s`}}>
-            <ellipse cx={cl.x} cy={cl.y} rx={cl.w*0.5} ry={cl.h*0.5} fill="white" opacity={cl.op}/>
-            <ellipse cx={cl.x+cl.w*0.18} cy={cl.y-cl.h*0.25} rx={cl.w*0.3} ry={cl.h*0.4} fill="white" opacity={cl.op}/>
-            <ellipse cx={cl.x-cl.w*0.18} cy={cl.y-cl.h*0.15} rx={cl.w*0.25} ry={cl.h*0.35} fill="white" opacity={cl.op*0.8}/>
-          </g>
-        ))}
-
-        {/* ── Background elements ── */}
-        {bgElements.map((el,i) => {
-          if (el.type==='tower') return (
-            <g key={i}>
-              <rect x={el.x-el.w/2} y={H*0.6-el.h} width={el.w} height={el.h} fill={pal.g[0]} opacity=".85"/>
-              {Array.from({length:Math.floor(el.w/7)},(_,j)=>(
-                <rect key={j} x={el.x-el.w/2+j*7} y={H*0.6-el.h-8} width={4} height={8} fill={pal.g[0]} opacity=".85"/>
-              ))}
-              {Array.from({length:el.windows},(_,j)=>(
-                <rect key={j} x={el.x-3} y={H*0.6-el.h+10+j*20} width={6} height={8} rx={3}
-                  fill={pal.light} opacity={time==='night'||time==='dusk'?0.7:0.15}/>
-              ))}
-            </g>
-          );
-          if (el.type==='wall')     return <rect key={i} x={0} y={el.y} width={W} height={6} fill={pal.g[0]} opacity=".6"/>;
-          if (el.type==='building') return (
-            <g key={i}>
-              <rect x={el.x} y={H*0.65-el.h} width={el.w} height={el.h} fill={pal.g[1]} opacity=".8"/>
-              {Array.from({length:el.floors},(_,row)=>
-                Array.from({length:Math.floor(el.w/10)},(_,col)=>(
-                  <rect key={`${row}-${col}`} x={el.x+3+col*10} y={H*0.65-el.h+6+row*14} width={5} height={6}
-                    fill={pal.light} opacity={Math.random()>0.4?0.6:0.05}/>
-                ))
-              )}
-            </g>
-          );
-          if (el.type==='planet') return (
-            <g key={i} filter={`url(#glow${uid})`}>
-              <circle cx={el.x} cy={el.y} r={el.r} fill={`hsl(${el.hue},55%,38%)`} opacity=".75"/>
-              <circle cx={el.x-el.r*0.28} cy={el.y-el.r*0.22} r={el.r*0.55} fill={sky[0][0]} opacity=".35"/>
-              {el.rings && <ellipse cx={el.x} cy={el.y} rx={el.r*1.7} ry={el.r*0.28}
-                fill="none" stroke={`hsl(${el.hue},40%,55%)`} strokeWidth="2" opacity=".4"/>}
-            </g>
-          );
-          if (el.type==='station') return (
-            <g key={i} fill={pal.g[1]} opacity=".6">
-              <rect x={el.x-20} y={el.y-6} width={40} height={12} rx={3}/>
-              <rect x={el.x-35} y={el.y-3} width={15} height={6} rx={1}/>
-              <rect x={el.x+20} y={el.y-3} width={15} height={6} rx={1}/>
-              <circle cx={el.x} cy={el.y} r={4} fill={pal.light} opacity=".5"/>
-            </g>
-          );
-          if (el.type==='ship') return (
-            <g key={i} fill={pal.g[0]} opacity=".7">
-              <path d={`M${el.x-25},${el.y} L${el.x+25},${el.y} L${el.x+20},${el.y+10} L${el.x-20},${el.y+10} Z`}/>
-              <line x1={el.x} y1={el.y} x2={el.x} y2={el.y-35} stroke={pal.g[0]} strokeWidth="2"/>
-              <path d={`M${el.x},${el.y-35} L${el.x+18},${el.y-20} L${el.x},${el.y-18} Z`} opacity=".5"/>
-            </g>
-          );
-          if (el.type==='lighthouse') return (
-            <g key={i} fill={pal.g[1]} opacity=".8">
-              <rect x={el.x-5} y={H*0.35} width={10} height={H*0.25} rx={2}/>
-              <ellipse cx={el.x} cy={H*0.35} rx={7} ry={5} fill={pal.g[0]}/>
-              <circle cx={el.x} cy={H*0.35} r={4} fill={pal.light} opacity=".7" filter={`url(#glow${uid})`}/>
-            </g>
-          );
-          if (el.type==='pyramid') return (
-            <polygon key={i} points={`${el.x},${el.y-50} ${el.x-40},${el.y} ${el.x+40},${el.y}`} fill={pal.g[1]} opacity=".75"/>
-          );
-          if (el.type==='dune')    return <ellipse key={i} cx={el.x} cy={el.y} rx={el.w/2} ry={el.h/2} fill={pal.g[1]} opacity=".5"/>;
-          if (el.type==='peak')    return (
-            <g key={i}>
-              <polygon points={`${el.x},${H*0.62-el.h} ${el.x-el.h*0.5},${H*0.62} ${el.x+el.h*0.5},${H*0.62}`} fill={pal.g[0]} opacity=".8"/>
-              <polygon points={`${el.x},${H*0.62-el.h} ${el.x-el.h*0.15},${H*0.62-el.h*0.6} ${el.x+el.h*0.15},${H*0.62-el.h*0.6}`} fill="white" opacity=".6"/>
-            </g>
-          );
-          if (el.type==='cottage') return (
-            <g key={i}>
-              <rect x={el.x-15} y={el.y-20} width={30} height={20} fill={pal.g[1]} opacity=".85"/>
-              <polygon points={`${el.x-18},${el.y-20} ${el.x+18},${el.y-20} ${el.x},${el.y-36}`} fill={pal.g[0]} opacity=".9"/>
-              {el.lit && <rect x={el.x-5} y={el.y-17} width={8} height={7} rx={1} fill={pal.light} opacity=".75"/>}
-            </g>
-          );
-          if (el.type==='windmill') return (
-            <g key={i} fill={pal.g[1]} opacity=".75">
-              <rect x={el.x-6} y={el.y-45} width={12} height={45} rx={2}/>
-              <g className={styles.windmillSpin} style={{transformOrigin:`${el.x}px ${el.y-45}px`}}>
-                {[[0,-25],[18,18],[-18,18]].map(([dx,dy],j)=>(
-                  <line key={j} x1={el.x} y1={el.y-45} x2={el.x+dx} y2={el.y-45+dy}
-                    stroke={pal.g[1]} strokeWidth="3" opacity=".8"/>
-                ))}
-              </g>
-            </g>
-          );
-          return null;
-        })}
-
-        {/* ── Terrain ── */}
-        <path d={terrain.d} fill={`url(#gnd${uid})`}/>
-
-        {/* ── Scene atmosphere icon (watermark) ── */}
-        {atmIcon && (
-          <image
-            href={`${ICON_BASE}/${atmIcon}.svg`}
-            x={W - 80} y={H*0.25}
-            width={68} height={68}
-            filter={`url(#atm${uid})`}
-            opacity="0.07"
-            className={styles.atmIcon}
-          />
-        )}
-
-        {/* ── Props ── */}
-        {props.map((el,i) => {
-          if (el.type==='tree') return (
-            <g key={i}>
-              <rect x={el.x-2.5} y={el.y-el.h*0.3} width={5} height={el.h*0.3+2} fill={el.dead?'#3a2a1a':pal.g[0]}/>
-              <ellipse cx={el.x} cy={el.y-el.h*0.55} rx={el.w*0.52} ry={el.h*0.55} fill={el.dead?'#2a1a0a':pal.g[1]} opacity=".9"/>
-              {!el.dead && <ellipse cx={el.x} cy={el.y-el.h*0.6} rx={el.w*0.34} ry={el.h*0.38} fill={pal.accent} opacity=".2"/>}
-            </g>
-          );
-          if (el.type==='snowtree') return (
-            <g key={i}>
-              <rect x={el.x-2} y={el.y-el.h*0.3} width={4} height={el.h*0.3} fill="#4a3828"/>
-              <polygon points={`${el.x},${el.y-el.h} ${el.x-el.h*0.4},${el.y} ${el.x+el.h*0.4},${el.y}`} fill="#1a2830" opacity=".8"/>
-              <polygon points={`${el.x},${el.y-el.h} ${el.x-el.h*0.35},${el.y-el.h*0.25} ${el.x+el.h*0.35},${el.y-el.h*0.25}`} fill="white" opacity=".5"/>
-            </g>
-          );
-          if (el.type==='stalactite') return <polygon key={i} points={`${el.x-7},0 ${el.x+7},0 ${el.x},${el.len}`} fill={pal.g[1]} opacity=".85"/>;
-          if (el.type==='stalagmite') return <polygon key={i} points={`${el.x-5},${el.y} ${el.x+5},${el.y} ${el.x},${el.y-el.len}`} fill={pal.g[1]} opacity=".75"/>;
-          if (el.type==='crystal') return (
-            <g key={i} filter={`url(#glow${uid})`}>
-              <polygon points={`${el.x},${el.y-el.h} ${el.x-5},${el.y} ${el.x+5},${el.y}`} fill={pal.accent} opacity=".55"/>
-              <polygon points={`${el.x+4},${el.y-el.h*0.7} ${el.x+1},${el.y} ${el.x+9},${el.y}`} fill={pal.accent} opacity=".35"/>
-            </g>
-          );
-          if (el.type==='torch') return (
-            <g key={i} filter={`url(#glow${uid})`}>
-              <ellipse cx={el.x} cy={H*0.68} rx={28} ry={8} fill={pal.light} opacity=".12"/>
-              <rect x={el.x-2} y={H*0.52} width={4} height={14} fill="#7a5020" rx={1}/>
-              <ellipse cx={el.x} cy={H*0.51} rx={5} ry={8} fill={pal.light} opacity=".9" className={styles.flicker}/>
-              <ellipse cx={el.x} cy={H*0.51} rx={3} ry={5} fill="#ffeeaa" opacity=".85" className={styles.flicker2}/>
-            </g>
-          );
-          if (el.type==='wave')     return <path key={i} d={`M${el.x},${el.y} Q${el.x+el.len/2},${el.y-8} ${el.x+el.len},${el.y}`} fill="none" stroke={pal.accent} strokeWidth={1.5} opacity=".35" className={styles.waveAnim}/>;
-          if (el.type==='rock')     return <ellipse key={i} cx={el.x} cy={el.y} rx={8+Math.random()*10} ry={5+Math.random()*6} fill={pal.g[0]} opacity=".7"/>;
-          if (el.type==='asteroid') return <ellipse key={i} cx={el.x} cy={el.y} rx={el.r} ry={el.r*0.7} fill={pal.g[1]} opacity=".65" transform={`rotate(${el.r*15},${el.x},${el.y})`}/>;
-          if (el.type==='nebula')   return <ellipse key={i} cx={el.x} cy={el.y} rx={el.r} ry={el.r*0.5} fill={`hsl(${el.hue},60%,40%)`} opacity=".12" filter={`url(#softblur${uid})`}/>;
-          if (el.type==='cactus')   return (
-            <g key={i} fill="#2a5a1a">
-              <rect x={el.x-3} y={el.y-28} width={6} height={28} rx={3}/>
-              <rect x={el.x-10} y={el.y-20} width={8} height={4} rx={2}/>
-              <rect x={el.x+2} y={el.y-16} width={8} height={4} rx={2}/>
-            </g>
-          );
-          if (el.type==='chest') return (
-            <g key={i} fill={pal.g[1]} opacity=".8">
-              <rect x={el.x-8} y={el.y-10} width={16} height={10} rx={2}/>
-              <rect x={el.x-8} y={el.y-14} width={16} height={6} rx={2}/>
-              <rect x={el.x-2} y={el.y-12} width={4} height={4} rx={1} fill={pal.accent} opacity=".8"/>
-            </g>
-          );
-          if (el.type==='portal') return (
-            <g key={i} filter={`url(#glow${uid})`}>
-              <ellipse cx={el.x} cy={el.y} rx={18} ry={26} fill="none" stroke={pal.accent} strokeWidth="3" opacity=".7" className={styles.portalSpin}/>
-              <ellipse cx={el.x} cy={el.y} rx={13} ry={20} fill={pal.accent} opacity=".12"/>
-              <ellipse cx={el.x} cy={el.y} rx={8} ry={14} fill={pal.accent} opacity=".08" className={styles.portalPulse}/>
-            </g>
-          );
-          if (el.type==='tuft') return (
-            <g key={i} fill={pal.g[1]} opacity=".7">
-              <rect x={el.x-1} y={el.y-6} width={2} height={6} rx={1}/>
-              <rect x={el.x+3} y={el.y-4} width={2} height={4} rx={1}/>
-              <rect x={el.x-4} y={el.y-5} width={2} height={5} rx={1}/>
-            </g>
-          );
-          return null;
-        })}
-
-        {/* ══ CHARACTER ICON BADGES ══════════════════
-            Replaces geometric stick figures with actual
-            game-icons.net class icons, tinted per player color.
-        ═══════════════════════════════════════════════ */}
-        {charData.map((cp, i) => {
-          const iconSize = 32;
-          const badgeR = 20;
-          const ix = cp.x - iconSize/2;
-          const iy = cp.y - 52;
-          return (
-            <g key={i} className={styles.charBadge} style={{ '--anim-delay': `${i * 0.3}s` }}>
-              {/* Ground shadow */}
-              <ellipse cx={cp.x} cy={cp.y} rx={14} ry={4}
-                fill="black" opacity="0.35" filter={`url(#softblur${uid})`}/>
-
-              {/* Outer glow ring — player color */}
-              <circle cx={cp.x} cy={cp.y - badgeR - 2} r={badgeR + 4}
-                fill={cp.color} opacity="0.10" filter={`url(#blurmed${uid})`}/>
-
-              {/* Badge backing circle */}
-              <circle cx={cp.x} cy={cp.y - badgeR - 2} r={badgeR}
-                fill={pal.g[0]} opacity="0.88"/>
-
-              {/* Badge border — player color */}
-              <circle cx={cp.x} cy={cp.y - badgeR - 2} r={badgeR}
-                fill="none" stroke={cp.color} strokeWidth="1.5" opacity="0.7"/>
-
-              {/* Class icon — tinted to player color */}
-              <image
-                href={`${ICON_BASE}/${cp.iconPath}.svg`}
-                x={ix} y={iy}
-                width={iconSize} height={iconSize}
-                filter={`url(#${cp.filterId})`}
-                opacity="0.9"
-              />
-
-              {/* Stem connecting badge to ground */}
-              <line
-                x1={cp.x} y1={cp.y - 2}
-                x2={cp.x} y2={cp.y}
-                stroke={cp.color} strokeWidth="1" opacity="0.4"
-              />
-
-              {/* Player name label */}
-              {cp.name && (
-                <text
-                  x={cp.x} y={cp.y + 12}
-                  textAnchor="middle"
-                  fontFamily="monospace" fontSize="7"
-                  fill={cp.color} opacity="0.7"
-                  letterSpacing="0.8"
-                >
-                  {cp.name.toUpperCase().slice(0, 8)}
-                </text>
-              )}
-            </g>
-          );
-        })}
-
-        {/* ══ ENEMY ICON (combat) ════════════════════
-            Shows enemy creature icon on the right side
-            when in combat, with a red hostile glow.
-        ═══════════════════════════════════════════════ */}
-        {(inCombat || enemy) && enemyData && (
-          <g className={styles.enemyBadge}>
-            {/* Enemy glow — red */}
-            <circle cx={enemyData.x} cy={enemyData.y - 22} r={24}
-              fill="#cc2222" opacity="0.12" filter={`url(#blurmed${uid})`}/>
-
-            {/* Badge */}
-            <circle cx={enemyData.x} cy={enemyData.y - 22} r={20}
-              fill={pal.g[0]} opacity="0.85"/>
-            <circle cx={enemyData.x} cy={enemyData.y - 22} r={20}
-              fill="none" stroke="#cc2222" strokeWidth="1.5" opacity="0.65"/>
-
-            {/* Creature icon — red tinted */}
-            <image
-              href={`${ICON_BASE}/${enemyData.iconPath}.svg`}
-              x={enemyData.x - 16} y={enemyData.y - 40}
-              width={32} height={32}
-              filter={`url(#enemy${uid})`}
-              opacity="0.9"
-            />
-
-            {/* Ground shadow */}
-            <ellipse cx={enemyData.x} cy={enemyData.y} rx={14} ry={4}
-              fill="black" opacity="0.3" filter={`url(#softblur${uid})`}/>
-
-            {/* Enemy name */}
-            {enemyData.name && (
-              <text
-                x={enemyData.x} y={enemyData.y + 12}
-                textAnchor="middle"
-                fontFamily="monospace" fontSize="7"
-                fill="#cc4444" opacity="0.8"
-                letterSpacing="0.5"
-              >
-                {enemyData.name.toUpperCase().slice(0, 10)}
-              </text>
-            )}
-
-            {/* VS indicator between party and enemy */}
-            {charData.length > 0 && (
-              <text
-                x={(charData[charData.length-1].x + enemyData.x) / 2}
-                y={enemyData.y - 18}
-                textAnchor="middle"
-                fontFamily="monospace" fontSize="9"
-                fill={pal.accent} opacity="0.55"
-                letterSpacing="2"
-                className={styles.vsPulse}
-              >
-                VS
-              </text>
-            )}
-          </g>
-        )}
-
-        {/* ── Weather particles ── */}
-        {weatherParticles?.type==='rain' && weatherParticles.drops.map((d,i)=>(
-          <line key={i} x1={d.x} y1={d.y} x2={d.x-2} y2={d.y+d.len}
-            stroke="#88aacc" strokeWidth=".8" opacity={d.op}
-            className={styles.rainFall} style={{animationDelay:`${(i*0.04)%1.5}s`}}/>
-        ))}
-        {weatherParticles?.type==='snow' && weatherParticles.flakes.map((f,i)=>(
-          <circle key={i} cx={f.x} cy={f.y} r={f.r} fill="white" opacity={f.op}
-            className={styles.snowFall} style={{animationDelay:`${(i*0.15)%3}s`}}/>
-        ))}
-        {weatherParticles?.type==='embers' && weatherParticles.sparks.map((s,i)=>(
-          <circle key={i} cx={s.x} cy={s.y} r={s.r} fill={pal.light} opacity={s.op}
-            className={styles.emberFloat} style={{animationDelay:`${(i*0.3)%4}s`}}/>
-        ))}
-        {weatherParticles?.type==='bubbles' && weatherParticles.list.map((b,i)=>(
-          <circle key={i} cx={b.x} cy={b.y} r={b.r} fill="none"
-            stroke={pal.accent} strokeWidth=".8" opacity={b.op}
-            className={styles.bubbleRise} style={{animationDelay:`${(i*0.5)%5}s`}}/>
-        ))}
-
-        {/* ── Ambient + fog ── */}
-        <rect width={W} height={H} fill={`url(#amb${uid})`}/>
-        <rect width={W} height={H} fill={`url(#fog${uid})`}/>
-
-        {/* ── Lightning ── */}
-        {weather==='storm' && (
-          <rect width={W} height={H} fill="white" opacity=".04" className={styles.lightning}/>
-        )}
-
-        {/* ── Scene label ── */}
-        <text x={W-6} y={H-6} textAnchor="end" fontFamily="monospace" fontSize={8}
-          fill="white" opacity=".22" letterSpacing={1}>
-          {type.toUpperCase()} · {time.toUpperCase()}
-        </text>
-      </svg>
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${W} ${H}`}
+        width="100%"
+        height="100%"
+        className={styles.svg}
+        xmlns="http://www.w3.org/2000/svg"
+      />
     </div>
   );
 }
