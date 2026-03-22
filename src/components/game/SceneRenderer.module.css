@@ -64,3 +64,40 @@
 @keyframes sway    { 0%,100%{transform:rotate(0)}  50%{transform:rotate(3deg)} }
 @keyframes breath  { 0%,100%{transform:scaleX(1) scaleY(1)} 50%{transform:scaleX(1.03) scaleY(0.98)} }
 @keyframes eyePulse{ 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* ── Character icon badges ──────────────── */
+.charBadge {
+  animation: charFloat 3s ease-in-out infinite;
+  animation-delay: var(--anim-delay, 0s);
+}
+@keyframes charFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* ── Enemy badge ────────────────────────── */
+.enemyBadge {
+  animation: enemyFloat 2.2s ease-in-out infinite;
+}
+@keyframes enemyFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+/* ── VS pulse ───────────────────────────── */
+.vsPulse {
+  animation: vsPulse 1.8s ease-in-out infinite;
+}
+@keyframes vsPulse {
+  0%,100% { opacity: 0.55; }
+  50%      { opacity: 0.9; }
+}
+
+/* ── Atmosphere watermark icon ──────────── */
+.atmIcon {
+  animation: atmFloat 8s ease-in-out infinite;
+}
+@keyframes atmFloat {
+  0%,100% { opacity: 0.07; }
+  50%      { opacity: 0.11; }
+}
