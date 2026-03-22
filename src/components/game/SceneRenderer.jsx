@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import rough from '../../lib/rough.js';
 import styles from './SceneRenderer.module.css';
+import { buildScenePopulation, renderPopulation, renderParticles, renderStatusAuras, renderNpcLabels } from './scenePopulation.js';
 
 // ═══════════════════════════════════════════
 //  SCENE RENDERER v5 — Children's Book Style
@@ -151,14 +152,19 @@ const PALETTE = {
     glow:   '#9B59FF',
   },
   city: {
-    sky:    ['#1A1A2E','#2D2D4A','#1A1A2E'],
-    ground: '#1E1E2E',
-    mid:    '#141422',
-    far:    '#0D0D18',
-    accent: '#FF6B35',
+    // Day palette: bright mercantile city
+    sky:    ['#4A90C8','#6AAEE0','#A8D4F0'],
+    ground: '#8B7355',
+    mid:    '#6B5540',
+    far:    '#4A3828',
+    accent: '#FF8C42',
     neon:   ['#FF6B35','#FF4CCD','#00FFFF'],
-    build:  ['#2D2D4A','#252538','#1A1A2E'],
+    build:  ['#8C7B6A','#7A6A5A','#5A4A38'],
+    stone:  ['#9E8E7A','#8A7A68','#7A6A56'],
     window: '#FFEE55',
+    roof:   '#A0522D',
+    flag:   '#CC2222',
+    sun:    '#FFE066',
   },
 };
 
@@ -532,37 +538,92 @@ function drawScene(svgEl2, scene, players, turnCount) {
     });
   }
 
-  // ── Scene NPCs (friendly/neutral — not combat enemies) ──
-  const sceneNpcs = (mergedScene?.npcs || []).filter(n =>
-    n.relationship !== 'enemy' && n.relationship !== 'hostile'
-  ).slice(0, 2); // max 2 NPCs in scene at once to avoid clutter
-
-  if (sceneNpcs.length > 0) {
-    const npcSpacing = 55;
-    const npcStartX = W * 0.68;
-    sceneNpcs.forEach((npc, i) => {
-      const nx = npcStartX + i * npcSpacing;
-      // Map NPC role to a drawable class
-      const npcClass = npc.creatureType
-        ? creatureTypeToClass(npc.creatureType)
-        : 'healer';
-      // Friendly NPCs: muted warm color, slightly smaller
-      const npcColor = npc.relationship === 'ally' ? '#88BBFF' : '#C8B090';
-      drawCharacter(rc, svgEl2, nx, groundY, npcClass, npcColor, npc.name || '', sr);
-    });
+  // ── Creature population (NPCs + enemies via creatures.js) ──
+  // Build terrain points array for Y positioning
+  const terrainPts = [];
+  for (let i = 0; i <= 20; i++) {
+    const tx = (i / 20) * W;
+    let ty;
+    if (type === 'mountain')     ty = H*0.55 + Math.sin(i*0.9)*30 + tr()*10;
+    else if (type === 'ocean')   ty = H*0.62 + Math.sin(i*0.5)*8 + tr()*5;
+    else if (type === 'desert')  ty = H*0.63 + Math.sin(i*0.4)*12 + tr()*8;
+    else if (type === 'dungeon' || type === 'cave') ty = H*0.75 + tr()*3;
+    else if (type === 'castle' || type === 'ruins') ty = H*0.66 + Math.sin(i*0.3)*6 + tr()*5;
+    else                         ty = H*0.65 + Math.sin(i*0.6)*12 + Math.sin(i*1.3)*6 + tr()*8;
+    terrainPts.push({ x: tx, y: ty });
   }
 
-  // ── Enemy (in combat) ──
-  if (inCombat && enemyName) {
-    const creatureType = enemyName.toLowerCase().replace(/\s+/g, '_');
-    drawEnemy(rc, svgEl2, W * 0.78, groundY, creatureType);
-    // VS flash
+  const allNpcs = mergedScene?.npcs || [];
+  const combatants = inCombat && enemyName
+    ? [{ name: enemyName, relationship: 'enemy', creatureType: enemyName.toLowerCase().replace(/\s+/g,'_'), hp: 1, maxHp: 1 }]
+    : [];
+
+  const population = buildScenePopulation(
+    allNpcs, inCombat, combatants, type, turnCount, terrainPts
+  );
+
+  const popResult = renderPopulation(population);
+  const particles  = renderParticles(population, turnCount);
+  const auras      = renderStatusAuras(population, `sc${turnCount}${type}`);
+  const npcLabels  = renderNpcLabels(population);
+
+  // Inject creature defs into SVG defs
+  if (popResult.defs) {
+    const extraDefs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    extraDefs.innerHTML = popResult.defs;
+    svgEl2.appendChild(extraDefs);
+  }
+
+  // Inject status auras (under feet — before far layer)
+  if (auras) {
+    const auraG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    auraG.innerHTML = auras;
+    svgEl2.appendChild(auraG);
+  }
+
+  // Far depth plane creatures (behind terrain midground)
+  if (popResult.far) {
+    const farG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    farG.innerHTML = popResult.far;
+    svgEl2.appendChild(farG);
+  }
+
+  // Mid depth plane creatures
+  if (popResult.mid) {
+    const midG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    midG.innerHTML = popResult.mid;
+    svgEl2.appendChild(midG);
+  }
+
+  // Near depth plane creatures (in front — after players)
+  if (popResult.near) {
+    const nearG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    nearG.innerHTML = popResult.near;
+    svgEl2.appendChild(nearG);
+  }
+
+  // Particles
+  if (particles) {
+    const partG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    partG.innerHTML = particles;
+    svgEl2.appendChild(partG);
+  }
+
+  // NPC name labels on top
+  if (npcLabels) {
+    const labG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    labG.innerHTML = npcLabels;
+    svgEl2.appendChild(labG);
+  }
+
+  // VS indicator in combat
+  if (inCombat && enemyName && allNpcs.length === 0) {
     const vs = svgEl('text', {
-      x: W * 0.58, y: groundY - 25,
+      x: W * 0.58, y: groundY - 28,
       'text-anchor':'middle', fill:'#FFD700',
       'font-family':'serif', 'font-size':'14',
       'font-weight':'bold', 'letter-spacing':'4',
-      opacity:'0.8',
+      opacity:'0.75',
     });
     vs.textContent = 'VS';
     svgEl2.appendChild(vs);
@@ -780,7 +841,7 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
     }
   }
 
-  if (type === 'village') {
+  if (type === 'village' || type === 'tavern') {
     // Sunset/sunrise color sky base
     // Cottages in background
     for (let i = 0; i < 5; i++) {
@@ -806,6 +867,94 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
       // Chimney
       svg.appendChild(rc.rectangle(hx+10, hy2-52, 7, 18, {
         stroke:'#5C3A1E', fill: pal.chimney||'#6D4C41', fillStyle:'solid', roughness:1.5
+      }));
+    }
+  }
+
+  if (type === 'city') {
+    // Daytime city — stone buildings with varied heights, market stalls
+    if (time === 'day' || !time) {
+      // Bright sun
+      svg.appendChild(rc.circle(W*0.8, H*0.13, 32, {
+        stroke: pal.sun || '#FFE066', fill: pal.sun || '#FFE066',
+        fillStyle: 'solid', roughness: 0.8
+      }));
+    } else {
+      // Night city — moon + neon glow on horizon
+      svg.appendChild(rc.circle(W*0.82, H*0.14, 24, {
+        stroke: '#f5e68a', fill: '#fdf5b0', fillStyle: 'solid', roughness: 0.7
+      }));
+      // Neon horizon glow
+      const neonColors = pal.neon || ['#FF6B35'];
+      for (let i = 0; i < 3; i++) {
+        const glowEl = svgEl('ellipse', {
+          cx: String(W * (0.25 + i * 0.25)), cy: String(H * 0.62),
+          rx: String(60 + sr() * 40), ry: '15',
+          fill: neonColors[i % neonColors.length],
+          opacity: '0.15',
+        });
+        svg.appendChild(glowEl);
+      }
+    }
+
+    // Background skyline — large distant buildings
+    for (let i = 0; i < 16; i++) {
+      const bx = i * (W / 14) + sr() * 15 - 7;
+      const bh = 35 + sr() * 90;
+      const bw = 22 + sr() * 28;
+      const stoneColor = pal.stone
+        ? pal.stone[Math.floor(sr() * pal.stone.length)]
+        : '#8C7B6A';
+      svg.appendChild(rc.rectangle(bx - bw/2, H * 0.65 - bh, bw, bh, {
+        stroke: shadeColor(stoneColor, -25),
+        fill: stoneColor,
+        fillStyle: 'hachure', roughness: 1.8, strokeWidth: 1.2
+      }));
+      // Windows grid
+      const floors = Math.floor(bh / 14);
+      const cols = Math.floor(bw / 10);
+      for (let row = 0; row < floors - 1; row++) {
+        for (let col = 0; col < cols; col++) {
+          const lit = time === 'night' ? sr() > 0.35 : sr() > 0.7;
+          if (lit) {
+            svg.appendChild(rc.rectangle(
+              bx - bw/2 + 3 + col * 10,
+              H * 0.65 - bh + 5 + row * 14,
+              6, 7,
+              { stroke: 'none', fill: pal.window || '#FFEE55',
+                fillStyle: 'solid', roughness: 0.4 }
+            ));
+          }
+        }
+      }
+      // Roof detail — flat or pointed
+      if (sr() > 0.5) {
+        svg.appendChild(rc.rectangle(bx - bw/2 - 2, H * 0.65 - bh - 5, bw + 4, 6, {
+          stroke: shadeColor(stoneColor, -40),
+          fill: pal.roof || '#8B5E3C',
+          fillStyle: 'solid', roughness: 1.5
+        }));
+      }
+    }
+
+    // Market stalls / street level detail (foreground)
+    for (let i = 0; i < 4; i++) {
+      const mx = 60 + i * (W / 4.5) + sr() * 20 - 10;
+      const my = H * 0.65 - sr() * 5;
+      // Awning
+      svg.appendChild(rc.polygon([
+        [mx - 18, my - 22], [mx + 18, my - 22],
+        [mx + 22, my - 14], [mx - 22, my - 14]
+      ], {
+        stroke: shadeColor(pal.roof || '#8B5E3C', -10),
+        fill: [pal.roof, '#7A3A3A', '#3A5A7A', '#5A7A3A'][i % 4],
+        fillStyle: 'solid', roughness: 2.0
+      }));
+      // Stall body
+      svg.appendChild(rc.rectangle(mx - 16, my - 14, 32, 16, {
+        stroke: shadeColor(pal.ground, -20),
+        fill: shadeColor(pal.ground, 10),
+        fillStyle: 'solid', roughness: 1.5
       }));
     }
   }
@@ -863,6 +1012,7 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
     else if (type === 'ocean')   y = H*0.62 + Math.sin(i*0.5)*8 + tr()*5;
     else if (type === 'desert')  y = H*0.63 + Math.sin(i*0.4)*12 + tr()*8;
     else if (type === 'dungeon' || type === 'cave') y = H*0.75 + tr()*3;
+    else if (type === 'city' || type === 'tavern') y = H*0.65 + tr()*2; // mostly flat paved ground
     else if (type === 'castle' || type === 'ruins') y = H*0.66 + Math.sin(i*0.3)*6 + tr()*5;
     else                         y = H*0.65 + Math.sin(i*0.6)*12 + Math.sin(i*1.3)*6 + tr()*8;
     pts.push([x, y]);

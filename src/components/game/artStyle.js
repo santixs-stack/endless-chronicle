@@ -5,7 +5,7 @@
 //  Lock this before building any creatures.
 // ═══════════════════════════════════════════
 
-export const W = 640, H = 240;
+export const W = 640, H = 300;
 
 // ── Unit system ────────────────────────────
 // All creature heights are expressed as
