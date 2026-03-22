@@ -42,8 +42,13 @@ export default function MusicPlayer() {
 
   // Group tracks by category for display
   const groups = [
-    { label: 'By Scene', ids: ['adventure_day','adventure_night','dungeon_day','dungeon_night','peaceful_day','peaceful_night','mystery_day','mystery_night','space'] },
-    { label: 'By Mood',  ids: ['battle','tense','triumphant','sad','joyful'] },
+    { label: 'Towns & Villages', ids: ['village_day','village_night'] },
+    { label: 'Wilderness',       ids: ['forest_day','forest_night','plains_day','mountain','snow','swamp'] },
+    { label: 'Water & Sky',      ids: ['ocean_day','ocean_night','space'] },
+    { label: 'Dark Places',      ids: ['dungeon','cave','ruins','castle_day'] },
+    { label: 'Exotic',           ids: ['desert'] },
+    { label: 'Combat',           ids: ['battle','battle_boss'] },
+    { label: 'Mood',             ids: ['tension','peaceful','mysterious','emotional','triumphant','npc_theme','rest'] },
   ];
 
   return (

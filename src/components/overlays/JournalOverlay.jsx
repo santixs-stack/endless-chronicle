@@ -1,3 +1,4 @@
+import { SFX } from '../game/SoundEngine.js';
 import { useState } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import styles from './JournalOverlay.module.css';
@@ -21,7 +22,7 @@ export default function JournalOverlay({ onClose }) {
             <button
               key={t}
               className={`${styles.tab} ${tab === t ? styles.tabActive : ''}`}
-              onClick={() => setTab(t)}
+              onClick={() => { SFX.tabSwitch(); setTab(t); }}
             >
               {t}
               {t === 'Journal' && state.journal?.length > 0 && (

@@ -7,7 +7,11 @@ import { logApiError, logFlow, logCombatEvent, updateStateSnapshot, logError } f
 import { buildSystemPrompt } from '../../engine/systemPrompt.js';
 import { parseAllTags } from '../../engine/tags.js';
 import { pickHiddenArc } from '../../data/hiddenArcs.js';
-import { autoTrackFromScene, startCombatMusic, endCombatMusic } from './MusicEngine.js';
+import {
+  autoTrackFromScene, startCombatMusic, endCombatMusic,
+  playVictoryMusic, playNpcMusic, playDiscoveryStinger,
+  playEmotionalMusic, playRestMusic, playTensionMusic,
+} from './MusicEngine.js';
 import { SFX, initAudio } from './SoundEngine.js';
 import { showNotif } from '../ui/Notification.jsx';
 import GameSidebar from './GameSidebar.jsx';
@@ -100,7 +104,7 @@ export default function GameScreen() {
       .then(text => {
         const parsed = parseAllTags(text);
         set({ messages: [...msgs, { role: 'assistant', content: text }], isLoading: false, lastScene: parsed.scene || null, currentActions: parsed.actions || [] });
-        if (parsed.scene) autoTrackFromScene(parsed.scene.type, parsed.scene.time, parsed.scene.mood);
+        // Music handled in main handler below to respect combat/mood priority
       })
       .catch(err => {
         const classified = classifyError(err);
@@ -176,24 +180,58 @@ export default function GameScreen() {
       if (parsed.location)        updates.location    = parsed.location;
       if (parsed.milestone != null) updates.milestones = parsed.milestone;
       if (parsed.stats?.health != null) updates.stats = { ...state.stats, health: parsed.stats.health };
-      if (parsed.combat)    { updates.inCombat  = true;  startCombatMusic(); SFX.combatStart(); }
-      if (parsed.combatEnd) { updates.inCombat  = false; updates.combatants = []; endCombatMusic(parsed.scene?.type || state.lastScene?.type, parsed.scene?.time || state.lastScene?.time, parsed.scene?.mood || state.lastScene?.mood); SFX.combatEnd(); }
+      if (parsed.combat)    {
+        updates.inCombat = true;
+        const isBoss = (parsed.combatants || []).some(c => c.isBoss);
+        startCombatMusic(isBoss);
+        SFX.combatStart();
+      }
+      if (parsed.combatEnd) {
+        updates.inCombat = false; updates.combatants = [];
+        endCombatMusic(
+          parsed.scene?.type || state.lastScene?.type,
+          parsed.scene?.time || state.lastScene?.time,
+          parsed.scene?.mood || state.lastScene?.mood
+        );
+        SFX.combatEnd();
+      }
 
       set(updates);
 
       // Auto-switch music on scene change
-      if (parsed.scene?.type && !updates.inCombat) autoTrackFromScene(parsed.scene.type, parsed.scene.time, parsed.scene.mood);
+      if (parsed.scene?.type && !updates.inCombat) {
+        const mood = parsed.scene.mood || '';
+        if (mood === 'sad' || mood === 'emotional')   playEmotionalMusic();
+        else if (mood === 'tense' || mood === 'ominous') playTensionMusic();
+        else if (mood === 'wonder' || mood === 'discovery') playDiscoveryStinger();
+        else if (mood === 'rest' || mood === 'camp')  playRestMusic();
+        else autoTrackFromScene(parsed.scene.type, parsed.scene.time, parsed.scene.mood);
+      }
+      // Victory on major milestone
+      if (parsed.milestone >= 5 && !updates.inCombat) playVictoryMusic();
 
       // Multiplayer turn advance
       if (state.playerCount > 1) set({ currentPlayerIdx: (state.currentPlayerIdx + 1) % state.playerCount });
 
       // Side effects
       if (parsed.journal) { addJournal(parsed.journal); SFX.journal(); }
-      parsed.npcs.forEach(npc => { addNpc(npc); SFX.npcIntroduced(); });
-      parsed.codex.forEach(entry => addCodex(entry));
-      if (parsed.gold) updateGold(parsed.gold.amount, parsed.gold.reason);
+      parsed.npcs.forEach(npc => {
+        addNpc(npc);
+        SFX.npcIntroduced();
+        playNpcMusic(npc.type || 'friendly');
+      });
+      parsed.codex.forEach(entry => { addCodex(entry); SFX.codexDiscover(); });
+      if (parsed.gold) {
+        updateGold(parsed.gold.amount, parsed.gold.reason);
+        if (parsed.gold.amount > 0) SFX.goldGain();
+        else if (parsed.gold.amount < 0) SFX.goldLose();
+      }
 
       // XP and level ups
+      // Near death warning — fire if any player below 20% health
+      if (parsed.stats?.health != null && parsed.stats.health <= 20 && parsed.stats.health > 0) {
+        SFX.nearDeath();
+      }
       processXP(parsed.xpAwards);
       parsed.xpAwards.forEach(award => {
         addCombatEvent({ turn: newTurn, type: 'xp', player: award.player, amount: award.amount });

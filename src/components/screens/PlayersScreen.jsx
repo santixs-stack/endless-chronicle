@@ -31,7 +31,7 @@ export default function PlayersScreen() {
           <button
             key={n}
             className={`${styles.card} ${count === n ? styles.selected : ''}`}
-            onClick={() => setCount(n)}
+            onClick={() => { SFX.playerSelect(); setCount(n); }}
           >
             <div className={styles.num}>{n}</div>
             <div className={styles.label}>{label}</div>
@@ -41,7 +41,7 @@ export default function PlayersScreen() {
       </div>
 
       <div className={styles.actions}>
-        <button className="btn-ghost" onClick={() => set({ screen: 'title' })}>← Back</button>
+        <button className="btn-ghost" onClick={() => { SFX.backButton(); set({ screen: 'title' }); }}>← Back</button>
         <button className="btn-primary" disabled={!count} onClick={confirm}>
           Create Characters →
         </button>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { SFX } from '../game/SoundEngine.js';
 import { useGame } from '../../hooks/useGameState.jsx';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './WorldScreen.module.css';
@@ -39,6 +40,7 @@ export default function WorldScreen() {
       tone:     tone || goal?.tone || '',
       extra,
     };
+    SFX.transition();
     set({ world: worldData, location: worldData.location, screen: 'quest' });
   }
 
@@ -91,7 +93,7 @@ export default function WorldScreen() {
       </div>
 
       <div className={styles.actions}>
-        <button className="btn-ghost" onClick={() => set({ screen: 'character', setupIdx: (state.playerCount || 1) - 1 })}>← Back to Characters</button>
+        <button className="btn-ghost" onClick={() => { SFX.backButton(); set({ screen: 'character', setupIdx: (state.playerCount || 1) - 1 }); }}>← Back to Characters</button>
         <button className="btn-primary" onClick={start}>Find Your Quest →</button>
       </div>
     </div>

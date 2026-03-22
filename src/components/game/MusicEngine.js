@@ -1,358 +1,1232 @@
 // ═══════════════════════════════════════════
-//  MIDI-STYLE MUSIC ENGINE v2
-//  Tracks react to: scene type + time of day
-//  + emotional tone of the story.
-//  Crossfade between all transitions.
+//  MUSIC ENGINE v4 — Composer Revision
+//  Fixes: loop length, percussion, battle
+//  strings, MOOD_MAP gaps, trigger guards,
+//  tension dissonance, ocean breathing,
+//  boss detection, NPC hostile routing.
 // ═══════════════════════════════════════════
 
 const N = {
-  C2:65.41,D2:73.42,E2:82.41,G2:98,A2:110,B2:123.47,
-  C3:130.81,D3:146.83,Eb3:155.56,E3:164.81,F3:174.61,G3:196,Ab3:207.65,A3:220,Bb3:233.08,B3:246.94,
-  C4:261.63,Db4:277.18,D4:293.66,Eb4:311.13,E4:329.63,F4:349.23,Gb4:369.99,G4:392,Ab4:415.3,A4:440,Bb4:466.16,B4:493.88,
-  C5:523.25,D5:587.33,Eb5:622.25,E5:659.25,F5:698.46,G5:783.99,A5:880,Bb5:932.33,
+  C2:65.41, D2:73.42, E2:82.41, F2:87.31, G2:98, A2:110, Bb2:116.54, B2:123.47,
+  C3:130.81, Cs3:138.59, D3:146.83, Eb3:155.56, E3:164.81,
+  F3:174.61, Fs3:185, G3:196, Gs3:207.65, A3:220, Bb3:233.08, B3:246.94,
+  C4:261.63, Cs4:277.18, D4:293.66, Eb4:311.13, E4:329.63,
+  F4:349.23, Fs4:369.99, G4:392, Gs4:415.3, A4:440, Bb4:466.16, B4:493.88,
+  C5:523.25, Cs5:554.37, D5:587.33, Eb5:622.25, E5:659.25,
+  F5:698.46, Fs5:739.99, G5:784, A5:880, Bb5:932.33,
   _:0,
 };
 
-// ── Track library ──────────────────────────
-// Each track: bpm, wave, gain, reverb, melody[], durs[], bass[], bassDurs[]
-export const TRACKS = {
+let ctx = null, rev = null, masterGain = null;
+let musicVolume = 0.38, musicMuted = false;
+let currentTrackId = null, activeNodes = [], loopTimeout = null;
+let preCombatTrack = null, isPlaying = false, fadeTimeout = null;
 
-  // ── ADVENTURE ─────────────────────────────
-  adventure_day: {
-    label:'⚔ Adventure (Day)', bpm:112, wave:'triangle', gain:.18, reverb:.25,
-    melody:['E4','E4','G4','A4','_','A4','G4','E4','D4','E4','_','G4','A4','B4','_','A4'],
-    durs:  [.5,  .5,  .5,  1,  .5, .5,  .5,  .5,  .5,  1,  .5,  .5,  .5,  1,  .5, 1],
-    bass:  ['C3','G3','A3','F3'], bassDurs:[2,2,2,2],
-  },
-  adventure_night: {
-    label:'⚔ Adventure (Night)', bpm:88, wave:'triangle', gain:.15, reverb:.4,
-    melody:['A3','_','C4','A3','_','G3','F3','_','G3','A3','_','E3','_','F3','G3','A3'],
-    durs:  [1,  .5, .5, .5,  .5, .5,  1,  .5, .5,  1,  1,  1,  .5, .5,  .5,  1],
-    bass:  ['A2','E3','F3','C3'], bassDurs:[2,2,2,2],
-  },
-
-  // ── DUNGEON ───────────────────────────────
-  dungeon_day: {
-    label:'💀 Dungeon (Day)', bpm:80, wave:'sawtooth', gain:.13, reverb:.5,
-    melody:['A3','_','C4','B3','_','G3','A3','_','F3','G3','A3','_','E3','_','F3','G3'],
-    durs:  [1,  .5, .5,  1,  1,  .5,  1,  .5, .5,  .5,  1,  1,  1,  .5, .5,  1],
-    bass:  ['A2','E3','A2','G2'], bassDurs:[2,2,2,2],
-  },
-  dungeon_night: {
-    label:'💀 Dungeon (Night)', bpm:60, wave:'sawtooth', gain:.1, reverb:.75,
-    melody:['A3','_','_','Eb4','_','D4','_','C4','_','B3','_','_','A3','_','G3','_'],
-    durs:  [1,  .5, .5, 1,   .5, 1,  .5, 1,  .5, 1,  .5, .5, 1,  .5, 1,  1],
-    bass:  ['A2','_','E3','_'], bassDurs:[2,2,2,2],
-  },
-
-  // ── PEACEFUL ──────────────────────────────
-  peaceful_day: {
-    label:'🌿 Peaceful (Day)', bpm:92, wave:'sine', gain:.18, reverb:.4,
-    melody:['C4','E4','G4','E4','C4','D4','F4','A4','F4','D4','E4','G4','B4','G4','E4','C4'],
-    durs:  [.5,  .5,  .5,  .5,  1,  .5,  .5,  .5,  .5,  1,  .5,  .5,  .5,  .5,  .5,  1],
-    bass:  ['C3','F3','G3','C3'], bassDurs:[2,2,2,2],
-  },
-  peaceful_night: {
-    label:'🌿 Peaceful (Night)', bpm:68, wave:'sine', gain:.14, reverb:.55,
-    melody:['G4','E4','_','D4','C4','_','E4','D4','_','C4','B3','_','A3','_','G3','_'],
-    durs:  [.5,  .5,  .5, .5,  1,  .5, .5,  .5,  .5, .5,  .5, .5, 1,  .5, 1,  1],
-    bass:  ['C3','G2','F3','G3'], bassDurs:[2,2,2,2],
-  },
-
-  // ── MYSTERY ───────────────────────────────
-  mystery_day: {
-    label:'🔮 Mystery (Day)', bpm:84, wave:'sine', gain:.15, reverb:.45,
-    melody:['E4','G4','F4','E4','_','D4','F4','E4','D4','C4','_','E4','G4','A4','G4','F4'],
-    durs:  [.5,  .5,  .5,  1,  .5, .5,  .5,  .5,  .5,  1,  .5, .5,  .5,  .5,  .5,  .5],
-    bass:  ['C3','G3','Bb3','F3'], bassDurs:[2,2,2,2],
-  },
-  mystery_night: {
-    label:'🔮 Mystery (Night)', bpm:65, wave:'sine', gain:.12, reverb:.65,
-    melody:['Eb4','_','D4','_','C4','_','Bb3','_','Ab3','_','Bb3','_','C4','_','Eb4','_'],
-    durs:  [1,   .5, 1,  .5, 1,  .5, 1,   .5, 1,   .5, .5,  .5, 1,  .5, 1,   1],
-    bass:  ['Ab2','Eb3','Bb2','F3'], bassDurs:[2,2,2,2],
-  },
-
-  // ── BATTLE ────────────────────────────────
-  battle: {
-    label:'⚡ Battle', bpm:145, wave:'square', gain:.15, reverb:.18,
-    melody:['E4','E4','E4','_','E4','G4','_','A4','G4','E4','_','D4','E4','_','E4','E4','G4','A4'],
-    durs:  [.25,.25, .5, .25,.25, .5, .25, .5, .25, .5, .25,.25, .5, .25,.25, .25,.25,  .5],
-    bass:  ['A3','A3','E3','A3'], bassDurs:[1,1,1,1],
-  },
-
-  // ── TENSE ─────────────────────────────────
-  tense: {
-    label:'😰 Tense', bpm:98, wave:'sawtooth', gain:.13, reverb:.5,
-    melody:['A3','Bb3','A3','_','G3','Ab3','G3','_','F3','Gb3','F3','_','E3','_','F3','A3'],
-    durs:  [.25, .25, .5, .5, .25, .25, .5, .5, .25, .25, .5, .5, 1,  .5, .5,  1],
-    bass:  ['A2','_','G2','_'], bassDurs:[2,2,2,2],
-  },
-
-  // ── TRIUMPHANT ────────────────────────────
-  triumphant: {
-    label:'🏆 Triumphant', bpm:118, wave:'triangle', gain:.2, reverb:.3,
-    melody:['C4','E4','G4','C5','_','B4','A4','G4','E4','G4','A4','_','C5','B4','A4','G4'],
-    durs:  [.25, .25, .25, .5, .25, .25, .25, .5, .25, .25, .5, .25, .5, .25, .25, 1],
-    bass:  ['C3','G3','F3','G3'], bassDurs:[1,1,1,1],
-  },
-
-  // ── SAD ───────────────────────────────────
-  sad: {
-    label:'😢 Sad', bpm:60, wave:'sine', gain:.14, reverb:.6,
-    melody:['A4','G4','F4','E4','_','D4','E4','_','C4','D4','E4','_','A3','_','B3','C4'],
-    durs:  [.5,  .5,  .5,  1,  .5, .5,  1,  .5, .5,  .5,  1,  .5, 1,  .5, .5,  1],
-    bass:  ['A2','E3','D3','F3'], bassDurs:[2,2,2,2],
-  },
-
-  // ── JOYFUL ────────────────────────────────
-  joyful: {
-    label:'😄 Joyful', bpm:128, wave:'triangle', gain:.19, reverb:.28,
-    melody:['C4','D4','E4','G4','E4','D4','C4','_','D4','E4','F4','A4','G4','F4','E4','G4'],
-    durs:  [.25, .25, .25, .5, .25, .25, .5, .25, .25, .25, .25, .5, .25, .25, .5,  .5],
-    bass:  ['C3','F3','G3','C3'], bassDurs:[1,1,1,1],
-  },
-
-  // ── SPACE ─────────────────────────────────
-  space: {
-    label:'🌌 Space', bpm:58, wave:'sine', gain:.13, reverb:.75,
-    melody:['A3','_','E4','_','D4','_','C4','_','G3','_','A3','_','B3','_','C4','_'],
-    durs:  [1,   1,  1,  1,  1,  .5,  1,  1,  1,   1,  1,  .5,  1,  .5,  1,  1],
-    bass:  ['A2','_','E3','_'], bassDurs:[4,4,4,4],
-  },
-};
-
-// ── Smart track selector ───────────────────
-// Picks the best track from scene type + time + mood
-export function selectTrack(sceneType, timeOfDay, mood) {
-  const type  = (sceneType  || 'plains').toLowerCase();
-  const time  = (timeOfDay  || 'day').toLowerCase();
-  const emotion = (mood || '').toLowerCase();
-
-  // Emotion overrides take highest priority
-  if (emotion.includes('battle') || emotion.includes('combat') || emotion.includes('fight'))
-    return 'battle';
-  if (emotion.includes('tense') || emotion.includes('danger') || emotion.includes('fear') || emotion.includes('nervous'))
-    return 'tense';
-  if (emotion.includes('triumph') || emotion.includes('victory') || emotion.includes('celebrat'))
-    return 'triumphant';
-  if (emotion.includes('sad') || emotion.includes('grief') || emotion.includes('mourn') || emotion.includes('sorrow'))
-    return 'sad';
-  if (emotion.includes('joy') || emotion.includes('happy') || emotion.includes('excit') || emotion.includes('cheer'))
-    return 'joyful';
-  if (emotion.includes('mysteri') || emotion.includes('strange') || emotion.includes('eerie') || emotion.includes('uncanny'))
-    return time.includes('night') ? 'mystery_night' : 'mystery_day';
-
-  // Scene type + time of day
-  const isNight = time === 'night' || time === 'cave' || time === 'dusk';
-
-  const sceneMap = {
-    dungeon:  isNight ? 'dungeon_night' : 'dungeon_day',
-    cave:     isNight ? 'dungeon_night' : 'dungeon_day',
-    castle:   isNight ? 'mystery_night' : 'mystery_day',
-    ruins:    isNight ? 'mystery_night' : 'mystery_day',
-    swamp:    isNight ? 'mystery_night' : 'mystery_day',
-    forest:   isNight ? 'peaceful_night' : 'peaceful_day',
-    plains:   isNight ? 'peaceful_night' : 'peaceful_day',
-    village:  isNight ? 'peaceful_night' : 'peaceful_day',
-    snow:     isNight ? 'peaceful_night' : 'peaceful_day',
-    mountain: isNight ? 'adventure_night' : 'adventure_day',
-    ocean:    isNight ? 'adventure_night' : 'adventure_day',
-    desert:   isNight ? 'adventure_night' : 'adventure_day',
-    city:     isNight ? 'adventure_night' : 'adventure_day',
-    space:    'space',
-    storm:    'battle',
-  };
-
-  return sceneMap[type] || (isNight ? 'adventure_night' : 'adventure_day');
-}
-
-// ── Engine state ───────────────────────────
-let ctx = null;
-let masterGain = null;
-let nodes = [];
-let active = null;
-let preCombatTrack = null;
-let scheduler = null;
-let masterVol = 0.4;
-const CROSSFADE = 0.9;
-
-function initCtx() {
+function getCtx() {
   if (!ctx) {
-    try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = ctx.createGain();
+      masterGain.gain.value = musicVolume;
+      masterGain.connect(ctx.destination);
+      rev = buildReverb(ctx);
+    } catch {}
   }
   if (ctx?.state === 'suspended') ctx.resume();
   return ctx;
 }
 
-function makeReverb(audioCtx, mix) {
-  const conv = audioCtx.createConvolver();
-  const len = audioCtx.sampleRate * 2.5;
-  const buf = audioCtx.createBuffer(2, len, audioCtx.sampleRate);
-  for (let c = 0; c < 2; c++) {
-    const d = buf.getChannelData(c);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2);
+function buildReverb(c) {
+  const rate = c.sampleRate, len = Math.floor(rate * 2.4);
+  const buf = c.createBuffer(2, len, rate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.0);
   }
-  conv.buffer = buf;
-  const dry = audioCtx.createGain(); dry.gain.value = 1 - mix;
-  const wet = audioCtx.createGain(); wet.gain.value = mix;
-  const out = audioCtx.createGain();
-  dry.connect(out); conv.connect(wet); wet.connect(out);
-  conv._dry = dry; conv._out = out;
-  return conv;
+  const conv = c.createConvolver(); conv.buffer = buf;
+  const wet = c.createGain(); wet.gain.value = 0.2;
+  const dry = c.createGain(); dry.gain.value = 1.0;
+  conv.connect(wet); wet.connect(masterGain); dry.connect(masterGain);
+  return { send(node) { node.connect(conv); node.connect(dry); } };
 }
 
-function resolveNote(n) {
-  if (!n || n === '_') return 0;
-  const freq = N[n];
-  if (freq) return freq;
-  // Try resolving the note name dynamically
-  return 0;
+// ── Instruments ───────────────────────────
+
+function noteFlute(freq, dur, t, vol) {
+  if (!freq || !rev) return [];
+  const c = getCtx(); if (!c) return [];
+  const g = c.createGain();
+  const lfo = c.createOscillator(), lfg = c.createGain();
+  lfo.frequency.value = 5.2; lfg.gain.value = freq * 0.005;
+  lfo.connect(lfg);
+  const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+  lfg.connect(o.frequency); o.connect(g);
+  const atk = Math.min(0.06, dur * 0.12);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + atk);
+  g.gain.setValueAtTime(vol, t + dur * 0.72);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.05);
+  rev.send(g);
+  o.start(t); lfo.start(t); o.stop(t + dur + 0.1); lfo.stop(t + dur + 0.1);
+  return [o, lfo];
 }
 
-function startTrackInternal(trackId, fadeIn = false) {
-  const audioCtx = initCtx();
-  if (!audioCtx) return;
+function noteStrings(freq, dur, t, vol, cutoff = 900) {
+  if (!freq || !rev) return [];
+  const c = getCtx(); if (!c) return [];
+  const mix = c.createGain(), lpf = c.createBiquadFilter();
+  lpf.type = 'lowpass'; lpf.frequency.value = cutoff; lpf.Q.value = 0.9;
+  lpf.connect(mix);
+  const oscs = [-10, -4, 0, 4, 10].map(det => {
+    const o = c.createOscillator(); o.type = 'sawtooth';
+    o.frequency.value = freq; o.detune.value = det;
+    o.connect(lpf); return o;
+  });
+  const atk = Math.min(0.1, dur * 0.18);
+  mix.gain.setValueAtTime(0, t);
+  mix.gain.linearRampToValueAtTime(vol * 0.17, t + atk);
+  mix.gain.setValueAtTime(vol * 0.17, t + dur * 0.7);
+  mix.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.12);
+  rev.send(mix);
+  oscs.forEach(o => { o.start(t); o.stop(t + dur + 0.18); });
+  return oscs;
+}
+
+function noteBrass(freq, dur, t, vol, bright = false) {
+  if (!freq || !rev) return [];
+  const c = getCtx(); if (!c) return [];
+  const g = c.createGain(), lpf = c.createBiquadFilter();
+  lpf.type = 'lowpass'; lpf.Q.value = 2.0;
+  lpf.frequency.setValueAtTime(bright ? 2200 : 600, t);
+  lpf.frequency.exponentialRampToValueAtTime(bright ? 4800 : 1800, t + 0.04);
+  lpf.frequency.exponentialRampToValueAtTime(bright ? 1600 : 1000, t + dur * 0.65);
+  const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = freq;
+  const sub = c.createOscillator(), sg = c.createGain();
+  sub.type = 'sine'; sub.frequency.value = freq * 0.5; sg.gain.value = 0.28;
+  o.connect(lpf); lpf.connect(g); sub.connect(sg); sg.connect(g);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.022);
+  g.gain.setValueAtTime(vol, t + dur * 0.52);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.1);
+  rev.send(g);
+  o.start(t); sub.start(t); o.stop(t + dur + 0.15); sub.stop(t + dur + 0.15);
+  return [o, sub];
+}
+
+function noteBell(freq, dur, t, vol) {
+  if (!freq || !rev) return [];
+  const c = getCtx(); if (!c) return [];
+  const nodes = [];
+  [{ r:1, a:1 },{ r:2.756, a:0.45 },{ r:5.404, a:0.2 },{ r:8.933, a:0.08 }]
+    .forEach(({ r, a }) => {
+      const g = c.createGain(), o = c.createOscillator();
+      o.type = 'sine'; o.frequency.value = freq * r;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol * a, t + 0.003);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.9);
+      o.connect(g); rev.send(g);
+      o.start(t); o.stop(t + dur + 0.05); nodes.push(o);
+    });
+  return nodes;
+}
+
+function noteHarp(freq, dur, t, vol) {
+  if (!freq || !rev) return [];
+  const c = getCtx(); if (!c) return [];
+  const g = c.createGain(), lpf = c.createBiquadFilter();
+  lpf.type = 'lowpass'; lpf.frequency.value = 3800;
+  lpf.frequency.exponentialRampToValueAtTime(700, t + 0.3);
+  const o1 = c.createOscillator(), o2 = c.createOscillator(), g2 = c.createGain();
+  o1.type = 'triangle'; o1.frequency.value = freq;
+  o2.type = 'sine'; o2.frequency.value = freq * 2; g2.gain.value = 0.3;
+  o1.connect(lpf); o2.connect(g2); g2.connect(lpf); lpf.connect(g);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.003);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + Math.min(dur, 0.9) + 0.05);
+  rev.send(g);
+  o1.start(t); o2.start(t); o1.stop(t + 1.0); o2.stop(t + 1.0);
+  return [o1, o2];
+}
+
+function notePad(freq, dur, t, vol) {
+  if (!freq || !rev) return [];
+  const c = getCtx(); if (!c) return [];
+  const oscs = [];
+  [{ d:-16, a:0.5 },{ d:-5, a:0.9 },{ d:0, a:1 },{ d:6, a:0.8 },{ d:16, a:0.5 }]
+    .forEach(({ d, a }) => {
+      const g = c.createGain(), lfo = c.createOscillator(), lfg = c.createGain();
+      lfo.type = 'sine'; lfo.frequency.value = 4.2 + Math.random(); lfg.gain.value = 0.005;
+      lfo.connect(lfg);
+      const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+      o.detune.value = d; lfg.connect(o.detune); o.connect(g);
+      const atk = Math.min(0.22, dur * 0.22);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol * a * 0.18, t + atk);
+      g.gain.setValueAtTime(vol * a * 0.18, t + dur * 0.6);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.25);
+      rev.send(g);
+      o.start(t); lfo.start(t); o.stop(t + dur + 0.35); lfo.stop(t + dur + 0.35);
+      oscs.push(o, lfo);
+    });
+  return oscs;
+}
+
+function noteBass(freq, dur, t, vol) {
+  if (!freq) return [];
+  const c = getCtx(); if (!c) return [];
+  const g = c.createGain(), lpf = c.createBiquadFilter();
+  lpf.type = 'lowpass'; lpf.frequency.value = 300;
+  const o1 = c.createOscillator(), o2 = c.createOscillator(), g2 = c.createGain();
+  o1.type = 'sine'; o1.frequency.value = freq;
+  o2.type = 'triangle'; o2.frequency.value = freq * 2; g2.gain.value = 0.4;
+  o1.connect(lpf); o2.connect(g2); g2.connect(lpf); lpf.connect(g);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.04);
+  g.gain.setValueAtTime(vol, t + dur * 0.65);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.08);
+  g.connect(masterGain);
+  o1.start(t); o2.start(t); o1.stop(t + dur + 0.12); o2.stop(t + dur + 0.12);
+  return [o1, o2];
+}
+
+// 🥁 Percussion — filtered noise bursts with pitch accent
+// This is the missing layer — provides rhythmic backbone
+function notePerc(type, t, vol) {
+  const c = getCtx(); if (!c) return [];
+  const bufLen = c.sampleRate * 0.06;
+  const buf = c.createBuffer(1, bufLen, c.sampleRate);
+  const dat = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++)
+    dat[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, type === 'kick' ? 1.2 : 2.5);
+  const nb = c.createBufferSource(); nb.buffer = buf;
+  const filter = c.createBiquadFilter();
+  // kick: low bandpass for thumping feel; snare: high bandpass for crack
+  filter.type = type === 'kick' ? 'bandpass' : 'highpass';
+  filter.frequency.value = type === 'kick' ? 80 : 2400;
+  filter.Q.value = type === 'kick' ? 1.5 : 0.8;
+  const g = c.createGain(); g.gain.value = vol * musicVolume * (muted ? 0 : 1);
+  // Pitch envelope for kick (makes it sound like a real kick drum)
+  if (type === 'kick') {
+    const osc = c.createOscillator(); osc.type = 'sine';
+    osc.frequency.setValueAtTime(120, t);
+    osc.frequency.exponentialRampToValueAtTime(40, t + 0.08);
+    const og = c.createGain(); og.gain.value = vol * musicVolume * 0.7;
+    osc.connect(og); og.connect(masterGain);
+    osc.start(t); osc.stop(t + 0.12);
+  }
+  nb.connect(filter); filter.connect(g); g.connect(masterGain);
+  nb.start(t);
+  return [nb];
+}
+
+// ── Voice player ──────────────────────────
+let muted = false; // local alias used by notePerc
+
+function playVoice(instrument, notes, durs, bpm, startTime, vol) {
+  const beatSec = 60 / bpm;
+  let t = startTime;
+  const nodes = [];
+  for (let i = 0; i < notes.length; i++) {
+    const freq = notes[i], durSec = durs[i] * beatSec;
+    if (freq > 0 || instrument === 'kick' || instrument === 'snare') {
+      let n;
+      switch (instrument) {
+        case 'flute':         n = noteFlute(freq, durSec, t, vol); break;
+        case 'strings':       n = noteStrings(freq, durSec, t, vol); break;
+        case 'strings_bright':n = noteStrings(freq, durSec, t, vol, 1600); break;
+        case 'brass':         n = noteBrass(freq, durSec, t, vol); break;
+        case 'brass_bright':  n = noteBrass(freq, durSec, t, vol, true); break;
+        case 'bell':          n = noteBell(freq, durSec, t, vol); break;
+        case 'harp':          n = noteHarp(freq, durSec, t, vol); break;
+        case 'pad':           n = notePad(freq, durSec, t, vol); break;
+        case 'bass':          n = noteBass(freq, durSec, t, vol); break;
+        case 'kick':  if (freq) n = notePerc('kick', t, vol); break;
+        case 'snare': if (freq) n = notePerc('snare', t, vol); break;
+      }
+      if (n) nodes.push(...n);
+    }
+    t += durSec;
+  }
+  return nodes;
+}
+
+// ═══════════════════════════════════════════
+//  TRACK LIBRARY
+// ═══════════════════════════════════════════
+
+export const TRACKS = {
+
+  // ── VILLAGE ──────────────────────────────
+  village_day: {
+    label: '🏘 Village (Day)', bpm: 92, category: 'explore',
+    voices: [
+      { instrument: 'flute', vol: 0.55, notes: [
+        N.G4,N.A4,N.B4,N.D5, N.B4,N.A4,N.G4,N.E4, N.A4,N.B4,N.D5,N.C5, N.B4,N.A4,N.G4,N._,
+        N.D5,N.C5,N.B4,N.A4, N.G4,N.A4,N.B4,N.G4, N.A4,N.G4,N.Fs4,N.E4, N.G4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,0.5,
+      ]},
+      // Harmony — thirds below melody
+      { instrument: 'strings', vol: 0.45, notes: [
+        N.E4,N.Fs4,N.G4,N.B4, N.G4,N.Fs4,N.E4,N.C4, N.Fs4,N.G4,N.B4,N.A4, N.G4,N.Fs4,N.E4,N._,
+        N.B3,N.A3,N.G3,N.Fs3, N.E3,N.Fs3,N.G3,N.E3, N.Fs3,N.E3,N.D3,N.C3, N.E3,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,0.5,
+      ]},
+      // Harp alberti bass — 1 and 3 of chord
+      { instrument: 'harp', vol: 0.38, notes: [
+        N.G3,N.D4,N.G3,N.D4, N.G3,N.D4,N.G3,N.D4, N.D3,N.A3,N.D3,N.A3, N.D3,N.A3,N.D3,N.A3,
+        N.G3,N.D4,N.G3,N.D4, N.C4,N.G3,N.C4,N.G3, N.D3,N.A3,N.D3,N.A3, N.G3,N.D4,N.G3,N.B3,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      { instrument: 'bass', vol: 0.5, notes: [
+        N.G2,N._,N.D3,N._, N.G2,N._,N.D3,N._, N.D2,N._,N.A2,N._, N.D2,N._,N.G2,N._,
+        N.G2,N._,N.D3,N._, N.C3,N._,N.G2,N._, N.D2,N._,N.A2,N._, N.G2,N._,N.G2,N._,
+      ], durs: [
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2,
+      ]},
+    ],
+  },
+
+  village_night: {
+    label: '🏘 Village (Night)', bpm: 72, category: 'explore',
+    voices: [
+      { instrument: 'flute', vol: 0.38, notes: [
+        N.F4,N._,N.G4,N.A4, N.Bb4,N.A4,N.G4,N._, N.F4,N.G4,N.A4,N.C5, N.Bb4,N._,N.A4,N._,
+        N.G4,N._,N.A4,N.Bb4, N.C5,N.Bb4,N.A4,N.G4, N.F4,N._,N.G4,N._, N.F4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 1,0.5,0.5,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,0.5,0.5,1, 2,2,2,2,
+      ]},
+      { instrument: 'pad', vol: 0.55, notes: [
+        N.F3,N._,N.F3,N._, N.Bb2,N._,N.Bb2,N._, N.F3,N._,N.C4,N._, N.F3,N._,N.F3,N._,
+        N.G3,N._,N.G3,N._, N.C4,N._,N.C4,N._, N.F3,N._,N.A3,N._, N.F3,N._,N.F3,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+      { instrument: 'harp', vol: 0.32, notes: [
+        N.F3,N.C4,N.F3,N.C4, N.Bb2,N.F3,N.Bb2,N.F3, N.F3,N.C4,N.F3,N.C4, N.F3,N.C4,N.F3,N.C4,
+        N.G3,N.D4,N.G3,N.D4, N.C3,N.G3,N.C3,N.G3, N.F3,N.A3,N.F3,N.A3, N.F3,N.C4,N.F3,N.C4,
+      ], durs: [
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2,
+      ]},
+      { instrument: 'bass', vol: 0.45, notes: [
+        N.F2,N._,N.F2,N._, N.Bb2,N._,N.F2,N._, N.F2,N._,N.C3,N._, N.F2,N._,N.F2,N._,
+        N.G2,N._,N.G2,N._, N.C3,N._,N.G2,N._, N.F2,N._,N.A2,N._, N.F2,N._,N.F2,N._,
+      ], durs: [
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2,
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 4,4,4,4,
+      ]},
+    ],
+  },
+
+  // ── FOREST ───────────────────────────────
+  forest_day: {
+    label: '🌲 Forest (Day)', bpm: 76, category: 'explore',
+    voices: [
+      // Pentatonic melody — E A B D E (Ghibli feel)
+      { instrument: 'flute', vol: 0.58, notes: [
+        N.E4,N._,N.A4,N.B4, N.D5,N.B4,N.A4,N._, N.E4,N.A4,N.B4,N.D5, N.B4,N._,N.A4,N._,
+        N.E4,N.D4,N.A3,N._, N.B3,N.A3,N.E3,N._, N.A3,N.B3,N.D4,N.E4, N.A4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 1,0.5,0.5,2,
+        0.5,0.5,0.5,0.5, 1,0.5,0.5,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      // Strings — sustained chord tones, contrary motion to melody
+      { instrument: 'strings', vol: 0.42, notes: [
+        N.A3,N._,N.A3,N._, N.A3,N._,N.G3,N._, N.A3,N._,N.D4,N._, N.B3,N._,N.A3,N._,
+        N.A3,N._,N.E3,N._, N.E3,N._,N.A3,N._, N.A3,N._,N.D4,N._, N.E4,N._,N._,N._,
+      ], durs: [
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 4,4,4,4,
+      ]},
+      // Bell — sparse, irregular hits for wood/nature feel
+      { instrument: 'bell', vol: 0.28, notes: [
+        N._,N._,N.B4,N._, N._,N._,N._,N.D5, N._,N.A4,N._,N._, N.B4,N._,N._,N._,
+        N._,N._,N._,N.E4, N._,N._,N.A4,N._, N._,N.D5,N._,N.B4, N.A4,N._,N._,N._,
+      ], durs: [
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2,
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 4,4,4,4,
+      ]},
+      { instrument: 'bass', vol: 0.42, notes: [
+        N.A2,N._,N.A2,N._, N.A2,N._,N.G2,N._, N.D3,N._,N.A2,N._, N.E2,N._,N.A2,N._,
+        N.A2,N._,N.E2,N._, N.E2,N._,N.A2,N._, N.D3,N._,N.A2,N._, N.A2,N._,N.A2,N._,
+      ], durs: [
+        2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2,
+        2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4,
+      ]},
+    ],
+  },
+
+  forest_night: {
+    label: '🌲 Forest (Night)', bpm: 60, category: 'explore',
+    voices: [
+      { instrument: 'flute', vol: 0.32, notes: [
+        N.D4,N._,N._,N.F4, N.A4,N._,N.G4,N._, N.F4,N._,N.E4,N._, N.D4,N._,N._,N._,
+        N.F4,N._,N._,N.A4, N.C5,N._,N.Bb4,N._, N.A4,N._,N.G4,N._, N.F4,N._,N._,N._,
+      ], durs: [
+        1,1,1,1, 1,1,2,2, 1,1,1,1, 4,4,4,4,
+        1,1,1,1, 1,1,2,2, 1,1,1,1, 4,4,4,4,
+      ]},
+      { instrument: 'pad', vol: 0.62, notes: [
+        N.D3,N._,N.D3,N._, N.C3,N._,N.C3,N._, N.Bb2,N._,N.Bb2,N._, N.A2,N._,N.A2,N._,
+        N.F3,N._,N.F3,N._, N.Eb3,N._,N.Eb3,N._, N.D3,N._,N.D3,N._, N.A2,N._,N.A2,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+      { instrument: 'bell', vol: 0.18, notes: [
+        N.F4,N._,N._,N._, N._,N.A4,N._,N._, N.G4,N._,N._,N._, N._,N._,N.E4,N._,
+        N.F4,N._,N.C5,N._, N._,N._,N.Bb4,N._, N.A4,N._,N._,N._, N._,N._,N._,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.45, notes: [
+        N.D2,N._,N.D2,N._, N.C3,N._,N.C3,N._, N.Bb2,N._,N.Bb2,N._, N.A2,N._,N.A2,N._,
+        N.F2,N._,N.F2,N._, N.Eb2,N._,N.Eb2,N._, N.D2,N._,N.D2,N._, N.A2,N._,N.A2,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+    ],
+  },
+
+  // ── OCEAN ────────────────────────────────
+  ocean_day: {
+    label: '🌊 Ocean (Day)', bpm: 98, category: 'explore',
+    voices: [
+      // BREATHING melody — long notes, silences. Wind Waker reference.
+      { instrument: 'flute', vol: 0.55, notes: [
+        N.D4,N._,N.Fs4,N._, N.A4,N._,N._,N._, N.B4,N._,N.A4,N._, N.Fs4,N._,N._,N._,
+        N.D4,N.E4,N.Fs4,N._, N.A4,N.B4,N._,N._, N.D5,N._,N.A4,N.Fs4, N.D4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,1,0.5, 2,0.5,0.5,0.5, 0.5,0.5,1,0.5, 2,2,2,2,
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      // Harp — wave-like arpeggios, the signature ocean texture
+      { instrument: 'harp', vol: 0.45, notes: [
+        N.D3,N.Fs3,N.A3,N.D4, N.A3,N.Fs3,N.D3,N.Fs3, N.E3,N.A3,N.Cs4,N.E4, N.A3,N.E3,N.A2,N.E3,
+        N.D3,N.A3,N.D4,N.Fs4, N.A3,N.D4,N.Fs4,N.A4, N.B2,N.Fs3,N.B3,N.D4, N.E3,N.A3,N.Cs4,N.E4,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      // Strings — sustained chord pads underneath, like the deep ocean
+      { instrument: 'strings', vol: 0.38, notes: [
+        N.D3,N._,N.D3,N._, N.A3,N._,N.A3,N._, N.A3,N._,N.E3,N._, N.A3,N._,N.A3,N._,
+        N.D3,N._,N.D3,N._, N.Fs3,N._,N.Fs3,N._, N.B2,N._,N.B2,N._, N.E3,N._,N.A3,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
+      { instrument: 'bass', vol: 0.48, notes: [
+        N.D2,N._,N.D2,N._, N.A2,N._,N.A2,N._, N.A2,N._,N.E2,N._, N.A2,N._,N.A2,N._,
+        N.D2,N._,N.D2,N._, N.Fs2,N._,N.Fs2,N._, N.B2,N._,N.B2,N._, N.E2,N._,N.A2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
+    ],
+  },
+
+  ocean_night: {
+    label: '🌊 Ocean (Night)', bpm: 66, category: 'explore',
+    voices: [
+      { instrument: 'flute', vol: 0.38, notes: [
+        N.Fs4,N._,N._,N.A4, N.B4,N._,N.A4,N.Fs4, N.E4,N._,N._,N._, N.Fs4,N._,N._,N._,
+        N.D4,N.Fs4,N.A4,N._, N.B4,N.A4,N.Fs4,N.E4, N.D4,N._,N._,N._, N.Fs4,N._,N._,N._,
+      ], durs: [
+        1,1,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2, 4,4,4,4,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 4,4,4,4, 4,4,4,4,
+      ]},
+      { instrument: 'pad', vol: 0.52, notes: [
+        N.B3,N._,N.B3,N._, N.Fs3,N._,N.Fs3,N._, N.A3,N._,N.E3,N._, N.B3,N._,N.B3,N._,
+        N.D4,N._,N.D4,N._, N.Fs3,N._,N.A3,N._, N.B3,N._,N.B3,N._, N.B3,N._,N.B3,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+      { instrument: 'bell', vol: 0.22, notes: [
+        N.B4,N._,N.Fs4,N._, N.E4,N._,N._,N._, N.D4,N._,N.Fs4,N._, N.B4,N._,N._,N._,
+        N.A4,N._,N._,N.B4, N.Cs5,N._,N._,N._, N.B4,N._,N.Fs4,N._, N.E4,N._,N._,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 2,2,2,2, 4,4,4,4, 2,2,2,2, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.42, notes: [
+        N.B2,N._,N.B2,N._, N.Fs2,N._,N.Fs2,N._, N.A2,N._,N.E2,N._, N.B2,N._,N.B2,N._,
+        N.D3,N._,N.D3,N._, N.Fs3,N._,N.A3,N._, N.B2,N._,N.B2,N._, N.Fs2,N._,N.B2,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+    ],
+  },
+
+  // ── DUNGEON ──────────────────────────────
+  dungeon: {
+    label: '💀 Dungeon', bpm: 64, category: 'explore',
+    voices: [
+      // Dark Locrian-flavored — A B C E G, sparse
+      { instrument: 'strings', vol: 0.55, notes: [
+        N.A3,N._,N._,N.C4, N.E4,N._,N.D4,N.C4, N.A3,N._,N._,N._, N.G3,N._,N.A3,N._,
+        N.A3,N.C4,N.E4,N._, N.G4,N.E4,N.C4,N.A3, N.Gs3,N._,N.A3,N._, N.A3,N._,N._,N._,
+      ], durs: [
+        1,1,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2, 1,1,2,2,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,2, 4,4,4,4,
+      ]},
+      // Pad — sustained dissonant intervals (tritone from bass)
+      { instrument: 'pad', vol: 0.48, notes: [
+        N.Eb3,N._,N.Eb3,N._, N.D3,N._,N.D3,N._, N.C3,N._,N.C3,N._, N.Eb3,N._,N.Eb3,N._,
+        N.Eb3,N._,N.E3,N._, N.G3,N._,N.G3,N._, N.D3,N._,N.Gs3,N._, N.A3,N._,N.A3,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+      // Bell — distant, irregular, like dripping water
+      { instrument: 'bell', vol: 0.18, notes: [
+        N.A4,N._,N._,N._, N._,N._,N.G4,N._, N._,N.A4,N._,N._, N._,N._,N._,N.C5,
+        N._,N._,N.Eb5,N._, N.A4,N._,N._,N._, N._,N._,N._,N.G4, N.A4,N._,N._,N._,
+      ], durs: [2,2,4,4, 2,2,4,4, 2,2,2,2, 2,2,2,2, 2,2,4,4, 2,2,4,4, 2,2,2,2, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.58, notes: [
+        N.A2,N._,N.A2,N._, N.A2,N._,N.A2,N._, N.G2,N._,N.G2,N._, N.A2,N._,N.Eb3,N._,
+        N.A2,N._,N.A2,N._, N.A2,N._,N.G2,N._, N.Gs2,N._,N.A2,N._, N.A2,N._,N.A2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+    ],
+  },
+
+  cave: {
+    label: '🕳 Cave', bpm: 50, category: 'explore',
+    voices: [
+      { instrument: 'pad', vol: 0.65, notes: [
+        N.Fs3,N._,N.Fs3,N._, N.E3,N._,N.E3,N._, N.Cs3,N._,N.D3,N._, N.Fs3,N._,N.Fs3,N._,
+        N.B2,N._,N.Cs3,N._, N.Fs3,N._,N.E3,N._, N.D3,N._,N.D3,N._, N.Fs3,N._,N.Cs3,N._,
+      ], durs: [8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8]},
+      { instrument: 'bell', vol: 0.15, notes: [
+        N.Cs5,N._,N._,N._, N.B4,N._,N._,N._, N.Fs4,N._,N.A4,N._, N._,N.Cs5,N._,N._,
+        N._,N._,N.B4,N._, N._,N.Cs5,N._,N._, N.A4,N._,N._,N._, N.Fs4,N._,N._,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.62, notes: [
+        N.Fs2,N._,N.Fs2,N._, N.E2,N._,N.E2,N._, N.Cs2,N._,N.D2,N._, N.Fs2,N._,N.Fs2,N._,
+        N.B2,N._,N.Cs3,N._, N.Fs2,N._,N.E2,N._, N.D2,N._,N.D2,N._, N.Cs2,N._,N.Fs2,N._,
+      ], durs: [8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8]},
+    ],
+  },
+
+  // ── CASTLE ───────────────────────────────
+  castle_day: {
+    label: '🏰 Castle (Day)', bpm: 84, category: 'explore',
+    voices: [
+      { instrument: 'brass', vol: 0.52, notes: [
+        N.D4,N.Fs4,N.A4,N.D5, N.A4,N.Fs4,N.D4,N._, N.E4,N.A4,N.Cs5,N.E5, N.Cs5,N.A4,N.E4,N._,
+        N.Fs4,N.A4,N.B4,N.D5, N.B4,N.A4,N.Fs4,N._, N.G4,N.A4,N.B4,N.D5, N.A4,N._,N.D4,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 1,0.5,1,0.5,
+      ]},
+      { instrument: 'strings', vol: 0.45, notes: [
+        N.D3,N.A3,N.D4,N.A3, N.D3,N.A3,N.Fs3,N._, N.A2,N.E3,N.A3,N.Cs4, N.A3,N.E3,N.A2,N._,
+        N.D3,N.Fs3,N.B3,N.Fs3, N.D3,N.Fs3,N.A3,N._, N.G3,N.B3,N.D4,N.B3, N.A3,N._,N.D3,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 1,0.5,1,0.5,
+      ]},
+      { instrument: 'bass', vol: 0.52, notes: [
+        N.D2,N._,N.A2,N._, N.D2,N._,N.Fs2,N._, N.A2,N._,N.E2,N._, N.A2,N._,N.E2,N._,
+        N.D2,N._,N.D2,N._, N.D2,N._,N.A2,N._, N.G2,N._,N.D3,N._, N.A2,N._,N.D2,N._,
+      ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2]},
+    ],
+  },
+
+  ruins: {
+    label: '🏚 Ruins', bpm: 66, category: 'explore',
+    voices: [
+      { instrument: 'flute', vol: 0.38, notes: [
+        N.D4,N.F4,N.A4,N._, N.G4,N.F4,N.Eb4,N._, N.D4,N._,N.C4,N._, N.Bb3,N._,N.A3,N._,
+        N.D4,N._,N.F4,N._, N.A4,N.G4,N.F4,N.Eb4, N.D4,N.C4,N._,N._, N.D4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 1,1,1,1, 1,1,2,2,
+        1,1,1,1, 0.5,0.5,0.5,0.5, 1,1,2,2, 4,4,4,4,
+      ]},
+      { instrument: 'pad', vol: 0.52, notes: [
+        N.D3,N._,N.F3,N._, N.A3,N._,N.G3,N._, N.Eb3,N._,N.A3,N._, N.D3,N._,N.D3,N._,
+        N.D3,N._,N.F3,N._, N.D3,N._,N.Bb2,N._, N.A2,N._,N.C3,N._, N.D3,N._,N.D3,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+      { instrument: 'bell', vol: 0.25, notes: [
+        N.F4,N._,N.A4,N._, N.G4,N._,N.Eb4,N._, N.D4,N._,N._,N._, N.A3,N._,N._,N._,
+        N.F4,N._,N._,N._, N.D4,N._,N.Bb3,N._, N.A3,N._,N.C4,N._, N.D4,N._,N._,N._,
+      ], durs: [1,1,1,1, 1,1,1,1, 2,2,4,4, 4,4,4,4, 2,2,2,2, 1,1,1,1, 1,1,1,1, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.48, notes: [
+        N.D2,N._,N.D2,N._, N.G2,N._,N.A2,N._, N.Eb2,N._,N.A2,N._, N.D2,N._,N.D2,N._,
+        N.D2,N._,N.F2,N._, N.D2,N._,N.Bb2,N._, N.A2,N._,N.C3,N._, N.D2,N._,N.D2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+    ],
+  },
+
+  // ── LANDSCAPE ────────────────────────────
+  desert: {
+    label: '🏜 Desert', bpm: 88, category: 'explore',
+    voices: [
+      // Phrygian dominant E F G# A B C D — authentic Middle Eastern scale
+      { instrument: 'flute', vol: 0.52, notes: [
+        N.E4,N.F4,N.Gs4,N.A4, N.Gs4,N.F4,N.E4,N._, N.B4,N.A4,N.Gs4,N.F4, N.E4,N._,N._,N._,
+        N.E4,N.F4,N.Gs4,N.B4, N.A4,N.Gs4,N.F4,N.E4, N.D4,N.F4,N.A4,N.Gs4, N.E4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      { instrument: 'strings', vol: 0.42, notes: [
+        N.E3,N.B3,N.E4,N.B3, N.A3,N.E4,N.A3,N.E3, N.B2,N.Gs3,N.B3,N.E3, N.A2,N.E3,N.A3,N.E2,
+        N.E3,N.A3,N.E3,N.A3, N.Gs3,N.E3,N.Gs3,N.E3, N.F3,N.A3,N.F3,N.A3, N.E3,N.E3,N.E3,N.E3,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      { instrument: 'bass', vol: 0.48, notes: [
+        N.E2,N._,N.A2,N._, N.E2,N._,N.B2,N._, N.E2,N._,N.A2,N._, N.E2,N._,N.E2,N._,
+        N.E2,N._,N.A2,N._, N.E2,N._,N.Gs2,N._, N.A2,N._,N.F2,N._, N.E2,N._,N.E2,N._,
+      ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2, 1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2]},
+    ],
+  },
+
+  mountain: {
+    label: '⛰ Mountain', bpm: 78, category: 'explore',
+    voices: [
+      // Big open Em — epic vistas, Skyrim-adjacent
+      { instrument: 'brass', vol: 0.5, notes: [
+        N.E4,N.G4,N.B4,N._, N.D5,N.B4,N.G4,N.E4, N.Fs4,N.A4,N.D5,N._, N.B4,N.G4,N.E4,N._,
+        N.E4,N.B3,N.G4,N.B4, N.E5,N.D5,N.B4,N.G4, N.Fs4,N.E4,N.D4,N.B3, N.E4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      { instrument: 'strings', vol: 0.48, notes: [
+        N.B3,N._,N.E4,N._, N.G4,N._,N.D4,N.B3, N.D4,N._,N.A3,N.Fs3, N.B3,N._,N.E3,N._,
+        N.E3,N._,N.B3,N.G3, N.B4,N._,N.G4,N.E4, N.D4,N._,N.B3,N.Fs3, N.E3,N._,N._,N._,
+      ], durs: [
+        1,1,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 4,4,4,4,
+      ]},
+      { instrument: 'pad', vol: 0.42, notes: [
+        N.E3,N._,N.E3,N._, N.G3,N._,N.D3,N._, N.D3,N._,N.A2,N._, N.B2,N._,N.E3,N._,
+        N.E3,N._,N.B2,N._, N.E4,N._,N.G3,N._, N.D3,N._,N.Fs3,N._, N.E3,N._,N.E3,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.52, notes: [
+        N.E2,N._,N.B2,N._, N.G2,N._,N.D2,N._, N.D2,N._,N.A2,N._, N.B2,N._,N.E2,N._,
+        N.E2,N._,N.B2,N._, N.E3,N._,N.G2,N._, N.D2,N._,N.Fs2,N._, N.E2,N._,N.E2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+    ],
+  },
+
+  space: {
+    label: '🌌 Space', bpm: 55, category: 'explore',
+    voices: [
+      // Sparse — long silences, lonely feel
+      { instrument: 'bell', vol: 0.38, notes: [
+        N.A4,N._,N._,N._, N._,N._,N.E4,N._, N._,N.C5,N._,N._, N.A4,N._,N._,N._,
+        N._,N._,N._,N.G4, N.E4,N._,N._,N._, N._,N.A4,N._,N.C5, N._,N._,N._,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4, 2,2,2,2, 4,4,4,4, 2,2,2,2, 8,8,8,8]},
+      { instrument: 'pad', vol: 0.5, notes: [
+        N.A2,N._,N.A2,N._, N.G2,N._,N.G2,N._, N.A2,N._,N.E3,N._, N.A2,N._,N.A2,N._,
+        N.C3,N._,N.C3,N._, N.A2,N._,N.G2,N._, N.E3,N._,N.E3,N._, N.A2,N._,N.A2,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 8,8,8,8]},
+      // High flute — like a distant signal
+      { instrument: 'flute', vol: 0.22, notes: [
+        N.A5,N._,N._,N._, N._,N._,N._,N._, N.G5,N._,N._,N._, N.E5,N._,N._,N._,
+        N._,N._,N._,N.A5, N._,N._,N._,N._, N._,N._,N.G5,N._, N._,N._,N._,N._,
+      ], durs: [2,2,4,4, 4,4,4,4, 2,2,4,4, 4,4,4,4, 2,2,2,2, 4,4,4,4, 2,2,2,2, 8,8,8,8]},
+      { instrument: 'bass', vol: 0.42, notes: [
+        N.A2,N._,N.A2,N._, N.G2,N._,N.G2,N._, N.A2,N._,N.E2,N._, N.A2,N._,N.A2,N._,
+        N.C3,N._,N.C3,N._, N.A2,N._,N.G2,N._, N.E2,N._,N.A2,N._, N.A2,N._,N.A2,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 8,8,8,8]},
+    ],
+  },
+
+  plains_day: {
+    label: '🌾 Plains (Day)', bpm: 96, category: 'explore',
+    voices: [
+      { instrument: 'flute', vol: 0.55, notes: [
+        N.C4,N.E4,N.G4,N.A4, N.G4,N.E4,N.C4,N.D4, N.E4,N.G4,N.A4,N.C5, N.B4,N.G4,N.E4,N._,
+        N.C4,N.D4,N.E4,N.G4, N.A4,N.G4,N.E4,N.C4, N.D4,N.E4,N.Fs4,N.G4, N.A4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      { instrument: 'strings_bright', vol: 0.42, notes: [
+        N.E3,N.G3,N.C4,N.E3, N.F3,N.A3,N.C4,N.F3, N.G3,N.B3,N.D4,N.G3, N.C3,N.G3,N.E4,N.C3,
+        N.C3,N.E3,N.G3,N.C4, N.A2,N.E3,N.A3,N.C4, N.D3,N.Fs3,N.A3,N.D4, N.C3,N.E3,N.G3,N.C3,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      { instrument: 'bass', vol: 0.48, notes: [
+        N.C2,N._,N.G2,N._, N.F2,N._,N.C3,N._, N.G2,N._,N.D3,N._, N.C2,N._,N.G2,N._,
+        N.C2,N._,N.E2,N._, N.A2,N._,N.E3,N._, N.D2,N._,N.A2,N._, N.C2,N._,N.C2,N._,
+      ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2, 1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2]},
+    ],
+  },
+
+  swamp: {
+    label: '🌿 Swamp', bpm: 56, category: 'explore',
+    voices: [
+      { instrument: 'pad', vol: 0.6, notes: [
+        N.C3,N._,N.C3,N._, N.Bb2,N._,N.Bb2,N._, N.Eb3,N._,N.Eb3,N._, N.C3,N._,N.C3,N._,
+        N.Ab2,N._,N.Ab2,N._, N.Bb2,N._,N.Bb2,N._, N.C3,N._,N.Eb3,N._, N.G2,N._,N.C3,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+      { instrument: 'bell', vol: 0.18, notes: [
+        N.C5,N._,N._,N._, N.Eb5,N._,N._,N._, N.Bb4,N._,N.C5,N._, N.G4,N._,N._,N._,
+        N._,N._,N.Ab4,N._, N.Bb4,N._,N._,N._, N._,N.C5,N._,N._, N.G4,N._,N._,N._,
+      ], durs: [2,2,4,4, 2,2,4,4, 2,2,2,4, 4,4,4,4, 2,2,2,4, 2,2,4,4, 2,2,2,4, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.55, notes: [
+        N.C2,N._,N.C2,N._, N.Bb2,N._,N.Bb2,N._, N.Eb2,N._,N.Eb2,N._, N.C2,N._,N.C2,N._,
+        N.Ab2,N._,N.Ab2,N._, N.Bb2,N._,N.Bb2,N._, N.C2,N._,N.Eb2,N._, N.G2,N._,N.C2,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+    ],
+  },
+
+  snow: {
+    label: '❄ Snow', bpm: 62, category: 'explore',
+    voices: [
+      // Bell melody first — ice crystal feel
+      { instrument: 'bell', vol: 0.35, notes: [
+        N.D5,N._,N.A4,N._, N.F4,N._,N.D4,N._, N.E4,N._,N.G4,N._, N.A4,N._,N.F4,N._,
+        N.D5,N._,N.C5,N.A4, N.F4,N.E4,N.D4,N._, N.E4,N.G4,N.Bb4,N.A4, N.F4,N._,N.D4,N._,
+      ], durs: [
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 1,0.5,1,0.5,
+      ]},
+      { instrument: 'flute', vol: 0.35, notes: [
+        N._,N._,N.F4,N.A4, N.G4,N.F4,N.E4,N._, N.D4,N.E4,N.F4,N._, N.A4,N.G4,N._,N._,
+        N.Bb4,N._,N.A4,N._, N.F4,N._,N.E4,N._, N.G4,N._,N.F4,N.Eb4, N.D4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,2,2,
+        1,1,1,1, 1,1,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      { instrument: 'pad', vol: 0.48, notes: [
+        N.D3,N._,N.D3,N._, N.C3,N._,N.Bb2,N._, N.A2,N._,N.A2,N._, N.D3,N._,N.D3,N._,
+        N.Bb3,N._,N.Bb3,N._, N.F3,N._,N.F3,N._, N.G3,N._,N.G3,N._, N.D3,N._,N.D3,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.4, notes: [
+        N.D2,N._,N.D2,N._, N.C3,N._,N.Bb2,N._, N.A2,N._,N.A2,N._, N.D2,N._,N.D2,N._,
+        N.Bb2,N._,N.Bb2,N._, N.F2,N._,N.F2,N._, N.G2,N._,N.G2,N._, N.D2,N._,N.D2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+    ],
+  },
+
+  // ── BATTLE ───────────────────────────────
+  battle: {
+    label: '⚔ Battle', bpm: 162, category: 'combat',
+    voices: [
+      // Em hook: E E G A — B A G F# (the "anime battle" ascending shape)
+      { instrument: 'brass_bright', vol: 0.68, notes: [
+        N.E4,N.E4,N.G4,N.A4, N.B4,N.A4,N.G4,N.Fs4,
+        N.E4,N.Fs4,N.G4,N.A4, N.B4,N._,N.Ds4,N.E4,
+        N.E4,N.G4,N.A4,N.B4, N.D5,N.B4,N.A4,N.G4,
+        N.Fs4,N.E4,N.Fs4,N.G4, N.A4,N._,N.E4,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 1,0.5,0.25,0.25,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 1,0.5,0.5,1,
+      ]},
+      // FIX: Strings now alternate chord tones — NOT monotone
+      { instrument: 'strings', vol: 0.55, notes: [
+        N.E3,N.G3,N.E3,N.G3, N.D3,N.G3,N.D3,N.G3,
+        N.A3,N.E3,N.A3,N.E3, N.B3,N.Fs3,N.B3,N.Fs3,
+        N.E3,N.B3,N.E3,N.B3, N.D3,N.A3,N.D3,N.A3,
+        N.G3,N.D4,N.G3,N.D4, N.E3,N.B3,N.E3,N.B3,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      // Counter-melody bell — 3rds below brass  
+      { instrument: 'bell', vol: 0.3, notes: [
+        N.G4,N._,N.B4,N._, N.D5,N._,N.B4,N._,
+        N.G4,N._,N.A4,N._, N.G4,N._,N.B3,N._,
+        N.G4,N._,N.D5,N._, N.B4,N._,N.G4,N._,
+        N.D4,N._,N.E4,N._, N.Fs4,N._,N.G4,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      // KICK — on beats 1 and 3 (1 = 1, 3 = 1 beat later since 0.5 dur)
+      { instrument: 'kick', vol: 0.7, notes: [
+        1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,1,0,
+        1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,1,0,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      // SNARE — on beats 2 and 4
+      { instrument: 'snare', vol: 0.55, notes: [
+        0,0,1,0, 1,0,0,0, 0,0,1,0, 1,0,0,0,
+        0,0,1,0, 1,0,0,0, 0,0,1,0, 1,0,0,0,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      { instrument: 'bass', vol: 0.65, notes: [
+        N.E2,N.E2,N.G2,N.A2, N.B2,N.B2,N.A2,N.G2,
+        N.A2,N.E2,N.A2,N.G2, N.B2,N.B2,N.B2,N.E2,
+        N.E2,N.B2,N.E2,N.B2, N.D2,N.A2,N.D2,N.A2,
+        N.G2,N.D3,N.G2,N.D3, N.E2,N.B2,N.E2,N.B2,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+    ],
+  },
+
+  battle_boss: {
+    label: '💀 Boss Battle', bpm: 182, category: 'combat',
+    voices: [
+      // Dm harmonic minor — intense chromatic tension
+      { instrument: 'brass_bright', vol: 0.75, notes: [
+        N.D4,N._,N.A4,N.Cs5, N.D5,N._,N.A4,N.F4,
+        N.D4,N.F4,N.A4,N.Cs4, N.D5,N.Cs5,N.A4,N.F4,
+        N.Eb4,N._,N.Bb4,N.D5, N.Cs5,N._,N.Bb4,N.Gs4,
+        N.A4,N._,N.F4,N.D4, N.A3,N._,N.Cs4,N._,
+      ], durs: [
+        0.5,0.5,0.25,0.25, 0.5,0.5,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.5,0.5,0.25,0.25, 0.5,0.5,0.25,0.25,
+        0.5,0.5,0.25,0.25, 1,0.5,0.25,0.25,
+      ]},
+      // Strings — 16th note ostinato with varied pitches (not monotone)
+      { instrument: 'strings', vol: 0.62, notes: [
+        N.D3,N.F3,N.A3,N.D3, N.F3,N.A3,N.Cs4,N.F3,
+        N.D3,N.A3,N.Bb3,N.D3, N.A3,N.E3,N.A3,N.E3,
+        N.Eb3,N.Bb3,N.D4,N.Eb3, N.Cs4,N.Gs3,N.Cs4,N.Gs3,
+        N.A3,N.F3,N.A3,N.F3, N.E3,N.A3,N.Cs4,N.E3,
+      ], durs: [
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+      ]},
+      // Kick: every beat (relentless boss feel)
+      { instrument: 'kick', vol: 0.75, notes: [
+        1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0,
+        1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0,
+      ], durs: [
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+      ]},
+      { instrument: 'snare', vol: 0.65, notes: [
+        0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0,
+        0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0,
+      ], durs: [
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+      ]},
+      { instrument: 'bass', vol: 0.72, notes: [
+        N.D2,N.D2,N.A2,N.F2, N.D2,N.Cs2,N.D2,N.A2,
+        N.Bb2,N.Bb2,N.A2,N.A2, N.D2,N.D2,N.E2,N.E2,
+        N.Eb2,N.Bb2,N.D3,N.Eb2, N.Cs3,N.Gs2,N.Cs3,N.Gs2,
+        N.A2,N.F2,N.A2,N.F2, N.E2,N.A2,N.Cs3,N.E2,
+      ], durs: [
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+        0.25,0.25,0.25,0.25, 0.25,0.25,0.25,0.25,
+      ]},
+    ],
+  },
+
+  // ── MOOD ─────────────────────────────────
+
+  tension: {
+    label: '⚡ Tension', bpm: 80, category: 'mood',
+    voices: [
+      // FIX: Add tritone dissonance voice — the hallmark of Herrmann-style tension
+      // Strings: chromatic rise A→Bb→B→C
+      { instrument: 'strings', vol: 0.52, notes: [
+        N.A3,N._,N._,N._, N.Bb3,N._,N._,N._, N.B3,N._,N._,N._, N.C4,N._,N.Bb3,N.A3,
+        N.A3,N._,N._,N._, N.Bb3,N._,N._,N._, N.B3,N._,N.C4,N._, N.Cs4,N._,N.D4,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 1,1,1,1, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
+      // FIX: Tritone voice — Eb above the A (the dissonance that makes it feel tense)
+      { instrument: 'pad', vol: 0.45, notes: [
+        N.Eb4,N._,N.Eb4,N._, N.E4,N._,N.E4,N._, N.F4,N._,N.F4,N._, N.Fs4,N._,N.Fs4,N._,
+        N.Eb4,N._,N.Eb4,N._, N.E4,N._,N.E4,N._, N.F4,N._,N.Fs4,N._, N.G4,N._,N.Gs4,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
+      // Kick — subtle, like a heartbeat getting faster
+      { instrument: 'kick', vol: 0.35, notes: [
+        1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0,
+        1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0,
+      ], durs: [
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+        1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+      ]},
+      { instrument: 'bass', vol: 0.55, notes: [
+        N.A2,N._,N.A2,N._, N.Bb2,N._,N.Bb2,N._, N.B2,N._,N.B2,N._, N.C3,N._,N.Bb2,N.A2,
+        N.A2,N._,N.A2,N._, N.Bb2,N._,N.Bb2,N._, N.B2,N._,N.C3,N._, N.Cs3,N._,N.D3,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 1,1,1,1, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]},
+    ],
+  },
+
+  peaceful: {
+    label: '🕊 Peaceful', bpm: 78, category: 'mood',
+    voices: [
+      { instrument: 'flute', vol: 0.48, notes: [
+        N.F4,N.A4,N.C5,N._, N.A4,N.G4,N.F4,N.E4, N.G4,N.Bb4,N.C5,N._, N.A4,N.G4,N.F4,N._,
+        N.C4,N.E4,N.G4,N.A4, N.G4,N.F4,N.E4,N.C4, N.F4,N.A4,N.C5,N.A4, N.F4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      { instrument: 'harp', vol: 0.4, notes: [
+        N.F3,N.A3,N.C4,N.F3, N.C3,N.G3,N.C4,N.E3, N.F3,N.Bb3,N.D4,N.F3, N.C3,N.G3,N.C4,N.F3,
+        N.A2,N.E3,N.A3,N.C4, N.Bb2,N.F3,N.Bb3,N.D4, N.F3,N.C4,N.F3,N.A3, N.C3,N.G3,N.C4,N.F3,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      { instrument: 'pad', vol: 0.38, notes: [
+        N.F3,N._,N.C4,N._, N.F3,N._,N.C3,N._, N.Bb2,N._,N.F3,N._, N.C3,N._,N.F3,N._,
+        N.A2,N._,N.E3,N._, N.Bb2,N._,N.F3,N._, N.F3,N._,N.C4,N._, N.F3,N._,N.F3,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.42, notes: [
+        N.F2,N._,N.C3,N._, N.F2,N._,N.G2,N._, N.Bb2,N._,N.F2,N._, N.C3,N._,N.F2,N._,
+        N.A2,N._,N.E3,N._, N.Bb2,N._,N.F2,N._, N.F2,N._,N.C3,N._, N.F2,N._,N.F2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+    ],
+  },
+
+  mysterious: {
+    label: '🔮 Mysterious', bpm: 70, category: 'mood',
+    voices: [
+      // B Locrian — ambiguous, unsettling
+      { instrument: 'bell', vol: 0.4, notes: [
+        N.B4,N._,N.D5,N.Fs5, N.E5,N._,N.D5,N._, N.B4,N._,N.Gs4,N.B4, N.Cs5,N._,N.A4,N._,
+        N.B4,N.D5,N.Fs5,N._, N.E5,N.D5,N.B4,N._, N.A4,N._,N.Gs4,N._, N.B4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,1.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,1,1, 2,2,2,2,
+      ]},
+      { instrument: 'pad', vol: 0.52, notes: [
+        N.B3,N._,N.B3,N._, N.Gs3,N._,N.A3,N._, N.B3,N._,N.Cs4,N._, N.A3,N._,N.E3,N._,
+        N.B3,N._,N.D4,N._, N.Fs4,N._,N.E4,N._, N.D4,N._,N.A3,N._, N.B3,N._,N.B3,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+      { instrument: 'flute', vol: 0.28, notes: [
+        N.Fs5,N._,N._,N._, N.E5,N._,N.D5,N._, N.B4,N.D5,N._,N._, N.Cs5,N._,N._,N._,
+        N._,N._,N.Fs5,N._, N.E5,N._,N._,N.B4, N.D5,N._,N.Cs5,N._, N.B4,N._,N._,N._,
+      ], durs: [1,1,2,2, 1,1,1,1, 1,1,2,2, 4,4,4,4, 2,2,2,2, 1,1,1,1, 1,1,2,2, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.45, notes: [
+        N.B2,N._,N.B2,N._, N.Gs2,N._,N.A2,N._, N.B2,N._,N.Cs3,N._, N.A2,N._,N.E2,N._,
+        N.B2,N._,N.D3,N._, N.Fs3,N._,N.E3,N._, N.D3,N._,N.A2,N._, N.B2,N._,N.B2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+    ],
+  },
+
+  emotional: {
+    label: '💔 Emotional', bpm: 62, category: 'mood',
+    voices: [
+      // Am — the classic emotional minor
+      { instrument: 'strings_bright', vol: 0.62, notes: [
+        N.A3,N.C4,N.E4,N._, N.D4,N.C4,N.B3,N.A3, N.G3,N.B3,N.E4,N.D4, N.C4,N.B3,N.A3,N._,
+        N.F3,N.A3,N.C4,N._, N.E3,N.G3,N.B3,N._, N.A3,N.C4,N.E4,N.G4, N.A4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,1,1, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1.5,
+        0.5,0.5,0.5,0.5, 1,1,1,1, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      { instrument: 'pad', vol: 0.55, notes: [
+        N.A3,N._,N.E4,N._, N.F3,N._,N.C4,N._, N.G3,N._,N.D4,N._, N.A3,N._,N.E3,N._,
+        N.F3,N._,N.C4,N._, N.E3,N._,N.B3,N._, N.A3,N._,N.E4,N._, N.A3,N._,N.A3,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+      { instrument: 'harp', vol: 0.35, notes: [
+        N.A3,N.E4,N.A3,N.E4, N.F3,N.C4,N.F3,N.C4, N.G3,N.D4,N.G3,N.D4, N.A3,N.E4,N.A3,N.E3,
+        N.F3,N.C4,N.F3,N.C4, N.E3,N.B3,N.E3,N.B3, N.A3,N.E4,N.A3,N.E4, N.A3,N.E4,N.A3,N.E4,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,2,
+      ]},
+      { instrument: 'bass', vol: 0.48, notes: [
+        N.A2,N._,N.A2,N._, N.F2,N._,N.C3,N._, N.G2,N._,N.D3,N._, N.A2,N._,N.E3,N._,
+        N.F2,N._,N.C3,N._, N.E2,N._,N.B2,N._, N.A2,N._,N.E3,N._, N.A2,N._,N.A2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+    ],
+  },
+
+  triumphant: {
+    label: '🏆 Triumphant', bpm: 112, category: 'mood',
+    voices: [
+      { instrument: 'brass_bright', vol: 0.65, notes: [
+        N.C4,N.E4,N.G4,N.C5, N.G4,N.E4,N.C4,N.E4, N.G4,N.A4,N.G4,N.F4, N.E4,N.D4,N.C4,N._,
+        N.C4,N.E4,N.G4,N.C5, N.A4,N.G4,N.F4,N.E4, N.D4,N.F4,N.A4,N.D5, N.C5,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      { instrument: 'strings_bright', vol: 0.5, notes: [
+        N.E3,N.G3,N.C4,N.E3, N.F3,N.A3,N.C4,N.F3, N.G3,N.B3,N.D4,N.G3, N.C3,N.G3,N.E4,N.C3,
+        N.E3,N.C4,N.E3,N.C4, N.A3,N.E4,N.A3,N.C4, N.D3,N.A3,N.D4,N.Fs4, N.G3,N.B3,N.D4,N.G3,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      { instrument: 'bell', vol: 0.38, notes: [
+        N.G4,N._,N.C5,N._, N.E5,N._,N.D5,N._, N.C5,N._,N.E5,N._, N.G5,N._,N._,N._,
+        N.G4,N._,N.C5,N.E5, N.A5,N._,N.G5,N.F5, N.E5,N._,N.D5,N._, N.C5,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,2,
+        0.5,0.5,0.25,0.25, 0.25,0.25,0.25,0.25, 0.5,0.5,0.5,0.5, 2,2,2,2,
+      ]},
+      { instrument: 'kick', vol: 0.55, notes: [
+        1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0,
+        1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      { instrument: 'bass', vol: 0.55, notes: [
+        N.C2,N._,N.G2,N.E2, N.F2,N._,N.C3,N.A2, N.G2,N._,N.D3,N.B2, N.C2,N._,N.G2,N._,
+        N.C2,N._,N.E2,N.G2, N.A2,N._,N.E3,N.C3, N.D2,N._,N.A2,N.Fs2, N.G2,N._,N.D3,N.G2,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+    ],
+  },
+
+  npc_theme: {
+    label: '🧙 NPC', bpm: 82, category: 'mood',
+    voices: [
+      { instrument: 'flute', vol: 0.48, notes: [
+        N.F4,N.A4,N.C5,N.A4, N.G4,N.Bb4,N.A4,N.G4, N.F4,N.G4,N.A4,N.C5, N.Bb4,N.A4,N.G4,N._,
+        N.F4,N.A4,N.C5,N.D5, N.C5,N.Bb4,N.A4,N.G4, N.F4,N.A4,N.Bb4,N._, N.F4,N._,N._,N._,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1, 2,2,2,2,
+      ]},
+      { instrument: 'harp', vol: 0.38, notes: [
+        N.F3,N.A3,N.C4,N.F3, N.G3,N.Bb3,N.D4,N.G3, N.A3,N.C4,N.E4,N.A3, N.F3,N.A3,N.C4,N.F3,
+        N.F3,N.C4,N.F3,N.A3, N.G3,N.Bb3,N.D4,N.G3, N.F3,N.A3,N.Bb3,N.F3, N.F3,N.C4,N.F3,N.A3,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5,
+      ]},
+      { instrument: 'pad', vol: 0.38, notes: [
+        N.F3,N._,N.A3,N._, N.G3,N._,N.Bb3,N._, N.A3,N._,N.C4,N._, N.F3,N._,N.F3,N._,
+        N.F3,N._,N.C4,N._, N.G3,N._,N.D4,N._, N.F3,N._,N.Bb3,N._, N.F3,N._,N.F3,N._,
+      ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 2,2,2,2, 1,1,1,1, 1,1,1,1, 1,1,1,1, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.42, notes: [
+        N.F2,N._,N.F2,N._, N.G2,N._,N.G2,N._, N.A2,N._,N.A2,N._, N.F2,N._,N.F2,N._,
+        N.F2,N._,N.C3,N._, N.G2,N._,N.D3,N._, N.F2,N._,N.Bb2,N._, N.F2,N._,N.F2,N._,
+      ], durs: [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,4,4,4]},
+    ],
+  },
+
+  rest: {
+    label: '🌙 Rest / Camp', bpm: 60, category: 'mood',
+    voices: [
+      { instrument: 'flute', vol: 0.3, notes: [
+        N.G4,N._,N.B4,N._, N.D5,N._,N.B4,N._, N.A4,N._,N.G4,N._, N.E4,N._,N.D4,N._,
+        N.G4,N._,N.A4,N._, N.B4,N._,N.G4,N._, N.A4,N._,N.Fs4,N._, N.G4,N._,N._,N._,
+      ], durs: [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,2,2, 1,1,1,1, 1,1,1,1, 1,1,1,1, 4,4,4,4]},
+      { instrument: 'harp', vol: 0.35, notes: [
+        N.G3,N.D4,N.B4,N.G4, N.D3,N.A3,N.D4,N.A3, N.C3,N.G3,N.E4,N.C4, N.G3,N.D4,N.B3,N.G3,
+        N.G3,N.B3,N.D4,N.G4, N.E3,N.B3,N.E4,N.B3, N.D3,N.Fs3,N.A3,N.D4, N.G3,N.D4,N.G3,N.D4,
+      ], durs: [
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,1,1,
+        0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 0.5,0.5,0.5,0.5, 1,1,2,2,
+      ]},
+      { instrument: 'pad', vol: 0.42, notes: [
+        N.G3,N._,N.G3,N._, N.D3,N._,N.D3,N._, N.C3,N._,N.C3,N._, N.G3,N._,N.G3,N._,
+        N.G3,N._,N.E3,N._, N.D3,N._,N.Fs3,N._, N.G3,N._,N.G3,N._, N.G3,N._,N.G3,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+      { instrument: 'bass', vol: 0.38, notes: [
+        N.G2,N._,N.G2,N._, N.D2,N._,N.D2,N._, N.C3,N._,N.C3,N._, N.G2,N._,N.G2,N._,
+        N.G2,N._,N.E2,N._, N.D2,N._,N.Fs2,N._, N.G2,N._,N.G2,N._, N.G2,N._,N.G2,N._,
+      ], durs: [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]},
+    ],
+  },
+};
+
+// ── Sequencer ─────────────────────────────
+
+function getLoopDuration(track) {
+  const beatSec = 60 / track.bpm;
+  return Math.max(...track.voices.map(v =>
+    v.durs.reduce((s, d) => s + d, 0) * beatSec
+  ));
+}
+
+function scheduleTrackOnce(track, startTime) {
+  const nodes = [];
+  track.voices.forEach(v => {
+    const n = playVoice(v.instrument, v.notes, v.durs, track.bpm, startTime, v.vol);
+    nodes.push(...n);
+  });
+  return nodes;
+}
+
+function stopAllNodes() {
+  activeNodes.forEach(n => { try { n.stop(); } catch {} });
+  activeNodes = [];
+  if (loopTimeout) { clearTimeout(loopTimeout); loopTimeout = null; }
+}
+
+function scheduleLoop(trackId, startTime) {
   const track = TRACKS[trackId];
-  if (!track) return;
-
-  const newMaster = audioCtx.createGain();
-  newMaster.gain.value = fadeIn ? 0 : masterVol * track.gain;
-  newMaster.connect(audioCtx.destination);
-
-  if (fadeIn) {
-    newMaster.gain.setValueAtTime(0, audioCtx.currentTime);
-    newMaster.gain.linearRampToValueAtTime(masterVol * track.gain, audioCtx.currentTime + CROSSFADE);
-  }
-
-  masterGain = newMaster;
-  nodes.push(newMaster);
-
-  const reverb = makeReverb(audioCtx, track.reverb);
-  reverb._dry.connect(newMaster);
-  reverb._out.connect(newMaster);
-  nodes.push(reverb, reverb._dry, reverb._out);
-
-  const spb = 60 / track.bpm;
-  const mel  = track.melody.map(n => resolveNote(n));
-  const mDur = track.durs;
-  const bas  = track.bass.map(n => resolveNote(n));
-  const bDur = track.bassDurs;
-
-  let mIdx = 0, bIdx = 0;
-  let mTime = audioCtx.currentTime + (fadeIn ? CROSSFADE * 0.4 : 0.05);
-  let bTime = audioCtx.currentTime + (fadeIn ? CROSSFADE * 0.4 : 0.05);
-  const AHEAD = 3;
-  const myId = trackId;
-
-  function schedule() {
-    if (!active || active !== myId) return;
-    while (mTime < audioCtx.currentTime + AHEAD) {
-      const freq = mel[mIdx % mel.length];
-      const dur  = mDur[mIdx % mDur.length] * spb;
-      if (freq > 0) {
-        const osc = audioCtx.createOscillator();
-        const env = audioCtx.createGain();
-        osc.type = track.wave;
-        osc.frequency.value = freq;
-        env.gain.setValueAtTime(0, mTime);
-        env.gain.linearRampToValueAtTime(0.7, mTime + 0.015);
-        env.gain.exponentialRampToValueAtTime(0.001, mTime + dur * 0.88);
-        osc.connect(env); env.connect(reverb._dry);
-        osc.start(mTime); osc.stop(mTime + dur);
-        nodes.push(osc, env);
-      }
-      mTime += dur;
-      mIdx = (mIdx + 1) % mel.length;
-    }
-    while (bTime < audioCtx.currentTime + AHEAD) {
-      const freq = bas[bIdx % bas.length];
-      const dur  = bDur[bIdx % bDur.length] * spb;
-      if (freq > 0) {
-        const osc = audioCtx.createOscillator();
-        const env = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        env.gain.setValueAtTime(0, bTime);
-        env.gain.linearRampToValueAtTime(0.45, bTime + 0.025);
-        env.gain.exponentialRampToValueAtTime(0.001, bTime + dur * 0.72);
-        osc.connect(env); env.connect(newMaster);
-        osc.start(bTime); osc.stop(bTime + dur);
-        nodes.push(osc, env);
-      }
-      bTime += dur;
-      bIdx = (bIdx + 1) % bas.length;
-    }
-    if (nodes.length > 300) nodes = nodes.filter(n => n === newMaster || n === reverb);
-  }
-
-  schedule();
-  scheduler = setInterval(schedule, 400);
+  if (!track || currentTrackId !== trackId) return;
+  const nodes = scheduleTrackOnce(track, startTime);
+  activeNodes.push(...nodes);
+  const dur = getLoopDuration(track);
+  const msUntilNext = Math.max(50, (startTime + dur - getCtx().currentTime - 0.15) * 1000);
+  loopTimeout = setTimeout(() => {
+    if (currentTrackId === trackId) scheduleLoop(trackId, startTime + dur);
+  }, msUntilNext);
 }
+
+function crossfadeTo(trackId) {
+  const c = getCtx(); if (!c || !masterGain) return;
+  if (fadeTimeout) clearTimeout(fadeTimeout);
+  const now = c.currentTime;
+  masterGain.gain.cancelScheduledValues(now);
+  masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+  masterGain.gain.linearRampToValueAtTime(0.0001, now + 1.1);
+  fadeTimeout = setTimeout(() => {
+    stopAllNodes();
+    if (!trackId || musicMuted) { masterGain.gain.setValueAtTime(0, c.currentTime); return; }
+    currentTrackId = trackId;
+    const st = c.currentTime + 0.05;
+    masterGain.gain.cancelScheduledValues(c.currentTime);
+    masterGain.gain.setValueAtTime(0.0001, c.currentTime);
+    masterGain.gain.linearRampToValueAtTime(musicVolume, c.currentTime + 1.4);
+    scheduleLoop(trackId, st);
+    muted = musicMuted;
+  }, 1150);
+}
+
+// ── Track selection ────────────────────────
+
+const SCENE_MAP = {
+  dungeon: { day:'dungeon', night:'dungeon' },
+  cave:    { day:'cave',    night:'cave' },
+  forest:  { day:'forest_day', night:'forest_night' },
+  plains:  { day:'plains_day', night:'peaceful' },
+  ocean:   { day:'ocean_day',  night:'ocean_night' },
+  castle:  { day:'castle_day', night:'ruins' },
+  ruins:   { day:'ruins',      night:'ruins' },
+  village: { day:'village_day', night:'village_night' },
+  city:    { day:'village_day', night:'village_night' },
+  desert:  { day:'desert',     night:'mysterious' },
+  mountain:{ day:'mountain',   night:'mountain' },
+  space:   { day:'space',      night:'space' },
+  swamp:   { day:'swamp',      night:'swamp' },
+  snow:    { day:'snow',       night:'snow' },
+  tavern:  { day:'village_day', night:'village_night' },
+  road:    { day:'plains_day', night:'peaceful' },
+  ship:    { day:'ocean_day',  night:'ocean_night' },
+};
+
+// FIX: Complete MOOD_MAP — covers all values AI can output
+const MOOD_MAP = {
+  tense:      'tension',   ominous:   'tension',
+  horror:     'dungeon',   dark:      'dungeon',
+  mysterious: 'mysterious', wonder:   'mysterious', wondrous: 'mysterious',
+  peaceful:   'peaceful',  calm:      'peaceful',   romantic: 'peaceful',
+  sad:        'emotional', emotional: 'emotional',
+  triumphant: 'triumphant', victory:  'triumphant', exciting: 'triumphant',
+  joyful:     'triumphant',
+  battle:     null, // handled by startCombatMusic, not autoTrack
+  funny:      'npc_theme', // light and bouncy
+  scary:      'tension',
+};
+
+function selectTrack(sceneType, time, mood) {
+  if (mood && MOOD_MAP[mood] !== undefined) {
+    if (MOOD_MAP[mood] === null) return currentTrackId; // preserve current (e.g. battle)
+    return MOOD_MAP[mood];
+  }
+  const slot = (time === 'night' || time === 'cave') ? 'night' : 'day';
+  return SCENE_MAP[sceneType]?.[slot] || (slot === 'night' ? 'peaceful' : 'plains_day');
+}
+
+// ── Public API ────────────────────────────
 
 export function playTrack(trackId) {
-  if (!trackId || trackId === active) return;
-  const audioCtx = initCtx();
-  if (!audioCtx) return;
-
-  // Fade out current
-  if (masterGain && active) {
-    const old = masterGain;
-    old.gain.setValueAtTime(old.gain.value, audioCtx.currentTime);
-    old.gain.linearRampToValueAtTime(0, audioCtx.currentTime + CROSSFADE);
-  }
-
-  if (scheduler) { clearInterval(scheduler); scheduler = null; }
-
-  const oldNodes = [...nodes];
-  setTimeout(() => {
-    oldNodes.forEach(n => { try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch {} });
-  }, (CROSSFADE + 0.3) * 1000);
-  nodes = [];
-
-  active = trackId;
-  startTrackInternal(trackId, true);
+  if (!TRACKS[trackId]) return;
+  if (currentTrackId === trackId && isPlaying) return;
+  isPlaying = true;
+  crossfadeTo(trackId);
 }
 
 export function stopMusic() {
-  if (scheduler) { clearInterval(scheduler); scheduler = null; }
-  if (masterGain && ctx) {
-    masterGain.gain.setValueAtTime(masterGain.gain.value, ctx.currentTime);
-    masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + CROSSFADE);
-    const old = [...nodes];
-    setTimeout(() => { old.forEach(n => { try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch {} }); }, (CROSSFADE + 0.3) * 1000);
-  } else {
-    nodes.forEach(n => { try { if (n.stop) n.stop(); if (n.disconnect) n.disconnect(); } catch {} });
-  }
-  nodes = []; active = null; masterGain = null; preCombatTrack = null;
+  isPlaying = false;
+  crossfadeTo(null);
+  currentTrackId = null;
 }
 
-export function setMusicVol(v) {
-  masterVol = v;
-  if (masterGain && ctx) {
-    masterGain.gain.setValueAtTime(v * (TRACKS[active]?.gain || 0.15), ctx.currentTime);
-  }
+// FIX: autoTrackFromScene now guards against overriding combat music
+export function autoTrackFromScene(sceneType, time, mood) {
+  if (!isPlaying) return;
+  if (['battle','battle_boss'].includes(currentTrackId)) return;
+  const suggested = selectTrack(sceneType, time, mood);
+  if (suggested && suggested !== currentTrackId) playTrack(suggested);
 }
 
-// Called on each scene update — only switches if music is already playing
-export function autoTrackFromScene(sceneType, timeOfDay, mood) {
-  if (!active) return; // music is off — don't auto-start
-  if (active === 'battle') return; // don't interrupt combat
-  const suggested = selectTrack(sceneType, timeOfDay, mood);
-  if (suggested !== active) playTrack(suggested);
+export function startCombatMusic(isBoss = false) {
+  preCombatTrack = currentTrackId;
+  playTrack(isBoss ? 'battle_boss' : 'battle');
 }
 
-export function startCombatMusic() {
-  if (active !== 'battle') { preCombatTrack = active; playTrack('battle'); }
-}
-
-export function endCombatMusic(sceneType, timeOfDay, mood) {
-  const returnTo = preCombatTrack || selectTrack(sceneType, timeOfDay, mood);
+export function endCombatMusic(sceneType, time, mood) {
+  const returnTo = preCombatTrack || selectTrack(sceneType, time, mood) || 'peaceful';
   preCombatTrack = null;
   playTrack(returnTo);
 }
 
-export function getMusicActive() { return active; }
-export function getMusicVol() { return masterGain?.gain.value ?? 0.4; }
-export function setMusicMuted(m) { if (m) stopMusic(); }
-export function getMusicMuted() { return !active; }
+export function playVictoryMusic() {
+  if (!isPlaying) return;
+  const prev = currentTrackId;
+  playTrack('triumphant');
+  setTimeout(() => { if (currentTrackId === 'triumphant') playTrack(prev || 'peaceful'); }, 13000);
+}
+
+// FIX: NPC music — only change if friendly, never override combat
+export function playNpcMusic(relationship = 'friendly') {
+  if (['battle','battle_boss'].includes(currentTrackId)) return;
+  if (!isPlaying) return;
+  if (relationship === 'friendly' || relationship === 'neutral') {
+    // Only switch to NPC theme if currently on a scene track — preserve mood tracks
+    const current = TRACKS[currentTrackId];
+    if (current?.category === 'explore') playTrack('npc_theme');
+  } else if (relationship === 'enemy') {
+    // Hostile NPC appearance — build tension before combat starts
+    if (TRACKS[currentTrackId]?.category === 'explore') playTensionMusic();
+  }
+}
+
+export function playDiscoveryStinger() {
+  if (!isPlaying) return;
+  if (['battle','battle_boss'].includes(currentTrackId)) return;
+  const prev = currentTrackId;
+  playTrack('mysterious');
+  setTimeout(() => { if (currentTrackId === 'mysterious') playTrack(prev || 'peaceful'); }, 16000);
+}
+
+export function playEmotionalMusic() {
+  if (!isPlaying) return;
+  if (['battle','battle_boss'].includes(currentTrackId)) return;
+  playTrack('emotional');
+}
+
+export function playRestMusic() {
+  if (!isPlaying) return;
+  playTrack('rest');
+}
+
+export function playTensionMusic() {
+  if (!isPlaying) return;
+  if (['battle','battle_boss'].includes(currentTrackId)) return;
+  playTrack('tension');
+}
+
+export function setMusicVol(v) {
+  musicVolume = Math.max(0, Math.min(1, v));
+  if (masterGain && isPlaying) masterGain.gain.value = musicVolume;
+}
+
+export function getMusicVol()    { return musicVolume; }
+export function getMusicActive() { return isPlaying ? currentTrackId : null; }
+
+export function setMusicMuted(m) {
+  musicMuted = m; muted = m;
+  if (masterGain) masterGain.gain.value = m ? 0 : (isPlaying ? musicVolume : 0);
+}
+
+export function getMusicMuted() { return musicMuted; }

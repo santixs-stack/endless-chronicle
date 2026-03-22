@@ -18,7 +18,7 @@ export default function SettingsOverlay({ onClose }) {
   const [sfxMuted, setSfxMutedState] = useState(getSfxMuted());
   const [sfxVol,   setSfxVolState]   = useState(getSfxVolume());
 
-  function setRL(level) { set({ readingLevel: level }); SFX.save(); }
+  function setRL(level) { set({ readingLevel: level }); SFX.modeChange(); }
 
   function toggleSfx() {
     const next = !sfxMuted;
@@ -62,7 +62,7 @@ export default function SettingsOverlay({ onClose }) {
                 key={m.id}
                 className={`${styles.modeBtn} ${state.mode === m.id ? styles.modeBtnActive : ''}`}
                 style={state.mode === m.id ? { borderColor: m.color, color: m.color } : undefined}
-                onClick={() => setMode(m.id)}
+                onClick={() => { SFX.modeChange(); setMode(m.id); }}
               >
                 <div className={styles.modeBtnName}>{m.name}</div>
                 <div className={styles.modeBtnDesc}>{m.desc}</div>
