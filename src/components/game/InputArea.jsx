@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
-import { CLASS_IDEAS } from '../../data/classes.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
-import DiceRoller from './DiceRoller.jsx';
+import { SFX } from './SoundEngine.js';
 import styles from './InputArea.module.css';
 
-const GENERIC_IDEAS = [
-  'Run toward the action!', 'Look for a hidden door or lever',
-  'Talk to whoever is here', 'Search the area carefully',
-  'Try something creative!', 'Use the environment — throw something!',
-  'Ask for help', 'Make a distraction',
-];
+// ═══════════════════════════════════════════
+//  INPUT AREA
+//  Cleaned up — no manual dice roller, no
+//  static ideas button. Dice roll happens
+//  automatically when AI is resolving your
+//  action (cosmetic animation only).
+// ═══════════════════════════════════════════
 
 const HINTS = [
-  'What do you do? (try anything!)',
+  'What do you do?',
   'e.g. I run toward the mysterious door!',
   'e.g. I try to befriend the creature.',
   'e.g. I search the room for hidden clues.',
@@ -21,12 +21,68 @@ const HINTS = [
   'e.g. I climb up to get a better look.',
   'e.g. I ask the old wizard for help.',
   'e.g. I make a really loud distraction!',
+  'e.g. I attempt something unexpected…',
 ];
+
+// ── Auto d20 roll animation ────────────────
+// Shows while AI is thinking — gives the
+// feeling that your action is being resolved
+function DiceAnimation({ active }) {
+  const [face, setFace] = useState(20);
+  const [finalRoll, setFinalRoll] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+
+  useEffect(() => {
+    if (!active) {
+      setFinalRoll(null);
+      setShowResult(false);
+      return;
+    }
+
+    // Rapidly cycle through numbers
+    const interval = setInterval(() => {
+      setFace(Math.floor(Math.random() * 20) + 1);
+    }, 80);
+
+    // After 1.2s settle on a final number
+    const settle = setTimeout(() => {
+      clearInterval(interval);
+      const result = Math.floor(Math.random() * 20) + 1;
+      setFace(result);
+      setFinalRoll(result);
+      setShowResult(true);
+    }, 1200);
+
+    return () => { clearInterval(interval); clearTimeout(settle); };
+  }, [active]);
+
+  if (!active && !showResult) return null;
+
+  const isNat20  = finalRoll === 20;
+  const isNat1   = finalRoll === 1;
+  const isGood   = finalRoll >= 15;
+
+  return (
+    <div className={`${styles.diceAnim} ${showResult ? styles.diceSettled : styles.diceRolling}`}>
+      <div className={`${styles.diceFace}
+        ${isNat20 ? styles.diceNat20 : ''}
+        ${isNat1  ? styles.diceNat1  : ''}
+        ${isGood && !isNat20 ? styles.diceGood : ''}
+      `}>
+        <span className={styles.diceNum}>{face}</span>
+      </div>
+      {showResult && (
+        <span className={styles.diceLabel}>
+          {isNat20 ? '⚡ NAT 20' : isNat1 ? '💀 NAT 1' : isGood ? 'GREAT' : 'd20'}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function InputArea({ onAction }) {
   const { state } = useGame();
   const [text, setText] = useState('');
-  const [showIdeas, setShowIdeas] = useState(false);
   const [hintIdx, setHintIdx] = useState(0);
   const textareaRef = useRef(null);
 
@@ -45,12 +101,10 @@ export default function InputArea({ onAction }) {
 
   function submit() {
     if (!text.trim() || state.isLoading) return;
+    SFX.click();
     onAction(text.trim());
     setText('');
-    setShowIdeas(false);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
   }
 
   function handleKey(e) {
@@ -63,67 +117,38 @@ export default function InputArea({ onAction }) {
     if (ta) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 110) + 'px'; }
   }
 
-  function useIdea(idea) {
-    setText(idea);
-    setShowIdeas(false);
+  function useChip(chip) {
+    setText(chip);
     textareaRef.current?.focus();
   }
 
-  // Build ideas list for current player's class
-  const ideas = [
-    ...(CLASS_IDEAS[curPlayer?.class] || []),
-    ...GENERIC_IDEAS,
-  ].slice(0, 8);
-
-  // Current actions from story response
-  const actions = state.currentActions || [];
-
-  // Combat-specific actions to inject
+  const actions     = state.currentActions || [];
   const combatChips = state.inCombat ? ['🔍 Assess the enemy'] : [];
 
   return (
     <div className={styles.inputSection}>
-      {/* Action suggestion chips */}
-      {(actions.length > 0 || combatChips.length > 0) && (
+
+      {/* Action suggestion chips (AI-generated) */}
+      {(actions.length > 0 || combatChips.length > 0) && !state.isLoading && (
         <div className={styles.chips}>
           <span className={styles.chipsLabel}>Try:</span>
           {combatChips.map((a, i) => (
-            <button key={`combat-${i}`} className={`${styles.chip} ${styles.assessChip}`} onClick={() => useIdea(a)}>{a}</button>
+            <button key={`combat-${i}`} className={`${styles.chip} ${styles.assessChip}`}
+              onClick={() => useChip(a)}>{a}</button>
           ))}
           {actions.slice(0, 4).map((a, i) => (
-            <button key={i} className={styles.chip} onClick={() => useIdea(a)}>{a}</button>
+            <button key={i} className={styles.chip} onClick={() => useChip(a)}>{a}</button>
           ))}
         </div>
       )}
 
-      {/* Ideas panel */}
-      {showIdeas && (
-        <div className={styles.ideasPanel}>
-          <div className={styles.ideasTitle}>💡 Ideas — click one to use it:</div>
-          <div className={styles.ideasChips}>
-            {ideas.map((idea, i) => (
-              <span key={i} className={styles.ideaChip} onClick={() => useIdea(idea)}>
-                💡 {idea}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Turn indicator */}
+      {/* Turn indicator + dice animation */}
       <div className={styles.turnRow}>
         <span className={styles.turnDot} style={{ background: color }} />
         <span className={styles.turnName} style={{ color }}>
           {curPlayer ? `${curPlayer.name} (${curPlayer.className})` : ''}
         </span>
-        <button
-          className={styles.ideasBtn}
-          onClick={() => setShowIdeas(s => !s)}
-          title="Need ideas?"
-        >
-          💡 Ideas
-        </button>
-        <DiceRoller onResult={result => { setText(result); textareaRef.current?.focus(); }} />
+        <DiceAnimation active={state.isLoading} />
       </div>
 
       {/* Text input */}
@@ -134,7 +159,7 @@ export default function InputArea({ onAction }) {
           value={text}
           onChange={handleTextChange}
           onKeyDown={handleKey}
-          placeholder={HINTS[hintIdx]}
+          placeholder={state.isLoading ? 'The GM is resolving your action…' : HINTS[hintIdx]}
           rows={1}
           disabled={state.isLoading}
         />
@@ -147,6 +172,7 @@ export default function InputArea({ onAction }) {
           ▶
         </button>
       </div>
+
       <div className={styles.hint}>
         Enter to send · Shift+Enter for new line
       </div>
