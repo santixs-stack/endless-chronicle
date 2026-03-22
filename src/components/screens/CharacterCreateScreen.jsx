@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { PLAYER_COLORS } from '../../lib/constants.js';
+import { getStartingGear, getSpecial } from '../../data/startingGear.js';
 import { GENRES, getGenreArchetypes, detectGenre } from '../../data/archetypes.js';
 import { CHAR_PRESETS } from '../../data/presets.js';
 import { DND_CLASSES } from '../../data/classes.js';
@@ -406,6 +407,9 @@ export default function CharacterCreateScreen() {
       hp: cls.hp, maxHp: cls.hp,
       xp: 0, level: 1,
       color: PLAYER_COLORS[idx],
+      // Genre-aware starting gear and special
+      startingGear: getStartingGear(genre, cls.id),
+      special: getSpecial(genre, cls.id, cls.special),
     };
 
     const players = [...(state.players || [])];
@@ -474,6 +478,8 @@ export default function CharacterCreateScreen() {
       hp: cls.hp, maxHp: cls.hp,
       xp: 0, level: 1,
       color: PLAYER_COLORS[idx],
+      startingGear: getStartingGear(defaultWorld.genre || genre, cls.id),
+      special: getSpecial(defaultWorld.genre || genre, cls.id, cls.special),
     };
 
     const players = [...(state.players || [])];

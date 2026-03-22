@@ -198,7 +198,13 @@ export default function GameScreen() {
     if (state.messages?.length > 0) return;
     hasOpened.current = true;
     const arc = pickHiddenArc();
-    set({ hiddenArc: arc });
+    // Seed shared inventory from all players' starting gear (deduplicated)
+    const seedInventory = [
+      ...new Set(
+        (state.players || []).flatMap(p => p.startingGear || [])
+      )
+    ];
+    set({ hiddenArc: arc, sharedInventory: seedInventory });
     const g = state.goal;
     const goalCtx = g ? `Quest: ${g.name}. ${g.start || g.hint}` : 'Begin the story.';
     const partyNames = state.players.map(p => `${p.name} the ${p.className}`).join(' and ');
@@ -282,6 +288,13 @@ export default function GameScreen() {
         turnCount: newTurn,
         currentActions: parsed.actions || [],
       };
+      // Add any new items the AI granted (via [ITEM:{...}] tags)
+      if (parsed.items?.length > 0) {
+        const newItemNames = parsed.items.map(it => it.name || it).filter(Boolean);
+        const existing = state.sharedInventory || [];
+        const merged = [...new Set([...existing, ...newItemNames])];
+        updates.sharedInventory = merged;
+      }
 
       if (parsed.scene)           updates.lastScene   = parsed.scene;
       if (parsed.location)        updates.location    = parsed.location;

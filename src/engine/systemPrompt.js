@@ -99,6 +99,8 @@ When journal-worthy: [JOURNAL:"one sentence entry"]
 When party advances toward goal: [MILESTONE:N]
 When something important is discovered: [CODEX:{"title":"","category":"person|place|item|lore","body":"1-2 sentences"}]
 When gold changes: [GOLD:{"type":"gold","amount":N,"reason":""}]
+When a player finds, buys, or is given an item: [ITEM:{"name":"Item Name","desc":"brief description"}]
+  Use this when: looting, purchasing, receiving gifts, crafting, stealing. One tag per item. Item names appear in the party inventory.
 If input is too vague: [CLARIFY: one specific question under 20 words]
 Adventure mode HP: [STATS:{"health":N}]
 When HP changes per character: [HPDELTA:{"target":"Name","delta":-10,"weapon":"sword","roll":14,"crit":false,"type":"damage|heal"}]
