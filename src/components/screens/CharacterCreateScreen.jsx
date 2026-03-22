@@ -11,6 +11,23 @@ import { SFX } from '../game/SoundEngine.js';
 import StepBar from '../ui/StepBar.jsx';
 import styles from './CharacterCreateScreen.module.css';
 
+// Default worlds per genre — used when archetype characters skip the world screen
+const GENRE_DEFAULT_WORLDS = {
+  fantasy:    { world: 'A medieval kingdom of ancient magic, hidden dungeons, and legendary swords', location: 'The cobblestone streets of a bustling castle town', tone: 'Epic & Exciting' },
+  space:      { world: 'A distant star system with alien civilizations and uncharted worlds', location: 'The observation deck of a battered starship', tone: 'Mysterious & Wondrous' },
+  ocean:      { world: 'The Golden Age of Sail — treacherous seas, hidden islands, legendary treasures', location: 'The deck of a weathered ship, open ocean in every direction', tone: 'Epic & Exciting' },
+  horror:     { world: 'A shadowed Victorian city where monsters lurk just beyond the gaslight', location: 'A fog-drenched street at the edge of a haunted district', tone: 'Dark & Mysterious' },
+  western:    { world: 'The untamed frontier — dusty towns, railroad money, and frontier justice', location: 'A crossroads saloon where outlaws and lawmen share the same whiskey', tone: 'Epic & Exciting' },
+  postapoc:   { world: 'A shattered civilization slowly rebuilding from the ashes of the old world', location: 'A fortified settlement on the edge of the wastes', tone: 'Dark & Mysterious' },
+  cyberpunk:  { world: 'A neon-soaked megacity where corporations own the law and data is power', location: 'A rain-slicked back alley in the lowest district', tone: 'Dark & Mysterious' },
+  mythology:  { world: 'An age of gods and heroes where myth is living truth', location: 'The base of a mountain sacred to the gods', tone: 'Epic & Exciting' },
+  fairytale:  { world: 'An enchanted realm where the old magic still holds and every forest has a secret', location: 'The edge of the Whispering Wood at twilight', tone: 'Mysterious & Wondrous' },
+  ninja:      { world: 'Feudal Japan in a time of warring clans, hidden arts, and shadow politics', location: 'The rooftops of a city under curfew, moonlight on black tiles', tone: 'Dark & Mysterious' },
+  historical: { world: 'A pivotal era of history where empires rise and individuals change the course of nations', location: 'A crossroads tavern where soldiers, merchants and spies all drink together', tone: 'Epic & Exciting' },
+};
+
+
+
 // Genre picker icons — confirmed working paths
 const GENRE_ICONS = {
   fantasy:    'lorc/broadsword',
@@ -298,7 +315,9 @@ function ConfirmCharacter({ char, playerIdx, playerCount, onConfirm, onBack }) {
         >
           {playerCount > 1 && playerIdx < playerCount - 1
             ? `Confirm — Next Player →`
-            : 'Confirm — Build the World →'}
+            : char.fromArchetype
+              ? 'Confirm — Begin the Quest →'
+              : 'Confirm — Build the World →'}
         </button>
       </div>
     </div>
@@ -345,7 +364,7 @@ export default function CharacterCreateScreen() {
       className: cls,
       classIcon: archetype.icon,
     };
-    setPendingChar(char);
+    setPendingChar({ ...char, fromArchetype: true });
     setSubFlow('confirm');
   }
 
@@ -383,16 +402,29 @@ export default function CharacterCreateScreen() {
     players[idx] = newPlayer;
 
     if (idx < playerCount - 1) {
-      // More players — flag custom player exists, stay on character screen
-      set({ players, setupIdx: idx + 1, hasCustomPlayer: true });
+      // More players — stay on character screen, flag if this was custom
+      const isCustom = !char.fromArchetype;
+      set({ players, setupIdx: idx + 1, ...(isCustom ? { hasCustomPlayer: true } : {}) });
       setSubFlow(null);
       setFreeformText('');
       setPendingChar(null);
     } else {
-      // Last player — custom always goes to world screen
-      // World may already be pre-filled from a preset player — that's fine as a default
-      SFX.transition();
-      set({ players, hasCustomPlayer: true, screen: 'world' });
+      // Last player
+      if (char.fromArchetype) {
+        // Archetype character — auto-fill world from genre, skip world screen
+        const defaultWorld = GENRE_DEFAULT_WORLDS[genre] || GENRE_DEFAULT_WORLDS.fantasy;
+        SFX.transition();
+        set({
+          players,
+          world: { world: defaultWorld.world, location: defaultWorld.location, tone: defaultWorld.tone, extra: '' },
+          location: defaultWorld.location,
+          screen: 'quest',
+        });
+      } else {
+        // Custom/freeform character — let them define the world
+        SFX.transition();
+        set({ players, hasCustomPlayer: true, screen: 'world' });
+      }
     }
   }
 
