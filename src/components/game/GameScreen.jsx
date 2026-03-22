@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { callAPI, trimMessagesForContext, getContextStatus } from '../../engine/api.js';
@@ -13,6 +13,7 @@ import {
   playEmotionalMusic, playRestMusic, playTensionMusic,
 } from './MusicEngine.js';
 import { SFX, initAudio } from './SoundEngine.js';
+import GameIcon from '../ui/GameIcon.jsx';
 import { showNotif } from '../ui/Notification.jsx';
 import GameSidebar from './GameSidebar.jsx';
 import StoryWindow from './StoryWindow.jsx';
@@ -33,6 +34,112 @@ import styles from './GameScreen.module.css';
 
 // XP thresholds for level up
 const XP_LEVELS = [0, 100, 250, 450, 700, 1000];
+
+
+// ── "GM is crafting the world" screen ─────
+// Shown before the very first AI response.
+// Animated icon constellation around the title.
+const CRAFT_ICONS = [
+  'lorc/crystal-ball', 'lorc/open-book', 'lorc/crown',
+  'lorc/plain-dagger', 'delapouite/caduceus', 'lorc/anchor',
+  'lorc/wizard-staff', 'lorc/ghost', 'lorc/wolf-howl',
+  'lorc/dice-twenty-faces-twenty', 'lorc/crossed-axes', 'lorc/fairy-wand',
+];
+
+const CRAFT_MESSAGES = [
+  'The GM is weaving your world…',
+  'Preparing your adventure…',
+  'Setting the scene…',
+  'Summoning the chronicle…',
+  'The story is awakening…',
+];
+
+function WorldCraftingScreen({ players }) {
+  const [msgIdx, setMsgIdx] = React.useState(0);
+
+  React.useEffect(() => {
+    // Play the world-crafting SFX on mount
+    SFX.worldCraft?.();
+    const t = setInterval(() => {
+      setMsgIdx(i => (i + 1) % CRAFT_MESSAGES.length);
+    }, 2200);
+    return () => clearInterval(t);
+  }, []);
+
+  // Build ring of icons — mix genre-specific player icons with world icons
+  const ringIcons = [...CRAFT_ICONS];
+  (players || []).forEach((p, i) => {
+    // inject player class icon into the ring
+  });
+
+  return (
+    <div className={styles.worldCraftOverlay}>
+      <div className={styles.worldCraftInner}>
+
+        {/* Rotating icon ring */}
+        <div className={styles.worldCraftRing}>
+          {ringIcons.slice(0, 8).map((icon, i) => (
+            <div
+              key={i}
+              className={styles.worldCraftOrbitIcon}
+              style={{
+                '--angle': `${i * 45}deg`,
+                '--delay': `${i * 0.18}s`,
+              }}
+            >
+              <GameIcon path={icon} size={18} tint="dim" />
+            </div>
+          ))}
+
+          {/* Inner ring — rotates opposite */}
+          {ringIcons.slice(8, 12).map((icon, i) => (
+            <div
+              key={i + 8}
+              className={styles.worldCraftInnerOrbit}
+              style={{
+                '--angle': `${i * 90 + 22}deg`,
+                '--delay': `${i * 0.25 + 0.1}s`,
+              }}
+            >
+              <GameIcon path={icon} size={13} tint="dim" />
+            </div>
+          ))}
+
+          {/* Center */}
+          <div className={styles.worldCraftCenter}>
+            <div className={styles.worldCraftPulse} />
+            <GameIcon path="lorc/dice-twenty-faces-twenty" size={32} tint="accent" />
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className={styles.worldCraftTitle}>The Endless</div>
+        <div className={styles.worldCraftTitleAccent}>Chronicle</div>
+
+        {/* Animated message */}
+        <p className={styles.worldCraftMsg} key={msgIdx}>
+          {CRAFT_MESSAGES[msgIdx]}
+        </p>
+
+        {/* Player silhouettes if available */}
+        {players?.length > 0 && (
+          <div className={styles.worldCraftParty}>
+            {players.map((p, i) => (
+              <div
+                key={i}
+                className={styles.worldCraftPlayer}
+                style={{ '--player-color': p.color || '#c4a84f' }}
+                title={p.name}
+              >
+                <span className={styles.worldCraftPlayerName}>{p.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function GameScreen() {
   const { state, set, addJournal, addNpc, addCodex, updateGold, addCombatEvent, setPlayer } = useGame();
@@ -216,7 +323,7 @@ export default function GameScreen() {
       // Side effects
       if (parsed.journal) { addJournal(parsed.journal); SFX.journal(); }
       parsed.npcs.forEach(npc => {
-        addNpc(npc);
+        addNpc({ ...npc, introTurn: state.turnCount || 0 });
         SFX.npcIntroduced();
         playNpcMusic(npc.type || 'friendly');
       });
@@ -323,16 +430,7 @@ export default function GameScreen() {
 
       {/* ── Initial loading screen (before first AI response) ── */}
       {state.isLoading && !state.messages?.length && (
-        <div className={styles.initLoadOverlay}>
-          <div className={styles.initLoadInner}>
-            <div className={styles.initSpinnerWrap}>
-              <div className={styles.initSpinner} />
-              <div className={styles.initSpinnerInner} />
-            </div>
-            <p className={styles.initLoadMsg}>The GM is setting the scene…</p>
-            <p className={styles.initLoadSub}>Preparing your adventure</p>
-          </div>
-        </div>
+        <WorldCraftingScreen players={state.players} />
       )}
 
       <GameSidebar

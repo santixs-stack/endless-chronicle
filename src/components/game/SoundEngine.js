@@ -630,3 +630,52 @@ export function setSfxMuted(m) { muted = m; }
 export function setSfxVolume(v2) { sfxVolume = Math.max(0, Math.min(1, v2)); }
 export function getSfxMuted()  { return muted; }
 export function getSfxVolume() { return sfxVolume; }
+
+// ── Late additions (appended) ──────────────
+
+// Extend SFX with worldCraft
+Object.assign(SFX, {
+
+  // NEW: World crafting — plays during "GM is crafting the world" screen
+  // Slower and more contemplative than newGame().
+  // Deep drone → slow harp ascent → distant bell cascade → choir resolve.
+  worldCraft() {
+    const c = getCtx(); if (!c || muted) return;
+    const rev = getRev(), now = c.currentTime;
+
+    // Low drone — earth rumbling awake
+    const dg = c.createGain(), do_ = c.createOscillator();
+    do_.type = 'sine'; do_.frequency.setValueAtTime(40, now);
+    do_.frequency.exponentialRampToValueAtTime(65, now + 3.0);
+    adsr(dg, now, 0.8, 1.5, 1.2, v(0.22));
+    do_.connect(dg); rev ? rev.send(dg) : dg.connect(c.destination);
+    do_.start(now); do_.stop(now + 4.0);
+
+    // Second drone — fifth above, phase offset
+    const dg2 = c.createGain(), do2 = c.createOscillator();
+    do2.type = 'sine'; do2.frequency.setValueAtTime(60, now + 0.3);
+    do2.frequency.exponentialRampToValueAtTime(98, now + 3.0);
+    adsr(dg2, now + 0.3, 0.9, 1.2, 1.0, v(0.14));
+    do2.connect(dg2); rev ? rev.send(dg2) : dg2.connect(c.destination);
+    do2.start(now + 0.3); do2.stop(now + 4.0);
+
+    // Harp ascent — slow, deliberate, like pages turning
+    [130, 165, 196, 247, 294, 370, 440, 523].forEach((f, i) => {
+      Harp(f, 0.30, 0.55 + i * 0.22);
+    });
+
+    // Choir swells in — the GM "waking up"
+    Choir(130, 0.42, 2.2, 1.0);
+    Choir(196, 0.32, 1.8, 1.4);
+    Choir(261, 0.24, 1.5, 1.8);
+
+    // Bell cascade at the peak — world materialising
+    [523, 659, 784, 1047, 1318].forEach((f, i) => {
+      Bell(f, 0.22, 0.9, 1.8 + i * 0.18);
+    });
+
+    // String warmth — settling into the world
+    Strings(130, 0.24, 2.5, 1.2, 1200);
+    Strings(196, 0.18, 2.0, 1.6, 1000);
+  },
+});
