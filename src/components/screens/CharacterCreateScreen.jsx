@@ -440,25 +440,16 @@ export default function CharacterCreateScreen() {
       // More players — stay on character screen
       set({ players, setupIdx: idx + 1 });
     } else {
-      // Last player — check if any previous player used custom
-      const anyCustom = state.hasCustomPlayer;
-      if (anyCustom) {
-        // Mixed game — go to world screen, pre-filled with preset's world as default
-        set({
-          players,
-          world: { world: defaultWorld.world, location: defaultWorld.location, tone: defaultWorld.tone, extra: '' },
-          location: defaultWorld.location,
-          screen: 'world',
-        });
-      } else {
-        // All presets — skip world screen entirely
-        set({
-          players,
-          world: { world: defaultWorld.world, location: defaultWorld.location, tone: defaultWorld.tone, extra: '' },
-          location: defaultWorld.location,
-          screen: 'quest',
-        });
-      }
+      // Last player is a preset — always skip world screen.
+      // World is auto-filled from the preset's genre. Custom players
+      // in a mixed party share this world context.
+      SFX.transition();
+      set({
+        players,
+        world: { world: defaultWorld.world, location: defaultWorld.location, tone: defaultWorld.tone, extra: '' },
+        location: defaultWorld.location,
+        screen: 'quest',
+      });
     }
   }
 
@@ -605,7 +596,7 @@ export default function CharacterCreateScreen() {
         <div className={styles.footer}>
           <button className="btn-ghost" onClick={() => {
             if (idx > 0) set({ setupIdx: idx - 1 });
-            else set({ screen: 'players' });
+            else set({ screen: 'players', hasCustomPlayer: false, players: [] });
           }}>
             ← Back
           </button>
