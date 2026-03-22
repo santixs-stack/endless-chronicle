@@ -1217,3 +1217,889 @@ export function drawCreature(type, x, y, scale, faction, status, uid) {
     return { defs:'', svg:'' };
   }
 }
+
+// ═══════════════════════════════════════════
+//  GENRE EXPANSION — New Creatures & NPCs
+//  Western · Cyberpunk · Ninja · Post-Apoc
+//  Historical · Mythology · Fairy Tale
+//  + Missing fantasy/horror/space types
+// ═══════════════════════════════════════════
+
+// ── RAT ────────────────────────────────────
+export function drawRat(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.beast;
+  const id = `rt_${uid}`;
+  const defs = `
+    ${g(`${id}_fur`, [[0,'#5a4030'],[50,'#3a2818'],[100,'#1a1008']])}
+    ${rg(`${id}_eye`, x+6*sc, y-8*sc, 4*sc, [[0,'#ff2200',1],[100,'#ff2200',0]])}
+    ${rg(`${id}_glow`, x, y, 10*sc, [[0,f.underGlow,0.15],[100,f.underGlow,0]])}
+  `;
+  const svg = `
+    <g class="${animClass('rat')}" style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${10*sc}" ry="${2.5*sc}" fill="url(#${id}_glow)"/>
+      <!-- Long tail -->
+      <path d="M${x-8*sc},${y-4*sc} Q${x-18*sc},${y-3*sc} ${x-22*sc},${y}" fill="none" stroke="#3a2818" stroke-width="${1.5*sc}" stroke-linecap="round"/>
+      <!-- Body -->
+      <ellipse cx="${x}" cy="${y-5*sc}" rx="${8*sc}" ry="${5*sc}" fill="url(#${id}_fur)"/>
+      <!-- Head -->
+      <ellipse cx="${x+6*sc}" cy="${y-8*sc}" rx="${5*sc}" ry="${4*sc}" fill="url(#${id}_fur)"/>
+      <!-- Pointy snout -->
+      <path d="M${x+9*sc},${y-7*sc} Q${x+13*sc},${y-8*sc} ${x+13*sc},${y-7*sc} Q${x+12*sc},${y-6*sc} ${x+9*sc},${y-7*sc}Z" fill="#5a4030"/>
+      <!-- Ears -->
+      <ellipse cx="${x+5*sc}" cy="${y-12*sc}" rx="${2.5*sc}" ry="${2*sc}" fill="#3a2818"/>
+      <ellipse cx="${x+5*sc}" cy="${y-12*sc}" rx="${1.5*sc}" ry="${1.2*sc}" fill="#7a5060" opacity="0.6"/>
+      <!-- Eyes -->
+      ${eye(x+8*sc, y-9*sc, 1.2*sc, '#ff2200', `${id}_eye`, uid)}
+      <!-- Legs -->
+      <line x1="${x-3*sc}" y1="${y-4*sc}" x2="${x-4*sc}" y2="${y}" stroke="#3a2818" stroke-width="${1.5*sc}"/>
+      <line x1="${x+2*sc}" y1="${y-3*sc}" x2="${x+3*sc}" y2="${y}" stroke="#3a2818" stroke-width="${1.5*sc}"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── BAT ────────────────────────────────────
+export function drawBat(x, y, sc, fac, status, uid) {
+  const f = FACTION.undead;
+  const id = `bt_${uid}`;
+  const defs = `
+    ${g(`${id}_wing`, [[0,'#2a1828',0.9],[50,'#180c18',0.85],[100,'#0a040a',0.7]])}
+    ${rg(`${id}_eye`, x, y-8*sc, 4*sc, [[0,'#ff4400',1],[100,'#ff4400',0]])}
+    ${rg(`${id}_glow`, x, y, 14*sc, [[0,f.underGlow,0.2],[100,f.underGlow,0]])}
+  `;
+  const svg = `
+    <g class="${animClass('bat')}" style="transform-origin:${x}px ${y-8*sc}px;filter:${statusFilter(status)}">
+      <!-- Wings spread -->
+      <path d="M${x},${y-10*sc} Q${x-20*sc},${y-18*sc} ${x-24*sc},${y-8*sc} Q${x-20*sc},${y-4*sc} ${x-8*sc},${y-8*sc}Z" fill="url(#${id}_wing)"/>
+      <path d="M${x},${y-10*sc} Q${x+20*sc},${y-18*sc} ${x+24*sc},${y-8*sc} Q${x+20*sc},${y-4*sc} ${x+8*sc},${y-8*sc}Z" fill="url(#${id}_wing)"/>
+      <!-- Wing membrane ribs -->
+      <line x1="${x}" y1="${y-10*sc}" x2="${x-20*sc}" y2="${y-14*sc}" stroke="#2a1828" stroke-width="${0.5*sc}" opacity="0.5"/>
+      <line x1="${x}" y1="${y-10*sc}" x2="${x+20*sc}" y2="${y-14*sc}" stroke="#2a1828" stroke-width="${0.5*sc}" opacity="0.5"/>
+      <!-- Body -->
+      <ellipse cx="${x}" cy="${y-8*sc}" rx="${4*sc}" ry="${5*sc}" fill="#1a0c18"/>
+      <!-- Head -->
+      <ellipse cx="${x}" cy="${y-14*sc}" rx="${3.5*sc}" ry="${3*sc}" fill="#1a0c18"/>
+      <!-- Ears -->
+      <path d="M${x-2*sc},${y-16*sc} L${x-4*sc},${y-21*sc} L${x},${y-18*sc}Z" fill="#2a1828"/>
+      <path d="M${x+2*sc},${y-16*sc} L${x+4*sc},${y-21*sc} L${x},${y-18*sc}Z" fill="#2a1828"/>
+      <!-- Eyes -->
+      ${eye(x-1.5*sc, y-15*sc, 1.2*sc, '#ff4400', `${id}_eye`, uid)}
+      ${eye(x+1.5*sc, y-15*sc, 1.2*sc, '#ff4400', `${id}_eye`, uid)}
+      <!-- Fangs -->
+      <line x1="${x-1*sc}" y1="${y-12*sc}" x2="${x-1*sc}" y2="${y-10*sc}" stroke="white" stroke-width="${0.8*sc}"/>
+      <line x1="${x+1*sc}" y1="${y-12*sc}" x2="${x+1*sc}" y2="${y-10*sc}" stroke="white" stroke-width="${0.8*sc}"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── KNIGHT NPC ─────────────────────────────
+export function drawKnight(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.neutral;
+  const id = `kn_${uid}`;
+  const defs = `
+    ${g(`${id}_armor`, [[0,'#888898'],[40,'#606070'],[100,'#303038']])}
+    ${g(`${id}_trim`, [[0,'#c8a830'],[50,'#a08020'],[100,'#604810']])}
+    ${rg(`${id}_eye`, x, y-45*sc, 5*sc, [[0,f.eye,0.8],[100,f.eye,0]])}
+    ${rg(`${id}_glow`, x, y, 18*sc, [[0,f.underGlow,0.18],[100,f.underGlow,0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${16*sc}" ry="${4*sc}" fill="url(#${id}_glow)"/>
+      <!-- Armored boots -->
+      <ellipse cx="${x-6*sc}" cy="${y}" rx="${6*sc}" ry="${2.5*sc}" fill="url(#${id}_armor)"/>
+      <ellipse cx="${x+6*sc}" cy="${y}" rx="${6*sc}" ry="${2.5*sc}" fill="url(#${id}_armor)"/>
+      <!-- Greaves -->
+      <rect x="${x-11*sc}" y="${y-18*sc}" width="${8*sc}" height="${18*sc}" rx="${2*sc}" fill="url(#${id}_armor)"/>
+      <rect x="${x+3*sc}"  y="${y-18*sc}" width="${8*sc}" height="${18*sc}" rx="${2*sc}" fill="url(#${id}_armor)"/>
+      <!-- Plate body -->
+      <path d="M${x-10*sc},${y-40*sc} Q${x-12*sc},${y-28*sc} ${x-9*sc},${y-18*sc} L${x+9*sc},${y-18*sc} Q${x+12*sc},${y-28*sc} ${x+10*sc},${y-40*sc} Q${x+6*sc},${y-48*sc} ${x},${y-48*sc} Q${x-6*sc},${y-48*sc} ${x-10*sc},${y-40*sc}Z"
+        fill="url(#${id}_armor)" stroke="#303038" stroke-width="${0.8*sc}"/>
+      <!-- Chest emblem cross -->
+      <rect x="${x-1.5*sc}" y="${y-42*sc}" width="${3*sc}" height="${10*sc}" rx="${1*sc}" fill="url(#${id}_trim)" opacity="0.8"/>
+      <rect x="${x-5*sc}" y="${y-37*sc}" width="${10*sc}" height="${2.5*sc}" rx="${1*sc}" fill="url(#${id}_trim)" opacity="0.8"/>
+      <!-- Shoulder pauldrons -->
+      <ellipse cx="${x-12*sc}" cy="${y-38*sc}" rx="${6*sc}" ry="${5*sc}" fill="url(#${id}_armor)"/>
+      <ellipse cx="${x+12*sc}" cy="${y-38*sc}" rx="${6*sc}" ry="${5*sc}" fill="url(#${id}_armor)"/>
+      <!-- Arms -->
+      <path d="M${x-12*sc},${y-38*sc} Q${x-18*sc},${y-28*sc} ${x-16*sc},${y-18*sc}" fill="none" stroke="#606070" stroke-width="${6*sc}" stroke-linecap="round"/>
+      <path d="M${x+12*sc},${y-38*sc} Q${x+18*sc},${y-28*sc} ${x+16*sc},${y-18*sc}" fill="none" stroke="#606070" stroke-width="${6*sc}" stroke-linecap="round"/>
+      <!-- Great shield -->
+      <path d="M${x-24*sc},${y-42*sc} Q${x-28*sc},${y-32*sc} ${x-24*sc},${y-20*sc} Q${x-20*sc},${y-16*sc} ${x-16*sc},${y-18*sc} L${x-16*sc},${y-42*sc}Z" fill="url(#${id}_armor)" stroke="#303038" stroke-width="${0.5*sc}"/>
+      <!-- Shield emblem -->
+      <path d="M${x-22*sc},${y-38*sc} L${x-22*sc},${y-24*sc}" stroke="url(#${id}_trim)" stroke-width="${1.5*sc}"/>
+      <path d="M${x-26*sc},${y-31*sc} L${x-18*sc},${y-31*sc}" stroke="url(#${id}_trim)" stroke-width="${1.5*sc}"/>
+      <!-- Sword -->
+      <rect x="${x+15*sc}" y="${y-38*sc}" width="${2.5*sc}" height="${22*sc}" rx="${1*sc}" fill="#c0c0c0"/>
+      <rect x="${x+12*sc}" y="${y-40*sc}" width="${8.5*sc}" height="${2.5*sc}" rx="${1*sc}" fill="#a08020"/>
+      <!-- Gauntlet -->
+      <ellipse cx="${x+16.5*sc}" cy="${y-16*sc}" rx="${3.5*sc}" ry="${2.5*sc}" fill="url(#${id}_armor)"/>
+      <!-- Helmet -->
+      <path d="M${x-8*sc},${y-50*sc} Q${x-9*sc},${y-44*sc} ${x-8*sc},${y-42*sc} L${x+8*sc},${y-42*sc} Q${x+9*sc},${y-44*sc} ${x+8*sc},${y-50*sc} Q${x+4*sc},${y-58*sc} ${x},${y-58*sc} Q${x-4*sc},${y-58*sc} ${x-8*sc},${y-50*sc}Z"
+        fill="url(#${id}_armor)"/>
+      <!-- Visor slit -->
+      <rect x="${x-5*sc}" y="${y-49*sc}" width="${10*sc}" height="${2.5*sc}" rx="${1*sc}" fill="#0a0a10" opacity="0.8"/>
+      <!-- Plume -->
+      <path d="M${x},${y-58*sc} Q${x+4*sc},${y-66*sc} ${x+2*sc},${y-68*sc} Q${x-2*sc},${y-62*sc} ${x},${y-58*sc}Z" fill="#cc1111" opacity="0.9"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── GUNSLINGER (Western) ───────────────────
+export function drawGunslinger(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.neutral;
+  const id = `gs_${uid}`;
+  const defs = `
+    ${g(`${id}_coat`, [[0,'#5a3a18'],[50,'#3a2410'],[100,'#1a1008']])}
+    ${g(`${id}_skin`, [[0,'#c8a878'],[50,'#a88858'],[100,'#685838']])}
+    ${rg(`${id}_eye`, x, y-35*sc, 5*sc, [[0,f.eye,0.7],[100,f.eye,0]])}
+    ${rg(`${id}_glow`, x, y, 14*sc, [[0,f.underGlow,0.14],[100,f.underGlow,0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${12*sc}" ry="${3*sc}" fill="url(#${id}_glow)"/>
+      <!-- Boots with spurs -->
+      <path d="M${x-7*sc},${y-4*sc} Q${x-9*sc},${y-2*sc} ${x-12*sc},${y} L${x-3*sc},${y} L${x-4*sc},${y-4*sc}Z" fill="#2a1808"/>
+      <circle cx="${x-12*sc}" cy="${y}" r="${1.5*sc}" fill="#a08030"/>
+      <path d="M${x+3*sc},${y-4*sc} Q${x+5*sc},${y-2*sc} ${x+8*sc},${y} L${x+12*sc},${y} Q${x+10*sc},${y-2*sc} ${x+8*sc},${y-4*sc}Z" fill="#2a1808"/>
+      <circle cx="${x+12*sc}" cy="${y}" r="${1.5*sc}" fill="#a08030"/>
+      <!-- Legs - trousers with stripe -->
+      <rect x="${x-9*sc}" y="${y-16*sc}" width="${6*sc}" height="${12*sc}" rx="${2*sc}" fill="#3a2810"/>
+      <line x1="${x-7*sc}" y1="${y-16*sc}" x2="${x-7*sc}" y2="${y-4*sc}" stroke="#a08030" stroke-width="${0.8*sc}"/>
+      <rect x="${x+3*sc}"  y="${y-16*sc}" width="${6*sc}" height="${12*sc}" rx="${2*sc}" fill="#3a2810"/>
+      <line x1="${x+7*sc}" y1="${y-16*sc}" x2="${x+7*sc}" y2="${y-4*sc}" stroke="#a08030" stroke-width="${0.8*sc}"/>
+      <!-- Duster coat -->
+      <path d="M${x-9*sc},${y-32*sc} Q${x-11*sc},${y-22*sc} ${x-9*sc},${y-12*sc} L${x-15*sc},${y-10*sc} L${x-16*sc},${y} L${x-9*sc},${y-6*sc} L${x+9*sc},${y-6*sc} L${x+16*sc},${y} L${x+15*sc},${y-10*sc} L${x+9*sc},${y-12*sc} Q${x+11*sc},${y-22*sc} ${x+9*sc},${y-32*sc} Q${x+5*sc},${y-38*sc} ${x},${y-38*sc} Q${x-5*sc},${y-38*sc} ${x-9*sc},${y-32*sc}Z"
+        fill="url(#${id}_coat)"/>
+      <!-- Vest underneath -->
+      <rect x="${x-5*sc}" y="${y-36*sc}" width="${10*sc}" height="${16*sc}" rx="${1*sc}" fill="#5a4020" opacity="0.7"/>
+      <!-- Sheriff star or belt buckle -->
+      ${fac === 'friendly' || fac === 'neutral' ? `
+        <!-- Star badge -->
+        ${[0,1,2,3,4].map(i=>{const a=i*72*Math.PI/180; return `<line x1="${x+Math.cos(a)*3*sc}" y1="${y-26*sc+Math.sin(a)*3*sc}" x2="${x+Math.cos(a+Math.PI)*3*sc}" y2="${y-26*sc+Math.sin(a+Math.PI)*3*sc}" stroke="#f0c830" stroke-width="${1*sc}"/>`}).join('')}
+        <circle cx="${x}" cy="${y-26*sc}" r="${1.5*sc}" fill="#f0c830"/>
+      ` : `
+        <!-- Skull belt buckle -->
+        <circle cx="${x}" cy="${y-22*sc}" r="${2.5*sc}" fill="#a08020"/>
+        <circle cx="${x-1*sc}" cy="${y-23*sc}" r="${0.8*sc}" fill="#1a1008"/>
+        <circle cx="${x+1*sc}" cy="${y-23*sc}" r="${0.8*sc}" fill="#1a1008"/>
+      `}
+      <!-- Arms -->
+      <path d="M${x-9*sc},${y-30*sc} Q${x-16*sc},${y-24*sc} ${x-14*sc},${y-16*sc}" fill="none" stroke="#3a2410" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <path d="M${x+9*sc},${y-30*sc} Q${x+16*sc},${y-24*sc} ${x+14*sc},${y-16*sc}" fill="none" stroke="#3a2410" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <!-- Revolver drawn -->
+      <rect x="${x+12*sc}" y="${y-20*sc}" width="${6*sc}" height="${3*sc}" rx="${1*sc}" fill="#606060"/>
+      <rect x="${x+13*sc}" y="${y-22*sc}" width="${2*sc}" height="${7*sc}" rx="${1*sc}" fill="#404040"/>
+      <circle cx="${x+13*sc}" cy="${y-17.5*sc}" r="${1.5*sc}" fill="#303030"/>
+      <!-- Hand -->
+      <ellipse cx="${x+14*sc}" cy="${y-14*sc}" rx="${3*sc}" ry="${2*sc}" fill="url(#${id}_skin)"/>
+      <!-- Head -->
+      <ellipse cx="${x}" cy="${y-44*sc}" rx="${7*sc}" ry="${7.5*sc}" fill="url(#${id}_skin)"/>
+      <!-- Stubble shadow -->
+      <path d="M${x-5*sc},${y-39*sc} Q${x},${y-37*sc} ${x+5*sc},${y-39*sc}" fill="none" stroke="#886648" stroke-width="${1.5*sc}" opacity="0.5"/>
+      <!-- Eyes under hat brim -->
+      ${eye(x-2.5*sc, y-46*sc, 1.5*sc, f.eye, `${id}_eye`, uid)}
+      ${eye(x+2.5*sc, y-46*sc, 1.5*sc, f.eye, `${id}_eye`, uid)}
+      <!-- Cowboy hat -->
+      <ellipse cx="${x}" cy="${y-52*sc}" rx="${11*sc}" ry="${2.5*sc}" fill="#2a1808"/>
+      <rect x="${x-7*sc}" y="${y-64*sc}" width="${14*sc}" height="${12*sc}" rx="${2*sc}" fill="#2a1808"/>
+      <!-- Hat band -->
+      <rect x="${x-7*sc}" y="${y-53.5*sc}" width="${14*sc}" height="${2*sc}" rx="${0.5*sc}" fill="#a08030" opacity="0.7"/>
+      <!-- Hat crease -->
+      <path d="M${x-6*sc},${y-64*sc} Q${x},${y-67*sc} ${x+6*sc},${y-64*sc}" fill="none" stroke="#1a1008" stroke-width="${1*sc}"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── NETRUNNER (Cyberpunk) ──────────────────
+export function drawNetrunner(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.alien;
+  const id = `nr_${uid}`;
+  const defs = `
+    ${g(`${id}_suit`, [[0,'#0a1a2a'],[50,'#050e18'],[100,'#020810']])}
+    ${g(`${id}_neon`, [[0,'#00ffff'],[50,'#0088cc'],[100,'#004466']])}
+    ${rg(`${id}_eye`, x, y-36*sc, 6*sc, [[0,'#00ffff',1],[100,'#00ffff',0]])}
+    ${rg(`${id}_glow`, x, y, 16*sc, [[0,'#00aacc',0.2],[100,'#00aacc',0]])}
+    ${rg(`${id}_data`, x, y-20*sc, 25*sc, [[0,'#00ffff',0.08],[100,'#00ffff',0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <!-- Data aura -->
+      <ellipse cx="${x}" cy="${y-20*sc}" rx="${22*sc}" ry="${18*sc}" fill="url(#${id}_data)" class="eyeGlow"/>
+      <ellipse cx="${x}" cy="${y}" rx="${14*sc}" ry="${3.5*sc}" fill="url(#${id}_glow)"/>
+      <!-- Boots - platform cyber -->
+      <path d="M${x-7*sc},${y-5*sc} L${x-10*sc},${y-2*sc} L${x-10*sc},${y} L${x-3*sc},${y} L${x-4*sc},${y-5*sc}Z" fill="#1a2a3a"/>
+      <path d="M${x+3*sc},${y-5*sc} L${x+10*sc},${y-2*sc} L${x+10*sc},${y} L${x+3*sc},${y} L${x+4*sc},${y-5*sc}Z" fill="#1a2a3a"/>
+      <!-- Neon sole lines -->
+      <line x1="${x-10*sc}" y1="${y-1*sc}" x2="${x-3*sc}" y2="${y-1*sc}" stroke="#00ffff" stroke-width="${1*sc}" opacity="0.7"/>
+      <line x1="${x+3*sc}" y1="${y-1*sc}" x2="${x+10*sc}" y2="${y-1*sc}" stroke="#00ffff" stroke-width="${1*sc}" opacity="0.7"/>
+      <!-- Legs -->
+      <rect x="${x-9*sc}" y="${y-18*sc}" width="${7*sc}" height="${13*sc}" rx="${2*sc}" fill="url(#${id}_suit)"/>
+      <rect x="${x+2*sc}"  y="${y-18*sc}" width="${7*sc}" height="${13*sc}" rx="${2*sc}" fill="url(#${id}_suit)"/>
+      <!-- Circuit line on legs -->
+      <path d="M${x-6*sc},${y-16*sc} L${x-6*sc},${y-12*sc} L${x-3*sc},${y-12*sc}" fill="none" stroke="#00ffff" stroke-width="${0.6*sc}" opacity="0.5"/>
+      <!-- Body - sleek bodysuit -->
+      <path d="M${x-8*sc},${y-36*sc} Q${x-9*sc},${y-26*sc} ${x-7*sc},${y-18*sc} L${x+7*sc},${y-18*sc} Q${x+9*sc},${y-26*sc} ${x+8*sc},${y-36*sc} Q${x+4*sc},${y-42*sc} ${x},${y-42*sc} Q${x-4*sc},${y-42*sc} ${x-8*sc},${y-36*sc}Z"
+        fill="url(#${id}_suit)" stroke="#002244" stroke-width="${0.5*sc}"/>
+      <!-- Neon strip lines on suit -->
+      <path d="M${x-7*sc},${y-36*sc} L${x-7*sc},${y-22*sc}" stroke="#00ffff" stroke-width="${0.8*sc}" opacity="0.6"/>
+      <path d="M${x+7*sc},${y-36*sc} L${x+7*sc},${y-22*sc}" stroke="#00ffff" stroke-width="${0.8*sc}" opacity="0.6"/>
+      <!-- Chest port -->
+      <rect x="${x-3*sc}" y="${y-34*sc}" width="${6*sc}" height="${4*sc}" rx="${1*sc}" fill="#001a2a"/>
+      <rect x="${x-2*sc}" y="${y-33.5*sc}" width="${4*sc}" height="${3*sc}" rx="${0.5*sc}" fill="#00ffff" opacity="0.4" class="eyeGlow"/>
+      <!-- Arms -->
+      <path d="M${x-8*sc},${y-34*sc} Q${x-16*sc},${y-28*sc} ${x-14*sc},${y-18*sc}" fill="none" stroke="#0a1a2a" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <path d="M${x+8*sc},${y-34*sc} Q${x+16*sc},${y-28*sc} ${x+14*sc},${y-18*sc}" fill="none" stroke="#0a1a2a" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <!-- Cyber arm implant -->
+      <path d="M${x+10*sc},${y-28*sc} L${x+14*sc},${y-26*sc}" stroke="#00ffff" stroke-width="${0.8*sc}" opacity="0.7"/>
+      <!-- Hands - one normal, one cyber -->
+      <ellipse cx="${x-13*sc}" cy="${y-16*sc}" rx="${3.5*sc}" ry="${2.5*sc}" fill="#1a2a3a"/>
+      <ellipse cx="${x+13*sc}" cy="${y-16*sc}" rx="${3.5*sc}" ry="${2.5*sc}" fill="#1a3a4a"/>
+      <!-- Data jack wire from hand -->
+      <path d="M${x-13*sc},${y-16*sc} Q${x-20*sc},${y-14*sc} ${x-22*sc},${y-10*sc}" fill="none" stroke="#00ffff" stroke-width="${0.8*sc}" opacity="0.5" class="eyeGlow"/>
+      <!-- Head -->
+      <ellipse cx="${x}" cy="${y-48*sc}" rx="${7*sc}" ry="${7*sc}" fill="url(#${id}_suit)"/>
+      <!-- Visor covering eyes -->
+      <path d="M${x-7*sc},${y-50*sc} Q${x-8*sc},${y-46*sc} ${x-7*sc},${y-44*sc} L${x+7*sc},${y-44*sc} Q${x+8*sc},${y-46*sc} ${x+7*sc},${y-50*sc}Z" fill="#001a2a"/>
+      <path d="M${x-7*sc},${y-50*sc} Q${x-8*sc},${y-46*sc} ${x-7*sc},${y-44*sc} L${x+7*sc},${y-44*sc} Q${x+8*sc},${y-46*sc} ${x+7*sc},${y-50*sc}Z" fill="#00ffff" opacity="0.15" class="eyeGlow"/>
+      <!-- Eye glow through visor -->
+      ${eye(x-2.5*sc, y-47*sc, 1.8*sc, '#00ffff', `${id}_eye`, uid)}
+      ${eye(x+2.5*sc, y-47*sc, 1.8*sc, '#00ffff', `${id}_eye`, uid)}
+      <!-- Neural implants on head -->
+      <circle cx="${x-5*sc}" cy="${y-52*sc}" r="${1.2*sc}" fill="#00ffff" opacity="0.6" class="eyeGlow"/>
+      <circle cx="${x+5*sc}" cy="${y-52*sc}" r="${1.2*sc}" fill="#00ffff" opacity="0.6" class="eyeGlow"/>
+      <!-- Hair - mohawk -->
+      <path d="M${x-3*sc},${y-54*sc} Q${x},${y-62*sc} ${x+3*sc},${y-54*sc}" fill="url(#${id}_neon)" opacity="0.9"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── SAMURAI NPC ────────────────────────────
+export function drawSamurai(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.neutral;
+  const id = `sa_${uid}`;
+  const defs = `
+    ${g(`${id}_armor`, [[0,'#1a1a1a'],[50,'#0a0a0a'],[100,'#000000']])}
+    ${g(`${id}_silk`, [[0,'#cc2222'],[50,'#881111'],[100,'#440808']])}
+    ${g(`${id}_skin`, [[0,'#e0c8a0'],[50,'#c0a880'],[100,'#806848']])}
+    ${rg(`${id}_eye`, x, y-40*sc, 5*sc, [[0,f.eye,0.8],[100,f.eye,0]])}
+    ${rg(`${id}_glow`, x, y, 18*sc, [[0,f.underGlow,0.16],[100,f.underGlow,0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${15*sc}" ry="${4*sc}" fill="url(#${id}_glow)"/>
+      <!-- Armored sandals/tabi -->
+      <ellipse cx="${x-6*sc}" cy="${y}" rx="${5.5*sc}" ry="${2.5*sc}" fill="#0a0a0a"/>
+      <ellipse cx="${x+6*sc}" cy="${y}" rx="${5.5*sc}" ry="${2.5*sc}" fill="#0a0a0a"/>
+      <!-- Hakama (wide pants) -->
+      <path d="M${x-10*sc},${y-20*sc} Q${x-12*sc},${y-12*sc} ${x-14*sc},${y} L${x-5*sc},${y} L${x-4*sc},${y-8*sc} Z" fill="url(#${id}_silk)"/>
+      <path d="M${x+10*sc},${y-20*sc} Q${x+12*sc},${y-12*sc} ${x+14*sc},${y} L${x+5*sc},${y} L${x+4*sc},${y-8*sc} Z" fill="url(#${id}_silk)"/>
+      <!-- Armor do (chest plate) -->
+      <path d="M${x-10*sc},${y-40*sc} Q${x-11*sc},${y-30*sc} ${x-9*sc},${y-20*sc} L${x+9*sc},${y-20*sc} Q${x+11*sc},${y-30*sc} ${x+10*sc},${y-40*sc} Q${x+5*sc},${y-46*sc} ${x},${y-46*sc} Q${x-5*sc},${y-46*sc} ${x-10*sc},${y-40*sc}Z"
+        fill="url(#${id}_armor)" stroke="#2a0a0a" stroke-width="${0.8*sc}"/>
+      <!-- Armor lacing -->
+      ${[-38,-32,-26].map(yy=>`<path d="M${x-8*sc},${y+yy*sc} Q${x},${y+(yy-1)*sc} ${x+8*sc},${y+yy*sc}" fill="none" stroke="url(#${id}_silk)" stroke-width="${1.2*sc}" opacity="0.7"/>`).join('')}
+      <!-- Sode shoulder guards -->
+      <rect x="${x-18*sc}" y="${y-42*sc}" width="${9*sc}" height="${14*sc}" rx="${1*sc}" fill="url(#${id}_armor)" stroke="#2a0a0a" stroke-width="${0.5*sc}"/>
+      <rect x="${x+9*sc}"  y="${y-42*sc}" width="${9*sc}" height="${14*sc}" rx="${1*sc}" fill="url(#${id}_armor)" stroke="#2a0a0a" stroke-width="${0.5*sc}"/>
+      <!-- Sode lacing -->
+      ${[-40,-36,-32,-28].map(yy=>`<line x1="${x-17*sc}" y1="${y+yy*sc}" x2="${x-11*sc}" y2="${y+yy*sc}" stroke="url(#${id}_silk)" stroke-width="${0.8*sc}" opacity="0.6"/>`).join('')}
+      ${[-40,-36,-32,-28].map(yy=>`<line x1="${x+11*sc}" y1="${y+yy*sc}" x2="${x+17*sc}" y2="${y+yy*sc}" stroke="url(#${id}_silk)" stroke-width="${0.8*sc}" opacity="0.6"/>`).join('')}
+      <!-- Arms -->
+      <path d="M${x-16*sc},${y-38*sc} Q${x-20*sc},${y-28*sc} ${x-18*sc},${y-18*sc}" fill="none" stroke="#1a1a1a" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <path d="M${x+16*sc},${y-38*sc} Q${x+20*sc},${y-28*sc} ${x+18*sc},${y-18*sc}" fill="none" stroke="#1a1a1a" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <!-- Hands -->
+      <ellipse cx="${x-18*sc}" cy="${y-16*sc}" rx="${3*sc}" ry="${2.5*sc}" fill="url(#${id}_skin)"/>
+      <ellipse cx="${x+18*sc}" cy="${y-16*sc}" rx="${3*sc}" ry="${2.5*sc}" fill="url(#${id}_skin)"/>
+      <!-- Katana held low at side -->
+      <line x1="${x+18*sc}" y1="${y-16*sc}" x2="${x+28*sc}" y2="${y-36*sc}" stroke="#e0e0c0" stroke-width="${1.8*sc}"/>
+      <line x1="${x+28*sc}" y1="${y-36*sc}" x2="${x+32*sc}" y2="${y-44*sc}" stroke="#c0c0a0" stroke-width="${1.4*sc}"/>
+      <!-- Tsuba (guard) -->
+      <ellipse cx="${x+28*sc}" cy="${y-36*sc}" rx="${3.5*sc}" ry="${1.5*sc}" fill="#a08030" transform="rotate(-60,${x+28*sc},${y-36*sc})"/>
+      <!-- Neck -->
+      <rect x="${x-4*sc}" y="${y-48*sc}" width="${8*sc}" height="${8*sc}" rx="${2*sc}" fill="url(#${id}_skin)"/>
+      <!-- Head -->
+      <ellipse cx="${x}" cy="${y-54*sc}" rx="${8*sc}" ry="${8*sc}" fill="url(#${id}_skin)"/>
+      <!-- Focused eyes -->
+      ${eye(x-3*sc, y-56*sc, 1.5*sc, f.eye, `${id}_eye`, uid)}
+      ${eye(x+3*sc, y-56*sc, 1.5*sc, f.eye, `${id}_eye`, uid)}
+      <!-- Kabuto (helmet) -->
+      <path d="M${x-9*sc},${y-60*sc} Q${x-10*sc},${y-56*sc} ${x-9*sc},${y-52*sc} L${x+9*sc},${y-52*sc} Q${x+10*sc},${y-56*sc} ${x+9*sc},${y-60*sc} Q${x+5*sc},${y-70*sc} ${x},${y-70*sc} Q${x-5*sc},${y-70*sc} ${x-9*sc},${y-60*sc}Z"
+        fill="url(#${id}_armor)"/>
+      <!-- Maedate (front crest) -->
+      <path d="M${x},${y-70*sc} Q${x+3*sc},${y-76*sc} ${x},${y-74*sc} Q${x-3*sc},${y-76*sc} ${x},${y-70*sc}Z" fill="url(#${id}_silk)"/>
+      <!-- Shikoro (neck guard) -->
+      ${[-60,-56,-52].map(yy=>`<path d="M${x-9*sc},${y+yy*sc} Q${x},${y+(yy-1)*sc} ${x+9*sc},${y+yy*sc}" fill="none" stroke="url(#${id}_armor)" stroke-width="${2.5*sc}" opacity="0.8"/>`).join('')}
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── MUMMY ──────────────────────────────────
+export function drawMummy(x, y, sc, fac, status, uid) {
+  const f = FACTION.undead;
+  const id = `mm_${uid}`;
+  const defs = `
+    ${g(`${id}_wrap`, [[0,'#d4c890'],[50,'#b0a460'],[100,'#706830']])}
+    ${g(`${id}_glow`, [[0,'#c8a820',0.3],[100,'#806000',0]])}
+    ${rg(`${id}_eye`, x, y-35*sc, 6*sc, [[0,'#ffaa00',1],[100,'#ff6600',0]])}
+    ${rg(`${id}_aura`, x, y, 22*sc, [[0,'#aa8000',0.25],[100,'#aa8000',0]])}
+  `;
+  const svg = `
+    <g class="${animClass('zombie')}" style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${18*sc}" ry="${4.5*sc}" fill="url(#${id}_aura)"/>
+      <!-- Wrapped feet -->
+      <ellipse cx="${x-6*sc}" cy="${y}" rx="${5.5*sc}" ry="${2.5*sc}" fill="url(#${id}_wrap)"/>
+      <ellipse cx="${x+6*sc}" cy="${y}" rx="${5.5*sc}" ry="${2.5*sc}" fill="url(#${id}_wrap)"/>
+      <!-- Wrapped legs -->
+      <path d="M${x-8*sc},${y-18*sc} Q${x-10*sc},${y-9*sc} ${x-7*sc},${y}" fill="url(#${id}_wrap)" stroke="#907030" stroke-width="${0.8*sc}"/>
+      <path d="M${x+5*sc},${y-18*sc} Q${x+8*sc},${y-9*sc} ${x+6*sc},${y}" fill="url(#${id}_wrap)" stroke="#907030" stroke-width="${0.8*sc}"/>
+      <!-- Wrap lines on legs -->
+      ${[-14,-10,-6].map(yy=>`<path d="M${x-9*sc},${y+yy*sc} Q${x-5*sc},${y+(yy-1)*sc} ${x-2*sc},${y+yy*sc}" fill="none" stroke="#907030" stroke-width="${0.8*sc}" opacity="0.6"/>`).join('')}
+      <!-- Body -->
+      <path d="M${x-9*sc},${y-34*sc} Q${x-11*sc},${y-24*sc} ${x-8*sc},${y-18*sc} L${x+8*sc},${y-18*sc} Q${x+11*sc},${y-24*sc} ${x+9*sc},${y-34*sc} Q${x+5*sc},${y-40*sc} ${x},${y-40*sc} Q${x-5*sc},${y-40*sc} ${x-9*sc},${y-34*sc}Z"
+        fill="url(#${id}_wrap)" stroke="#907030" stroke-width="${0.5*sc}"/>
+      <!-- Body wrapping -->
+      ${[-36,-30,-24,-18].map(yy=>`<path d="M${x-9*sc},${y+yy*sc} Q${x},${y+(yy-1)*sc} ${x+9*sc},${y+yy*sc}" fill="none" stroke="#907030" stroke-width="${1*sc}" opacity="0.5"/>`).join('')}
+      <!-- Arms outstretched (classic) -->
+      <path d="M${x-9*sc},${y-32*sc} Q${x-20*sc},${y-30*sc} ${x-24*sc},${y-24*sc}" fill="none" stroke="#b0a460" stroke-width="${5.5*sc}" stroke-linecap="round"/>
+      <path d="M${x+9*sc},${y-32*sc} Q${x+20*sc},${y-28*sc} ${x+22*sc},${y-22*sc}" fill="none" stroke="#b0a460" stroke-width="${5.5*sc}" stroke-linecap="round"/>
+      <!-- Wrap on arms -->
+      <path d="M${x-14*sc},${y-30*sc} Q${x-17*sc},${y-28*sc} ${x-20*sc},${y-26*sc}" fill="none" stroke="#907030" stroke-width="${1*sc}" opacity="0.5"/>
+      <!-- Reaching fingers -->
+      ${[-2,0,2].map(i=>`<line x1="${x-24*sc}" y1="${y-24*sc}" x2="${x-26*sc+i*2*sc}" y2="${y-20*sc}" stroke="#c0b070" stroke-width="${1.5*sc}" stroke-linecap="round"/>`).join('')}
+      <!-- Head wrapped -->
+      <ellipse cx="${x}" cy="${y-46*sc}" rx="${8.5*sc}" ry="${8*sc}" fill="url(#${id}_wrap)"/>
+      <!-- Head wrapping strips -->
+      ${[-50,-46,-42,-38].map(yy=>`<path d="M${x-8*sc},${y+yy*sc} Q${x},${y+(yy-1)*sc} ${x+8*sc},${y+yy*sc}" fill="none" stroke="#907030" stroke-width="${1.2*sc}" opacity="0.6"/>`).join('')}
+      <!-- Glowing eyes through wrappings -->
+      <ellipse cx="${x-3.5*sc}" cy="${y-46*sc}" rx="${2.5*sc}" ry="${2*sc}" fill="#0a0800" opacity="0.8"/>
+      <ellipse cx="${x+3.5*sc}" cy="${y-46*sc}" rx="${2.5*sc}" ry="${2*sc}" fill="#0a0800" opacity="0.8"/>
+      ${eye(x-3.5*sc, y-46*sc, 1.5*sc, '#ffaa00', `${id}_eye`, uid)}
+      ${eye(x+3.5*sc, y-46*sc, 1.5*sc, '#ffaa00', `${id}_eye`, uid)}
+      <!-- Unraveling wrap strip -->
+      <path d="M${x+8*sc},${y-48*sc} Q${x+14*sc},${y-44*sc} ${x+18*sc},${y-40*sc}" fill="none" stroke="#b0a460" stroke-width="${1.5*sc}" opacity="0.5"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── WITCH ──────────────────────────────────
+export function drawWitch(x, y, sc, fac, status, uid) {
+  const f = FACTION.magic;
+  const id = `wt_${uid}`;
+  const defs = `
+    ${g(`${id}_robe`, [[0,'#1a0a2a'],[50,'#100820'],[100,'#060310']])}
+    ${g(`${id}_skin`, [[0,'#b0c880'],[50,'#8aaa58'],[100,'#506830']])}
+    ${rg(`${id}_eye`, x, y-38*sc, 5*sc, [[0,'#88ff44',1],[100,'#44cc00',0]])}
+    ${rg(`${id}_cauldron`, x+10*sc, y-6*sc, 10*sc, [[0,'#40ff40',0.5],[100,'#40ff40',0]])}
+    ${rg(`${id}_glow`, x, y, 18*sc, [[0,'#44aa00',0.2],[100,'#44aa00',0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${16*sc}" ry="${4*sc}" fill="url(#${id}_glow)"/>
+      <!-- Robe hem — ragged -->
+      <path d="M${x-12*sc},${y-4*sc} Q${x-14*sc},${y-2*sc} ${x-14*sc},${y} L${x-10*sc},${y-2*sc} L${x-8*sc},${y} L${x-4*sc},${y-3*sc} L${x},${y} L${x+4*sc},${y-3*sc} L${x+8*sc},${y} L${x+10*sc},${y-2*sc} L${x+14*sc},${y} L${x+14*sc},${y-4*sc}Z" fill="url(#${id}_robe)"/>
+      <!-- Robe body -->
+      <path d="M${x-10*sc},${y-38*sc} Q${x-12*sc},${y-26*sc} ${x-12*sc},${y-6*sc} L${x+12*sc},${y-6*sc} Q${x+12*sc},${y-26*sc} ${x+10*sc},${y-38*sc} Q${x+5*sc},${y-44*sc} ${x},${y-44*sc} Q${x-5*sc},${y-44*sc} ${x-10*sc},${y-38*sc}Z"
+        fill="url(#${id}_robe)"/>
+      <!-- Arms - wide sleeves -->
+      <path d="M${x-10*sc},${y-36*sc} Q${x-20*sc},${y-30*sc} ${x-18*sc},${y-20*sc}" fill="none" stroke="#1a0a2a" stroke-width="${7*sc}" stroke-linecap="round"/>
+      <path d="M${x+10*sc},${y-36*sc} Q${x+20*sc},${y-28*sc} ${x+18*sc},${y-18*sc}" fill="none" stroke="#1a0a2a" stroke-width="${7*sc}" stroke-linecap="round"/>
+      <!-- Hands - gnarled green -->
+      <ellipse cx="${x-17*sc}" cy="${y-18*sc}" rx="${4*sc}" ry="${2.5*sc}" fill="url(#${id}_skin)"/>
+      <ellipse cx="${x+17*sc}" cy="${y-16*sc}" rx="${4*sc}" ry="${2.5*sc}" fill="url(#${id}_skin)"/>
+      <!-- Long fingers -->
+      ${[-2,0,2].map(i=>`<line x1="${x-17*sc}" y1="${y-18*sc}" x2="${x-17*sc+i*1.5*sc}" y2="${y-13*sc}" stroke="#8aaa58" stroke-width="${1*sc}" stroke-linecap="round"/>`).join('')}
+      <!-- Cauldron (right hand) -->
+      <path d="M${x+14*sc},${y-10*sc} Q${x+10*sc},${y-4*sc} ${x+18*sc},${y-4*sc} Q${x+22*sc},${y-4*sc} ${x+20*sc},${y-10*sc}Z" fill="#1a1008"/>
+      <ellipse cx="${x+17*sc}" cy="${y-8*sc}" rx="${5*sc}" ry="${3*sc}" fill="url(#${id}_cauldron)" class="eyeGlow"/>
+      <!-- Cauldron bubbles -->
+      <circle cx="${x+15*sc}" cy="${y-9*sc}" r="${1*sc}" fill="#40ff40" opacity="0.6" class="eyeGlow"/>
+      <circle cx="${x+19*sc}" cy="${y-10*sc}" r="${0.8*sc}" fill="#40ff40" opacity="0.5" class="eyeGlow"/>
+      <!-- Head - green pointy chin -->
+      <ellipse cx="${x}" cy="${y-50*sc}" rx="${7.5*sc}" ry="${7*sc}" fill="url(#${id}_skin)"/>
+      <!-- Pointed chin -->
+      <path d="M${x-4*sc},${y-45*sc} Q${x},${y-40*sc} ${x+4*sc},${y-45*sc} L${x+2*sc},${y-42*sc} Q${x},${y-40*sc} ${x-2*sc},${y-42*sc}Z" fill="url(#${id}_skin)"/>
+      <!-- Warts -->
+      <circle cx="${x-4*sc}" cy="${y-48*sc}" r="${1*sc}" fill="#6a8a40"/>
+      <circle cx="${x+3*sc}" cy="${y-52*sc}" r="${0.8*sc}" fill="#6a8a40"/>
+      <!-- Eyes -->
+      ${eye(x-3*sc, y-52*sc, 1.8*sc, '#88ff44', `${id}_eye`, uid)}
+      ${eye(x+3*sc, y-52*sc, 1.8*sc, '#88ff44', `${id}_eye`, uid)}
+      <!-- Crooked nose -->
+      <path d="M${x-1*sc},${y-48*sc} Q${x+2*sc},${y-46*sc} ${x+1*sc},${y-44*sc}" fill="none" stroke="#6a8a40" stroke-width="${1.2*sc}"/>
+      <!-- Toothy grin -->
+      <path d="M${x-4*sc},${y-43*sc} Q${x},${y-41*sc} ${x+4*sc},${y-43*sc}" fill="none" stroke="#0a0a0a" stroke-width="${1.5*sc}"/>
+      ${[-2,0,2].map(tx=>`<rect x="${x+tx*sc-0.7*sc}" y="${y-43*sc}" width="${1.4*sc}" height="${2*sc}" fill="#d0d0a0"/>`).join('')}
+      <!-- Pointed hat -->
+      <path d="M${x-10*sc},${y-56*sc} Q${x-11*sc},${y-58*sc} ${x-9*sc},${y-58*sc} L${x},${y-80*sc} L${x+9*sc},${y-58*sc} Q${x+11*sc},${y-58*sc} ${x+10*sc},${y-56*sc}Z" fill="#0a0418"/>
+      <ellipse cx="${x}" cy="${y-56*sc}" rx="${11*sc}" ry="${2.8*sc}" fill="#0a0418"/>
+      <!-- Hat band -->
+      <path d="M${x-6*sc},${y-60*sc} Q${x-5*sc},${y-68*sc} ${x+5*sc},${y-68*sc} Q${x+6*sc},${y-60*sc}" fill="none" stroke="#4a0a60" stroke-width="${1*sc}" opacity="0.7"/>
+      <!-- Hat buckle -->
+      <rect x="${x-3*sc}" y="${y-65*sc}" width="${6*sc}" height="${4*sc}" rx="${1*sc}" fill="#3a0850" opacity="0.8"/>
+      <!-- Hair strands -->
+      <path d="M${x-9*sc},${y-58*sc} Q${x-14*sc},${y-54*sc} ${x-16*sc},${y-48*sc}" fill="none" stroke="#1a1028" stroke-width="${2*sc}"/>
+      <path d="M${x+9*sc},${y-58*sc} Q${x+14*sc},${y-54*sc} ${x+15*sc},${y-46*sc}" fill="none" stroke="#1a1028" stroke-width="${2*sc}"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── DJINN (Desert) ─────────────────────────
+export function drawDjinn(x, y, sc, fac, status, uid) {
+  const f = FACTION.boss;
+  const id = `dj_${uid}`;
+  const defs = `
+    ${g(`${id}_body`, [[0,'#4060c0',0.9],[50,'#2040a0',0.8],[100,'#1020a0',0.5]])}
+    ${g(`${id}_smoke`, [[0,'#8090d0',0.7],[50,'#4060a0',0.4],[100,'#2040a0',0]])}
+    ${rg(`${id}_eye`, x, y-35*sc, 8*sc, [[0,'#ffcc00',1],[100,'#ff8800',0]])}
+    ${rg(`${id}_glow`, x, y, 35*sc, [[0,'#3050cc',0.35],[100,'#3050cc',0]])}
+    ${rg(`${id}_orb`, x, y-20*sc, 28*sc, [[0,'#8090ff',0.15],[100,'#8090ff',0]])}
+  `;
+  const svg = `
+    <g class="${animClass('ghost')}" style="transform-origin:${x}px ${y-20*sc}px;filter:${statusFilter(status)}">
+      <!-- Magical aura -->
+      <ellipse cx="${x}" cy="${y-20*sc}" rx="${30*sc}" ry="${25*sc}" fill="url(#${id}_orb)" class="eyeGlow"/>
+      <ellipse cx="${x}" cy="${y}" rx="${28*sc}" ry="${7*sc}" fill="url(#${id}_glow)"/>
+      <!-- Smoke wisps at base -->
+      <path d="M${x-14*sc},${y-2*sc} Q${x-20*sc},${y+4*sc} ${x-14*sc},${y+8*sc} Q${x-6*sc},${y+6*sc} ${x-8*sc},${y-2*sc}Z" fill="url(#${id}_smoke)"/>
+      <path d="M${x+2*sc},${y} Q${x-2*sc},${y+8*sc} ${x+4*sc},${y+10*sc} Q${x+8*sc},${y+6*sc} ${x+6*sc},${y}Z" fill="url(#${id}_smoke)"/>
+      <path d="M${x+12*sc},${y-2*sc} Q${x+20*sc},${y+4*sc} ${x+14*sc},${y+8*sc} Q${x+6*sc},${y+4*sc} ${x+8*sc},${y-2*sc}Z" fill="url(#${id}_smoke)"/>
+      <!-- Main body — powerful, masculine -->
+      <path d="M${x-14*sc},${y-30*sc} Q${x-16*sc},${y-18*sc} ${x-14*sc},${y-4*sc} Q${x},${y-2*sc} ${x+14*sc},${y-4*sc} Q${x+16*sc},${y-18*sc} ${x+14*sc},${y-30*sc} Q${x+8*sc},${y-46*sc} ${x},${y-48*sc} Q${x-8*sc},${y-46*sc} ${x-14*sc},${y-30*sc}Z"
+        fill="url(#${id}_body)"/>
+      <!-- Muscle definition -->
+      <path d="M${x-6*sc},${y-40*sc} Q${x},${y-38*sc} ${x+6*sc},${y-40*sc}" fill="none" stroke="#6080d0" stroke-width="${1*sc}" opacity="0.4"/>
+      <path d="M${x-8*sc},${y-32*sc} Q${x},${y-30*sc} ${x+8*sc},${y-32*sc}" fill="none" stroke="#6080d0" stroke-width="${1*sc}" opacity="0.4"/>
+      <!-- Magical armlets -->
+      <path d="M${x-14*sc},${y-30*sc} Q${x-24*sc},${y-26*sc} ${x-26*sc},${y-18*sc}" fill="none" stroke="#4060b0" stroke-width="${8*sc}" stroke-linecap="round"/>
+      <path d="M${x+14*sc},${y-30*sc} Q${x+24*sc},${y-26*sc} ${x+26*sc},${y-18*sc}" fill="none" stroke="#4060b0" stroke-width="${8*sc}" stroke-linecap="round"/>
+      <!-- Gold armlet bands -->
+      <path d="M${x-20*sc},${y-25*sc} Q${x-23*sc},${y-23*sc} ${x-24*sc},${y-20*sc}" fill="none" stroke="#ffcc00" stroke-width="${2*sc}" opacity="0.7"/>
+      <path d="M${x+20*sc},${y-25*sc} Q${x+23*sc},${y-23*sc} ${x+24*sc},${y-20*sc}" fill="none" stroke="#ffcc00" stroke-width="${2*sc}" opacity="0.7"/>
+      <!-- Hands — large, powerful -->
+      <ellipse cx="${x-25*sc}" cy="${y-16*sc}" rx="${5*sc}" ry="${4*sc}" fill="#4060c0"/>
+      <ellipse cx="${x+25*sc}" cy="${y-16*sc}" rx="${5*sc}" ry="${4*sc}" fill="#4060c0"/>
+      <!-- Gold jewelry -->
+      <path d="M${x-6*sc},${y-40*sc} Q${x},${y-36*sc} ${x+6*sc},${y-40*sc}" fill="none" stroke="#ffcc00" stroke-width="${2.5*sc}"/>
+      <!-- Head — powerful, turbaned -->
+      <ellipse cx="${x}" cy="${y-54*sc}" rx="${9*sc}" ry="${9*sc}" fill="url(#${id}_body)"/>
+      <!-- Turban -->
+      <path d="M${x-10*sc},${y-58*sc} Q${x-11*sc},${y-62*sc} ${x},${y-66*sc} Q${x+11*sc},${y-62*sc} ${x+10*sc},${y-58*sc}" fill="#2840a0" stroke="#1828a0" stroke-width="${0.5*sc}"/>
+      <ellipse cx="${x}" cy="${y-58*sc}" rx="${11*sc}" ry="${3*sc}" fill="#1828a0"/>
+      <!-- Jewel on turban -->
+      <circle cx="${x}" cy="${y-60*sc}" r="${3*sc}" fill="#ffcc00" opacity="0.8"/>
+      <circle cx="${x}" cy="${y-60*sc}" r="${1.8*sc}" fill="#ff8800" opacity="0.9"/>
+      <!-- Face — stern, glowing eyes -->
+      ${eye(x-3.5*sc, y-56*sc, 2.5*sc, '#ffcc00', `${id}_eye`, uid)}
+      ${eye(x+3.5*sc, y-56*sc, 2.5*sc, '#ffcc00', `${id}_eye`, uid)}
+      <!-- Pointed beard -->
+      <path d="M${x-4*sc},${y-49*sc} Q${x},${y-44*sc} ${x+4*sc},${y-49*sc} Q${x+2*sc},${y-46*sc} ${x},${y-44*sc} Q${x-2*sc},${y-46*sc} ${x-4*sc},${y-49*sc}Z" fill="#1a2050" opacity="0.8"/>
+      <!-- Energy sparks -->
+      <path d="M${x-14*sc},${y-18*sc} Q${x-18*sc},${y-14*sc} ${x-16*sc},${y-10*sc}" fill="none" stroke="#8090ff" stroke-width="${1*sc}" opacity="0.5" class="eyeGlow"/>
+      <path d="M${x+14*sc},${y-18*sc} Q${x+18*sc},${y-14*sc} ${x+16*sc},${y-10*sc}" fill="none" stroke="#8090ff" stroke-width="${1*sc}" opacity="0.5" class="eyeGlow"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── PIRATE NPC ─────────────────────────────
+export function drawPirateNpc(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.neutral;
+  const id = `pn_${uid}`;
+  const defs = `
+    ${g(`${id}_coat`, [[0,'#1a1a3a'],[50,'#0e0e28'],[100,'#060618']])}
+    ${g(`${id}_skin`, [[0,'#c0986a'],[50,'#a07848'],[100,'#60482a']])}
+    ${rg(`${id}_eye`, x, y-36*sc, 5*sc, [[0,f.eye,0.8],[100,f.eye,0]])}
+    ${rg(`${id}_glow`, x, y, 14*sc, [[0,f.underGlow,0.15],[100,f.underGlow,0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${13*sc}" ry="${3.5*sc}" fill="url(#${id}_glow)"/>
+      <!-- Boots — tall -->
+      <path d="M${x-7*sc},${y-6*sc} Q${x-10*sc},${y-2*sc} ${x-12*sc},${y} L${x-4*sc},${y} L${x-4*sc},${y-6*sc}Z" fill="#2a1808"/>
+      <path d="M${x+3*sc},${y-6*sc} Q${x+6*sc},${y-2*sc} ${x+8*sc},${y} L${x+12*sc},${y} Q${x+10*sc},${y-2*sc} ${x+8*sc},${y-6*sc}Z" fill="#2a1808"/>
+      <!-- Pants tucked in -->
+      <rect x="${x-8*sc}" y="${y-16*sc}" width="${6*sc}" height="${10*sc}" rx="${2*sc}" fill="#4a3818"/>
+      <rect x="${x+2*sc}"  y="${y-16*sc}" width="${6*sc}" height="${10*sc}" rx="${2*sc}" fill="#4a3818"/>
+      <!-- Coat body -->
+      <path d="M${x-9*sc},${y-34*sc} Q${x-10*sc},${y-22*sc} ${x-8*sc},${y-12*sc} L${x-14*sc},${y-10*sc} L${x-16*sc},${y} L${x-8*sc},${y-6*sc} L${x+8*sc},${y-6*sc} L${x+16*sc},${y} L${x+14*sc},${y-10*sc} L${x+8*sc},${y-12*sc} Q${x+10*sc},${y-22*sc} ${x+9*sc},${y-34*sc} Q${x+5*sc},${y-40*sc} ${x},${y-40*sc} Q${x-5*sc},${y-40*sc} ${x-9*sc},${y-34*sc}Z"
+        fill="url(#${id}_coat)"/>
+      <!-- Gold coat buttons -->
+      ${[-34,-28,-22,-16].map(yy=>`<circle cx="${x}" cy="${y+yy*sc}" r="${1.2*sc}" fill="#d0a020"/>`).join('')}
+      <!-- Tricorn hat shadow brim over coat -->
+      <!-- Arms -->
+      <path d="M${x-9*sc},${y-32*sc} Q${x-17*sc},${y-26*sc} ${x-16*sc},${y-16*sc}" fill="none" stroke="#1a1a3a" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <path d="M${x+9*sc},${y-32*sc} Q${x+18*sc},${y-26*sc} ${x+18*sc},${y-16*sc}" fill="none" stroke="#1a1a3a" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <!-- Cutlass -->
+      <line x1="${x+18*sc}" y1="${y-16*sc}" x2="${x+28*sc}" y2="${y-36*sc}" stroke="#d0d0b0" stroke-width="${2*sc}"/>
+      <ellipse cx="${x+21*sc}" cy="${y-21*sc}" rx="${4*sc}" ry="${2*sc}" fill="#a08020" transform="rotate(-50,${x+21*sc},${y-21*sc})"/>
+      <!-- Hook hand -->
+      <path d="M${x-16*sc},${y-16*sc} Q${x-20*sc},${y-14*sc} ${x-22*sc},${y-10*sc}" fill="none" stroke="#808080" stroke-width="${2.5*sc}" stroke-linecap="round"/>
+      <!-- Head -->
+      <ellipse cx="${x}" cy="${y-46*sc}" rx="${7.5*sc}" ry="${7*sc}" fill="url(#${id}_skin)"/>
+      <!-- Scar -->
+      <path d="M${x-3*sc},${y-50*sc} L${x-1*sc},${y-44*sc}" stroke="#805030" stroke-width="${0.8*sc}" opacity="0.6"/>
+      <!-- Eyepatch -->
+      <ellipse cx="${x-3*sc}" cy="${y-48*sc}" rx="${3*sc}" ry="${2.2*sc}" fill="#0a0a0a"/>
+      <path d="M${x-6*sc},${y-49*sc} L${x},${y-49*sc}" stroke="#0a0a0a" stroke-width="${1*sc}"/>
+      <!-- Remaining eye -->
+      ${eye(x+3*sc, y-48*sc, 1.6*sc, f.eye, `${id}_eye`, uid)}
+      <!-- Stubble -->
+      <path d="M${x-5*sc},${y-41*sc} Q${x},${y-39.5*sc} ${x+5*sc},${y-41*sc}" fill="none" stroke="#806040" stroke-width="${1.2*sc}" opacity="0.5"/>
+      <!-- Tricorn hat -->
+      <ellipse cx="${x}" cy="${y-52*sc}" rx="${11*sc}" ry="${2.5*sc}" fill="#1a1a1a"/>
+      <rect x="${x-6*sc}" y="${y-64*sc}" width="${12*sc}" height="${12*sc}" rx="${2*sc}" fill="#1a1a1a"/>
+      <!-- Hat brim turned up on sides -->
+      <path d="M${x-11*sc},${y-52*sc} Q${x-12*sc},${y-56*sc} ${x-8*sc},${y-56*sc}" fill="none" stroke="#1a1a1a" stroke-width="${3*sc}"/>
+      <path d="M${x+11*sc},${y-52*sc} Q${x+12*sc},${y-56*sc} ${x+8*sc},${y-56*sc}" fill="none" stroke="#1a1a1a" stroke-width="${3*sc}"/>
+      <!-- Skull and crossbones pin -->
+      <circle cx="${x}" cy="${y-61*sc}" r="${2.5*sc}" fill="#e0d080" opacity="0.8"/>
+      <circle cx="${x}" cy="${y-61*sc}" r="${1.2*sc}" fill="#1a1a1a" opacity="0.8"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── YETI ───────────────────────────────────
+export function drawYeti(x, y, sc, fac, status, uid) {
+  const f = FACTION.beast;
+  const id = `yt_${uid}`;
+  const defs = `
+    ${g(`${id}_fur`, [[0,'#e8f0f8'],[50,'#c0d0e0'],[100,'#8090a8']])}
+    ${rg(`${id}_eye`, x, y-52*sc, 8*sc, [[0,'#4488ff',1],[100,'#2266dd',0]])}
+    ${rg(`${id}_glow`, x, y, 28*sc, [[0,'#88aaff',0.2],[100,'#88aaff',0]])}
+  `;
+  const svg = `
+    <g class="${animClass('troll')}" style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${22*sc}" ry="${5.5*sc}" fill="url(#${id}_glow)"/>
+      <!-- Huge furry feet -->
+      <ellipse cx="${x-10*sc}" cy="${y}" rx="${10*sc}" ry="${4*sc}" fill="url(#${id}_fur)"/>
+      <ellipse cx="${x+10*sc}" cy="${y}" rx="${10*sc}" ry="${4*sc}" fill="url(#${id}_fur)"/>
+      <!-- Thick legs -->
+      <rect x="${x-16*sc}" y="${y-22*sc}" width="${12*sc}" height="${22*sc}" rx="${5*sc}" fill="url(#${id}_fur)"/>
+      <rect x="${x+4*sc}"  y="${y-22*sc}" width="${12*sc}" height="${22*sc}" rx="${5*sc}" fill="url(#${id}_fur)"/>
+      <!-- Massive body -->
+      <path d="M${x-18*sc},${y-52*sc} Q${x-22*sc},${y-36*sc} ${x-16*sc},${y-22*sc} L${x+16*sc},${y-22*sc} Q${x+22*sc},${y-36*sc} ${x+18*sc},${y-52*sc} Q${x+10*sc},${y-66*sc} ${x},${y-66*sc} Q${x-10*sc},${y-66*sc} ${x-18*sc},${y-52*sc}Z"
+        fill="url(#${id}_fur)" stroke="#90a0b8" stroke-width="${0.5*sc}"/>
+      <!-- Fur texture lines -->
+      ${[-55,-48,-40,-32,-24].map(yy=>{const w=(12+Math.abs((yy+40)/3))*sc; return `<path d="M${x-w},${y+yy*sc} Q${x},${y+(yy-2)*sc} ${x+w},${y+yy*sc}" fill="none" stroke="#b0c0d0" stroke-width="${0.5*sc}" opacity="0.4"/>`;}).join('')}
+      <!-- Huge arms — dragging knuckles -->
+      <path d="M${x-18*sc},${y-50*sc} Q${x-30*sc},${y-38*sc} ${x-32*sc},${y-8*sc}" fill="none" stroke="#d0e0f0" stroke-width="${14*sc}" stroke-linecap="round"/>
+      <path d="M${x+18*sc},${y-50*sc} Q${x+28*sc},${y-35*sc} ${x+30*sc},${y-8*sc}" fill="none" stroke="#d0e0f0" stroke-width="${14*sc}" stroke-linecap="round"/>
+      <!-- Knuckles on ground -->
+      ${[-3,-1,1,3].map(cx=>`<circle cx="${x-32*sc+cx*2*sc}" cy="${y-8*sc}" r="${2.5*sc}" fill="#b0c0d0"/>`).join('')}
+      ${[-3,-1,1,3].map(cx=>`<circle cx="${x+30*sc+cx*2*sc}" cy="${y-8*sc}" r="${2.5*sc}" fill="#b0c0d0"/>`).join('')}
+      <!-- Head — wide, low brow -->
+      <path d="M${x-14*sc},${y-68*sc} Q${x-16*sc},${y-62*sc} ${x-14*sc},${y-58*sc} L${x+14*sc},${y-58*sc} Q${x+16*sc},${y-62*sc} ${x+14*sc},${y-68*sc} Q${x+8*sc},${y-78*sc} ${x},${y-78*sc} Q${x-8*sc},${y-78*sc} ${x-14*sc},${y-68*sc}Z"
+        fill="url(#${id}_fur)"/>
+      <!-- Heavy brow -->
+      <path d="M${x-12*sc},${y-68*sc} Q${x},${y-73*sc} ${x+12*sc},${y-68*sc}" fill="#9090a8" stroke="#9090a8" stroke-width="${2.5*sc}"/>
+      <!-- Eyes — intelligent blue -->
+      ${eye(x-5*sc, y-68*sc, 3*sc, '#4488ff', `${id}_eye`, uid)}
+      ${eye(x+5*sc, y-68*sc, 3*sc, '#4488ff', `${id}_eye`, uid)}
+      <!-- Flat nose -->
+      <ellipse cx="${x}" cy="${y-62*sc}" rx="${3.5*sc}" ry="${2*sc}" fill="#9090a8"/>
+      <circle cx="${x-1.8*sc}" cy="${y-62*sc}" r="${1.2*sc}" fill="#7070a0"/>
+      <circle cx="${x+1.8*sc}" cy="${y-62*sc}" r="${1.2*sc}" fill="#7070a0"/>
+      <!-- Wide mouth with fangs -->
+      <path d="M${x-8*sc},${y-57*sc} Q${x},${y-54*sc} ${x+8*sc},${y-57*sc}" fill="none" stroke="#7070a0" stroke-width="${1.5*sc}"/>
+      <line x1="${x-4*sc}" y1="${y-57*sc}" x2="${x-3*sc}" y2="${y-53*sc}" stroke="#e8e8f8" stroke-width="${2*sc}" stroke-linecap="round"/>
+      <line x1="${x+4*sc}" y1="${y-57*sc}" x2="${x+3*sc}" y2="${y-53*sc}" stroke="#e8e8f8" stroke-width="${2*sc}" stroke-linecap="round"/>
+      <!-- Ice breath hint -->
+      <path d="M${x+6*sc},${y-56*sc} Q${x+12*sc},${y-54*sc} ${x+18*sc},${y-50*sc}" fill="none" stroke="#88ccff" stroke-width="${1.5*sc}" opacity="0.4"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── GUARD NPC ──────────────────────────────
+export function drawGuard(x, y, sc, fac, status, uid) {
+  // Reuse knight but simpler, lighter armor, no plumed helm
+  const f = FACTION[fac] || FACTION.friendly;
+  const id = `gd_${uid}`;
+  const defs = `
+    ${g(`${id}_armor`, [[0,'#7a8898'],[40,'#5a6878'],[100,'#2a3848']])}
+    ${g(`${id}_blue`,  [[0,'#2a4880'],[50,'#1a3060'],[100,'#0a1830']])}
+    ${g(`${id}_skin`,  [[0,'#e0c8a0'],[50,'#c0a880'],[100,'#806848']])}
+    ${rg(`${id}_eye`,  x, y-38*sc, 5*sc, [[0,f.eye,0.7],[100,f.eye,0]])}
+    ${rg(`${id}_glow`, x, y, 15*sc, [[0,f.underGlow,0.15],[100,f.underGlow,0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${14*sc}" ry="${3.5*sc}" fill="url(#${id}_glow)"/>
+      <!-- Boots -->
+      <ellipse cx="${x-5*sc}" cy="${y}" rx="${5.5*sc}" ry="${2.5*sc}" fill="#2a1808"/>
+      <ellipse cx="${x+5*sc}" cy="${y}" rx="${5.5*sc}" ry="${2.5*sc}" fill="#2a1808"/>
+      <!-- Legs/greaves -->
+      <rect x="${x-9*sc}" y="${y-18*sc}" width="${7*sc}" height="${18*sc}" rx="${2*sc}" fill="url(#${id}_armor)"/>
+      <rect x="${x+2*sc}"  y="${y-18*sc}" width="${7*sc}" height="${18*sc}" rx="${2*sc}" fill="url(#${id}_armor)"/>
+      <!-- Body — tabard over chain -->
+      <path d="M${x-8*sc},${y-36*sc} Q${x-9*sc},${y-26*sc} ${x-7*sc},${y-18*sc} L${x+7*sc},${y-18*sc} Q${x+9*sc},${y-26*sc} ${x+8*sc},${y-36*sc} Q${x+4*sc},${y-42*sc} ${x},${y-42*sc} Q${x-4*sc},${y-42*sc} ${x-8*sc},${y-36*sc}Z"
+        fill="url(#${id}_blue)"/>
+      <!-- Chain mail texture -->
+      ${[-36,-30,-24,-18].map(yy=>`<path d="M${x-7*sc},${y+yy*sc} Q${x},${y+(yy-0.5)*sc} ${x+7*sc},${y+yy*sc}" fill="none" stroke="#3a4858" stroke-width="${0.6*sc}" opacity="0.5"/>`).join('')}
+      <!-- Arms -->
+      <path d="M${x-8*sc},${y-34*sc} Q${x-14*sc},${y-26*sc} ${x-12*sc},${y-16*sc}" fill="none" stroke="#5a6878" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <path d="M${x+8*sc},${y-34*sc} Q${x+15*sc},${y-26*sc} ${x+14*sc},${y-16*sc}" fill="none" stroke="#5a6878" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <!-- Spear -->
+      <line x1="${x+14*sc}" y1="${y-16*sc}" x2="${x+12*sc}" y2="${y+5*sc}" stroke="#8B5A00" stroke-width="${2*sc}"/>
+      <line x1="${x+13*sc}" y1="${y-14*sc}" x2="${x+13*sc}" y2="${y-40*sc}" stroke="#8B5A00" stroke-width="${1.5*sc}"/>
+      <polygon points="${x+12*sc},${y-40*sc} ${x+14*sc},${y-40*sc} ${x+13*sc},${y-50*sc}" fill="#b0b0b0"/>
+      <!-- Shield -->
+      <path d="M${x-20*sc},${y-36*sc} Q${x-22*sc},${y-28*sc} ${x-20*sc},${y-18*sc} Q${x-16*sc},${y-14*sc} ${x-12*sc},${y-16*sc} L${x-12*sc},${y-36*sc}Z" fill="url(#${id}_armor)" stroke="#2a3848" stroke-width="${0.5*sc}"/>
+      <!-- Shield emblem -->
+      <circle cx="${x-17*sc}" cy="${y-27*sc}" r="${3.5*sc}" fill="#d0b020" opacity="0.7"/>
+      <!-- Head/coif -->
+      <ellipse cx="${x}" cy="${y-48*sc}" rx="${7.5*sc}" ry="${7*sc}" fill="url(#${id}_skin)"/>
+      <!-- Simple helmet -->
+      <path d="M${x-7.5*sc},${y-50*sc} Q${x-8*sc},${y-48*sc} ${x-7.5*sc},${y-46*sc} L${x+7.5*sc},${y-46*sc} Q${x+8*sc},${y-48*sc} ${x+7.5*sc},${y-50*sc} Q${x+4*sc},${y-58*sc} ${x},${y-58*sc} Q${x-4*sc},${y-58*sc} ${x-7.5*sc},${y-50*sc}Z"
+        fill="url(#${id}_armor)"/>
+      ${eye(x-2.5*sc, y-50*sc, 1.4*sc, f.eye, `${id}_eye`, uid)}
+      ${eye(x+2.5*sc, y-50*sc, 1.4*sc, f.eye, `${id}_eye`, uid)}
+      <!-- Nasal guard -->
+      <rect x="${x-0.8*sc}" y="${y-52*sc}" width="${1.6*sc}" height="${5*sc}" rx="${0.5*sc}" fill="url(#${id}_armor)"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── REGISTER ALL NEW CREATURES ─────────────
+Object.assign(CREATURE_REGISTRY, {
+  rat:          drawRat,
+  bat:          drawBat,
+  cave_bat:     drawBat,
+  knight:       (x,y,sc,fac,st,uid) => drawKnight(x,y,sc,fac,st,uid),
+  cursed_knight:(x,y,sc,fac,st,uid) => drawKnight(x,y,sc,'enemy',st,uid),
+  guard:        drawGuard,
+  guard_npc:    drawGuard,
+  gunslinger:   (x,y,sc,fac,st,uid) => drawGunslinger(x,y,sc,fac,st,uid),
+  sheriff:      (x,y,sc,fac,st,uid) => drawGunslinger(x,y,sc,'friendly',st,uid),
+  outlaw:       (x,y,sc,fac,st,uid) => drawGunslinger(x,y,sc,'enemy',st,uid),
+  desert_bandit:(x,y,sc,fac,st,uid) => drawGunslinger(x,y,sc,'enemy',st,uid),
+  netrunner:    drawNetrunner,
+  street_samurai:(x,y,sc,fac,st,uid) => drawNetrunner(x,y,sc,fac,st,uid),
+  cyber_hacker: drawNetrunner,
+  samurai:      drawSamurai,
+  samurai_npc:  drawSamurai,
+  ronin:        (x,y,sc,fac,st,uid) => drawSamurai(x,y,sc,'neutral',st,uid),
+  shogun:       (x,y,sc,fac,st,uid) => drawSamurai(x,y,sc,'boss',st,uid),
+  mummy:        drawMummy,
+  witch:        drawWitch,
+  swamp_witch:  drawWitch,
+  frost_mage:   (x,y,sc,fac,st,uid) => drawWitch(x,y,sc,fac,st,uid),
+  djinn:        drawDjinn,
+  genie:        drawDjinn,
+  pirate_npc:   drawPirateNpc,
+  sea_captain:  (x,y,sc,fac,st,uid) => drawPirateNpc(x,y,sc,'friendly',st,uid),
+  ghost_sailor: (x,y,sc,fac,st,uid) => drawPirateNpc(x,y,sc,'undead',st,uid),
+  yeti:         drawYeti,
+  abominable:   drawYeti,
+  ice_wraith:   (x,y,sc,fac,st,uid) => drawWraith(x,y,sc,fac,st,uid),
+});
+
+// ── RAIDER (Post-Apocalyptic) ──────────────
+export function drawRaider(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.enemy;
+  const id = `rd2_${uid}`;
+  const defs = `
+    ${g(`${id}_gear`, [[0,'#3a3020'],[50,'#252015'],[100,'#100c08']])}
+    ${g(`${id}_skin`, [[0,'#b09070'],[50,'#907050'],[100,'#503828']])}
+    ${rg(`${id}_eye`, x, y-34*sc, 5*sc, [[0,f.eye,0.9],[100,f.eye,0]])}
+    ${rg(`${id}_glow`, x, y, 14*sc, [[0,f.underGlow,0.16],[100,f.underGlow,0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${13*sc}" ry="${3.5*sc}" fill="url(#${id}_glow)"/>
+      <!-- Heavy boots - scavenged -->
+      <path d="M${x-7*sc},${y-5*sc} L${x-11*sc},${y} L${x-3*sc},${y} L${x-4*sc},${y-5*sc}Z" fill="#2a1808"/>
+      <path d="M${x+3*sc},${y-5*sc} L${x+7*sc},${y} L${x+11*sc},${y} Q${x+9*sc},${y-2*sc} ${x+7*sc},${y-5*sc}Z" fill="#2a1808"/>
+      <!-- Legs - tattered patchwork -->
+      <rect x="${x-9*sc}" y="${y-16*sc}" width="${7*sc}" height="${11*sc}" rx="${1.5*sc}" fill="#3a2810"/>
+      <rect x="${x+2*sc}"  y="${y-16*sc}" width="${7*sc}" height="${11*sc}" rx="${1.5*sc}" fill="#2a2010"/>
+      <!-- Body armor - scavenged plates -->
+      <path d="M${x-9*sc},${y-32*sc} Q${x-10*sc},${y-22*sc} ${x-8*sc},${y-16*sc} L${x+8*sc},${y-16*sc} Q${x+10*sc},${y-22*sc} ${x+9*sc},${y-32*sc} Q${x+5*sc},${y-38*sc} ${x},${y-38*sc} Q${x-5*sc},${y-38*sc} ${x-9*sc},${y-32*sc}Z"
+        fill="url(#${id}_gear)"/>
+      <!-- Patchwork armor plates -->
+      <rect x="${x-7*sc}" y="${y-36*sc}" width="${6*sc}" height="${8*sc}" rx="${0.5*sc}" fill="#4a3820" opacity="0.7"/>
+      <rect x="${x+1*sc}" y="${y-34*sc}" width="${5*sc}" height="${6*sc}" rx="${0.5*sc}" fill="#383018" opacity="0.7"/>
+      <!-- Shoulder spikes -->
+      ${[-1,0,1].map(i=>`<path d="M${x-10*sc},${y-32*sc+i*3*sc} L${x-16*sc},${y-34*sc+i*3*sc}" fill="none" stroke="#808070" stroke-width="${1.5*sc}" stroke-linecap="round"/>`).join('')}
+      <!-- Arms -->
+      <path d="M${x-9*sc},${y-30*sc} Q${x-17*sc},${y-24*sc} ${x-15*sc},${y-14*sc}" fill="none" stroke="#3a2810" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <path d="M${x+9*sc},${y-30*sc} Q${x+17*sc},${y-22*sc} ${x+15*sc},${y-12*sc}" fill="none" stroke="#3a2810" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <!-- Pipe weapon -->
+      <rect x="${x+13*sc}" y="${y-22*sc}" width="${3*sc}" height="${16*sc}" rx="${1*sc}" fill="#606060"/>
+      <rect x="${x+11*sc}" y="${y-25*sc}" width="${7*sc}" height="${3*sc}" rx="${1*sc}" fill="#808080"/>
+      <!-- Head - goggles + wrapped face -->
+      <ellipse cx="${x}" cy="${y-44*sc}" rx="${7.5*sc}" ry="${7*sc}" fill="url(#${id}_skin)"/>
+      <!-- Face wrap/bandana -->
+      <rect x="${x-6*sc}" y="${y-42*sc}" width="${12*sc}" height="${5*sc}" rx="${1*sc}" fill="#282018" opacity="0.9"/>
+      <!-- Goggles -->
+      <ellipse cx="${x-3.5*sc}" cy="${y-48*sc}" rx="${3*sc}" ry="${2.5*sc}" fill="#1a1a1a"/>
+      <ellipse cx="${x+3.5*sc}" cy="${y-48*sc}" rx="${3*sc}" ry="${2.5*sc}" fill="#1a1a1a"/>
+      ${eye(x-3.5*sc, y-48*sc, 1.8*sc, f.eye, `${id}_eye`, uid)}
+      ${eye(x+3.5*sc, y-48*sc, 1.8*sc, f.eye, `${id}_eye`, uid)}
+      <!-- Goggle strap -->
+      <path d="M${x-6.5*sc},${y-48*sc} L${x-8*sc},${y-46*sc}" stroke="#3a3020" stroke-width="${1*sc}"/>
+      <path d="M${x+6.5*sc},${y-48*sc} L${x+8*sc},${y-46*sc}" stroke="#3a3020" stroke-width="${1*sc}"/>
+      <!-- Mohawk / spiky hair -->
+      ${[-1,0,1].map(i=>`<path d="M${x+i*2*sc},${y-50*sc} L${x+i*1.5*sc},${y-58*sc}" stroke="#c04020" stroke-width="${2*sc}" stroke-linecap="round"/>`).join('')}
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── ANDROID / SYNTH (Cyberpunk) ────────────
+export function drawAndroid(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.alien;
+  const id = `an_${uid}`;
+  const defs = `
+    ${g(`${id}_chrome`, [[0,'#c0d0e0'],[50,'#8090a8'],[100,'#404858']])}
+    ${g(`${id}_dark`,   [[0,'#2a3848'],[50,'#1a2838'],[100,'#0a1828']])}
+    ${rg(`${id}_eye`,   x, y-35*sc, 6*sc, [[0,'#00ffcc',1],[100,'#00aacc',0]])}
+    ${rg(`${id}_glow`,  x, y, 16*sc, [[0,'#008888',0.2],[100,'#008888',0]])}
+  `;
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${14*sc}" ry="${3.5*sc}" fill="url(#${id}_glow)"/>
+      <!-- Feet - precise mechanical -->
+      <rect x="${x-9*sc}" y="${y-5*sc}" width="${7*sc}" height="${5*sc}" rx="${1.5*sc}" fill="url(#${id}_chrome)"/>
+      <rect x="${x+2*sc}"  y="${y-5*sc}" width="${7*sc}" height="${5*sc}" rx="${1.5*sc}" fill="url(#${id}_chrome)"/>
+      <!-- Legs - geometric, perfect -->
+      <rect x="${x-9*sc}" y="${y-22*sc}" width="${7*sc}" height="${17*sc}" rx="${2*sc}" fill="url(#${id}_dark)"/>
+      <rect x="${x+2*sc}"  y="${y-22*sc}" width="${7*sc}" height="${17*sc}" rx="${2*sc}" fill="url(#${id}_dark)"/>
+      <!-- Joint rings -->
+      <rect x="${x-9*sc}" y="${y-12*sc}" width="${7*sc}" height="${2.5*sc}" rx="${0.5*sc}" fill="url(#${id}_chrome)" opacity="0.6"/>
+      <rect x="${x+2*sc}" y="${y-12*sc}" width="${7*sc}" height="${2.5*sc}" rx="${0.5*sc}" fill="url(#${id}_chrome)" opacity="0.6"/>
+      <!-- Body - sleek humanoid chassis -->
+      <path d="M${x-9*sc},${y-40*sc} Q${x-10*sc},${y-30*sc} ${x-8*sc},${y-22*sc} L${x+8*sc},${y-22*sc} Q${x+10*sc},${y-30*sc} ${x+9*sc},${y-40*sc} Q${x+5*sc},${y-46*sc} ${x},${y-46*sc} Q${x-5*sc},${y-46*sc} ${x-9*sc},${y-40*sc}Z"
+        fill="url(#${id}_dark)" stroke="#404858" stroke-width="${0.6*sc}"/>
+      <!-- Chest panel with status lights -->
+      <rect x="${x-6*sc}" y="${y-42*sc}" width="${12*sc}" height="${14*sc}" rx="${2*sc}" fill="#1a2838"/>
+      ${[-4,-1.5,1,3.5].map((lx,i)=>`<circle cx="${x+lx*sc}" cy="${y-36*sc}" r="${1.2*sc}" fill="${['#00ffcc','#00aaff','#ffcc00','#ff4444'][i]}" opacity="0.8" class="eyeGlow"/>`).join('')}
+      <!-- Shoulder joints -->
+      <circle cx="${x-10*sc}" cy="${y-38*sc}" r="${4*sc}" fill="url(#${id}_chrome)"/>
+      <circle cx="${x+10*sc}" cy="${y-38*sc}" r="${4*sc}" fill="url(#${id}_chrome)"/>
+      <!-- Arms - chrome tubes -->
+      <path d="M${x-10*sc},${y-38*sc} Q${x-18*sc},${y-30*sc} ${x-16*sc},${y-18*sc}" fill="none" stroke="#6a7a8a" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <path d="M${x+10*sc},${y-38*sc} Q${x+18*sc},${y-30*sc} ${x+16*sc},${y-18*sc}" fill="none" stroke="#6a7a8a" stroke-width="${5*sc}" stroke-linecap="round"/>
+      <!-- Hands -->
+      <rect x="${x-18*sc}" y="${y-20*sc}" width="${6*sc}" height="${4*sc}" rx="${2*sc}" fill="url(#${id}_chrome)"/>
+      <rect x="${x+12*sc}" y="${y-20*sc}" width="${6*sc}" height="${4*sc}" rx="${2*sc}" fill="url(#${id}_chrome)"/>
+      <!-- Head - smooth ovoid -->
+      <ellipse cx="${x}" cy="${y-52*sc}" rx="${8*sc}" ry="${9*sc}" fill="url(#${id}_dark)"/>
+      <!-- Face panel -->
+      <rect x="${x-7*sc}" y="${y-57*sc}" width="${14*sc}" height="${10*sc}" rx="${2*sc}" fill="#0a1828"/>
+      <!-- Eyes - LED strips -->
+      <rect x="${x-5*sc}" y="${y-55*sc}" width="${4*sc}" height="${2.5*sc}" rx="${1*sc}" fill="#00ffcc" opacity="0.9" class="eyeGlow"/>
+      <rect x="${x+1*sc}" y="${y-55*sc}" width="${4*sc}" height="${2.5*sc}" rx="${1*sc}" fill="#00ffcc" opacity="0.9" class="eyeGlow"/>
+      <!-- Mouth speaker grille -->
+      ${[-2,-1,0,1,2].map(i=>`<line x1="${x+i*2*sc}" y1="${y-49.5*sc}" x2="${x+i*2*sc}" y2="${y-47*sc}" stroke="#00aacc" stroke-width="${0.6*sc}" opacity="0.5"/>`).join('')}
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── MERMAID ────────────────────────────────
+export function drawMermaid(x, y, sc, fac, status, uid) {
+  const f = FACTION[fac] || FACTION.friendly;
+  const id = `mr_${uid}`;
+  const defs = `
+    ${g(`${id}_tail`, [[0,'#20c080'],[50,'#108060'],[100,'#084030']])}
+    ${g(`${id}_skin`, [[0,'#e8d8b0'],[50,'#c8b890'],[100,'#887058']])}
+    ${g(`${id}_hair`, [[0,'#20c0d0'],[50,'#1090a0'],[100,'#085060']])}
+    ${rg(`${id}_eye`, x, y-30*sc, 5*sc, [[0,'#40d0ff',0.8],[100,'#40d0ff',0]])}
+    ${rg(`${id}_glow`, x, y, 20*sc, [[0,'#20c080',0.2],[100,'#20c080',0]])}
+    ${rg(`${id}_bubble`, x, y-15*sc, 22*sc, [[0,'#40c0ff',0.1],[100,'#40c0ff',0]])}
+  `;
+  const svg = `
+    <g class="${animClass('ghost')}" style="transform-origin:${x}px ${y-20*sc}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y-15*sc}" rx="${20*sc}" ry="${16*sc}" fill="url(#${id}_bubble)"/>
+      <ellipse cx="${x}" cy="${y}" rx="${16*sc}" ry="${4*sc}" fill="url(#${id}_glow)"/>
+      <!-- Fish tail -->
+      <path d="M${x-8*sc},${y-10*sc} Q${x-10*sc},${y-3*sc} ${x-8*sc},${y} Q${x},${y+2*sc} ${x+8*sc},${y} Q${x+10*sc},${y-3*sc} ${x+8*sc},${y-10*sc}Z"
+        fill="url(#${id}_tail)"/>
+      <!-- Tail fin -->
+      <path d="M${x-8*sc},${y} Q${x-14*sc},${y+5*sc} ${x-10*sc},${y+10*sc} Q${x},${y+8*sc} ${x+10*sc},${y+10*sc} Q${x+14*sc},${y+5*sc} ${x+8*sc},${y}Z"
+        fill="url(#${id}_tail)"/>
+      <!-- Scales pattern -->
+      ${[-8,-4,0,4].map(yy=>`<path d="M${x-7*sc},${y+yy*sc} Q${x},${y+(yy-1)*sc} ${x+7*sc},${y+yy*sc}" fill="none" stroke="#108060" stroke-width="${0.6*sc}" opacity="0.5"/>`).join('')}
+      <!-- Body (upper, human) -->
+      <path d="M${x-7*sc},${y-28*sc} Q${x-8*sc},${y-20*sc} ${x-7*sc},${y-12*sc} L${x+7*sc},${y-12*sc} Q${x+8*sc},${y-20*sc} ${x+7*sc},${y-28*sc} Q${x+3*sc},${y-32*sc} ${x},${y-32*sc} Q${x-3*sc},${y-32*sc} ${x-7*sc},${y-28*sc}Z"
+        fill="url(#${id}_skin)"/>
+      <!-- Shell top -->
+      <ellipse cx="${x-4*sc}" cy="${y-26*sc}" rx="${3.5*sc}" ry="${2.5*sc}" fill="#20c080" opacity="0.7"/>
+      <ellipse cx="${x+4*sc}" cy="${y-26*sc}" rx="${3.5*sc}" ry="${2.5*sc}" fill="#20c080" opacity="0.7"/>
+      <!-- Arms graceful -->
+      <path d="M${x-7*sc},${y-26*sc} Q${x-16*sc},${y-22*sc} ${x-14*sc},${y-14*sc}" fill="none" stroke="#c8b890" stroke-width="${4.5*sc}" stroke-linecap="round"/>
+      <path d="M${x+7*sc},${y-26*sc} Q${x+16*sc},${y-20*sc} ${x+14*sc},${y-12*sc}" fill="none" stroke="#c8b890" stroke-width="${4.5*sc}" stroke-linecap="round"/>
+      <!-- Hands holding trident (right) -->
+      <line x1="${x+14*sc}" y1="${y-12*sc}" x2="${x+14*sc}" y2="${y-36*sc}" stroke="#1090a0" stroke-width="${2*sc}"/>
+      ${[-2,0,2].map(i=>`<line x1="${x+14*sc+i*2*sc}" y1="${y-36*sc}" x2="${x+14*sc+i*2.5*sc}" y2="${y-42*sc}" stroke="#1090a0" stroke-width="${1.5*sc}" stroke-linecap="round"/>`).join('')}
+      <!-- Head -->
+      <ellipse cx="${x}" cy="${y-38*sc}" rx="${7*sc}" ry="${7.5*sc}" fill="url(#${id}_skin)"/>
+      <!-- Hair flowing -->
+      <path d="M${x-6*sc},${y-42*sc} Q${x-12*sc},${y-38*sc} ${x-14*sc},${y-28*sc} Q${x-12*sc},${y-24*sc} ${x-8*sc},${y-26*sc}Z" fill="url(#${id}_hair)"/>
+      <path d="M${x+6*sc},${y-42*sc} Q${x+12*sc},${y-38*sc} ${x+14*sc},${y-28*sc}Z" fill="url(#${id}_hair)"/>
+      <!-- Eyes -->
+      ${eye(x-2.5*sc, y-40*sc, 1.8*sc, '#40d0ff', `${id}_eye`, uid)}
+      ${eye(x+2.5*sc, y-40*sc, 1.8*sc, '#40d0ff', `${id}_eye`, uid)}
+      <!-- Smile -->
+      <path d="M${x-3*sc},${y-35.5*sc} Q${x},${y-33.5*sc} ${x+3*sc},${y-35.5*sc}" fill="none" stroke="#a09080" stroke-width="${0.9*sc}"/>
+      <!-- Bubbles -->
+      <circle cx="${x+10*sc}" cy="${y-22*sc}" r="${1.5*sc}" fill="none" stroke="#40c0ff" stroke-width="${0.7*sc}" opacity="0.5"/>
+      <circle cx="${x+13*sc}" cy="${y-16*sc}" r="${1*sc}" fill="none" stroke="#40c0ff" stroke-width="${0.6*sc}" opacity="0.4"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
+// ── REGISTER ALL NEW GENRE CREATURES ───────
+Object.assign(CREATURE_REGISTRY, {
+  raider:          drawRaider,
+  mutant:          (x,y,sc,fac,st,uid) => drawRaider(x,y,sc,'enemy',st,uid),
+  scavenger:       (x,y,sc,fac,st,uid) => drawRaider(x,y,sc,'neutral',st,uid),
+  wasteland_bandit:(x,y,sc,fac,st,uid) => drawRaider(x,y,sc,'enemy',st,uid),
+  android:         drawAndroid,
+  synth:           drawAndroid,
+  cyber_soldier:   drawAndroid,
+  mermaid:         drawMermaid,
+  sea_captain:     (x,y,sc,fac,st,uid) => drawPirateNpc(x,y,sc,'friendly',st,uid),
+  crime_boss:      (x,y,sc,fac,st,uid) => drawBandit(x,y,sc,'boss',st,uid),
+  space_pirate:    (x,y,sc,fac,st,uid) => drawRaider(x,y,sc,'enemy',st,uid),
+  // Mythology aliases using existing creatures
+  titan_npc:       (x,y,sc,fac,st,uid) => drawTroll(x,y,sc,'boss',st,uid),
+  cyclops:         (x,y,sc,fac,st,uid) => drawTroll(x,y,sc,'enemy',st,uid),
+  minotaur:        (x,y,sc,fac,st,uid) => drawTroll(x,y,sc,'enemy',st,uid),
+  // Historical aliases
+  roman_soldier:   (x,y,sc,fac,st,uid) => drawKnight(x,y,sc,fac,st,uid),
+  viking:          (x,y,sc,fac,st,uid) => drawOrc(x,y,sc,fac,st,uid),
+  legionary:       (x,y,sc,fac,st,uid) => drawKnight(x,y,sc,fac,st,uid),
+  centurion:       (x,y,sc,fac,st,uid) => drawKnight(x,y,sc,'friendly',st,uid),
+  pharaoh_guard:   (x,y,sc,fac,st,uid) => drawKnight(x,y,sc,'neutral',st,uid),
+  barbarian:       (x,y,sc,fac,st,uid) => drawOrc(x,y,sc,'enemy',st,uid),
+  // Fairy tale
+  giant_npc:       (x,y,sc,fac,st,uid) => drawTroll(x,y,sc,fac,st,uid),
+  enchanted_beast: (x,y,sc,fac,st,uid) => drawWolf(x,y,sc,'boss',st,uid),
+  fairy_godmother: (x,y,sc,fac,st,uid) => drawMageNpc(x,y,sc,'friendly',st,uid),
+  prince_npc:      (x,y,sc,fac,st,uid) => drawKnight(x,y,sc,'friendly',st,uid),
+  // Range check aliases already registered as fallbacks
+  chest_mimic:     (x,y,sc,fac,st,uid) => drawGoblin(x,y,sc,'boss',st,uid),
+  golem:           (x,y,sc,fac,st,uid) => drawRobotDrone(x,y,sc,'enemy',st,uid),
+  crystal_golem:   (x,y,sc,fac,st,uid) => drawRobotDrone(x,y,sc,'enemy',st,uid),
+  stone_golem:     (x,y,sc,fac,st,uid) => drawRobotDrone(x,y,sc,'enemy',st,uid),
+  ice_wraith:      (x,y,sc,fac,st,uid) => drawWraith(x,y,sc,fac,st,uid),
+  bog_zombie:      (x,y,sc,fac,st,uid) => drawZombie(x,y,sc,fac,st,uid),
+  lizardman:       (x,y,sc,fac,st,uid) => drawGoblin(x,y,sc,'enemy',st,uid),
+  frog_beast:      (x,y,sc,fac,st,uid) => drawGoblin(x,y,sc,'enemy',st,uid),
+  will_o_wisp:     (x,y,sc,fac,st,uid) => drawGhost(x,y,sc,fac,st,uid),
+  traveling_bard:  (x,y,sc,fac,st,uid) => drawMerchant(x,y,sc,'friendly',st,uid),
+  child_npc:       (x,y,sc,fac,st,uid) => drawElder(x,y,sc,'friendly',st,uid),
+  ranger_npc:      (x,y,sc,fac,st,uid) => drawBandit(x,y,sc,'neutral',st,uid),
+});

@@ -139,20 +139,33 @@ export const FOCAL_POINTS = {
 // ── Creature → scene affinity ──────────────
 // Which creatures appear naturally in each scene
 export const SCENE_CREATURES = {
-  dungeon:  ['goblin','skeleton','rat','zombie','troll','chest_mimic'],
-  cave:     ['bat','spider','cave_troll','crystal_golem','wraith'],
-  castle:   ['knight','ghost','gargoyle','vampire','demon'],
-  ruins:    ['skeleton','wraith','golem','cursed_knight','lich'],
-  forest:   ['wolf','treant','fairy','ranger_npc','bandit'],
-  plains:   ['bandit','merchant','guard','wolf','scarecrow'],
-  ocean:    ['pirate_npc','mermaid','kraken','sea_serpent','ghost_sailor'],
-  space:    ['alien_grey','robot_drone','space_pirate','cosmic_horror','android'],
-  village:  ['merchant','elder','guard','child_npc','traveling_bard'],
-  city:     ['thief','guard','merchant','assassin','crime_boss'],
-  desert:   ['sandworm','mummy','desert_bandit','djinn','scorpion'],
-  mountain: ['yeti','stone_golem','eagle','dwarf_npc','avalanche_spirit'],
-  swamp:    ['lizardman','witch','frog_beast','will_o_wisp','bog_zombie'],
-  snow:     ['yeti','ice_wraith','polar_bear','frost_mage','snowman'],
+  // ── Core fantasy scenes ────────────────────────────────────────────────
+  dungeon:   ['goblin','skeleton','rat','zombie','troll','orc'],
+  cave:      ['bat','spider','wraith','zombie','rat','crystal_golem'],
+  castle:    ['knight','ghost','vampire','demon','guard','cursed_knight'],
+  ruins:     ['skeleton','wraith','cursed_knight','mummy','ghost','zombie'],
+  forest:    ['wolf','fairy','bandit','ranger_npc','witch','elder'],
+  plains:    ['bandit','merchant','guard','wolf','gunslinger','elder'],
+  // ── Water / ocean scenes ───────────────────────────────────────────────
+  ocean:     ['pirate_npc','ghost_sailor','kraken','sea_captain','mermaid'],
+  ship:      ['pirate_npc','sea_captain','ghost_sailor','guard'],
+  // ── Urban scenes — genre-blended ──────────────────────────────────────
+  village:   ['merchant','elder','guard','witch','samurai_npc','gunslinger'],
+  tavern:    ['bandit','merchant','elder','pirate_npc','gunslinger','guard'],
+  city:      ['thief','guard','merchant','assassin','netrunner','gunslinger'],
+  road:      ['bandit','merchant','guard','gunslinger','samurai_npc'],
+  // ── Space / sci-fi ─────────────────────────────────────────────────────
+  space:     ['alien_grey','robot_drone','netrunner','android','alien_grey'],
+  // ── Harsh environments ─────────────────────────────────────────────────
+  desert:    ['mummy','djinn','desert_bandit','gunslinger','scorpion'],
+  mountain:  ['yeti','samurai_npc','guard','witch','wolf'],
+  swamp:     ['witch','zombie','bat','spider','ghost'],
+  snow:      ['yeti','ice_wraith','guard','witch','wolf'],
+  // ── Atmospheric scenes ─────────────────────────────────────────────────
+  wasteland: ['raider','mutant','scavenger','robot_drone','zombie'],
+  shrine:    ['samurai_npc','elder','witch','mage_npc','ghost'],
+  temple:    ['mummy','djinn','elder','mage_npc','skeleton'],
+  saloon:    ['gunslinger','bandit','merchant','elder','outlaw'],
 };
 
 // ── Particle presets per creature ─────────
@@ -169,6 +182,17 @@ export const CREATURE_PARTICLES = {
   alien_grey:    { type: 'static',  color: '#00ffaa', size: 1.2, count: 8  },
   crystal_golem: { type: 'shard',   color: '#80c0ff', size: 1.5, count: 6  },
   slime:         { type: 'drip',    color: '#60aa40', size: 2.0, count: 5  },
+  // Genre expansions
+  netrunner:     { type: 'static',  color: '#00ffff', size: 1.0, count: 8  },
+  robot_drone:   { type: 'spark',   color: '#00ccff', size: 1.2, count: 6  },
+  djinn:         { type: 'sparkle', color: '#8888ff', size: 2.0, count: 10 },
+  witch:         { type: 'wisp',    color: '#44ff44', size: 1.5, count: 8  },
+  mummy:         { type: 'dust',    color: '#d4c890', size: 1.5, count: 6  },
+  vampire:       { type: 'wisp',    color: '#cc0020', size: 1.2, count: 6  },
+  yeti:          { type: 'shard',   color: '#bbddff', size: 1.8, count: 5  },
+  ice_wraith:    { type: 'shard',   color: '#88ccff', size: 1.5, count: 8  },
+  samurai:       { type: 'spark',   color: '#ffd040', size: 0.8, count: 4  },
+  samurai_npc:   { type: 'spark',   color: '#ffd040', size: 0.8, count: 4  },
 };
 
 // ── Animation class map ────────────────────
@@ -232,6 +256,37 @@ export const ROLE_TO_CREATURE = {
   mage:         'mage_npc',     wizard:   'mage_npc',
   ranger:       'ranger_npc',   scout:    'ranger_npc',
   dwarf:        'dwarf_npc',    halfling: 'dwarf_npc',
+  // Western
+  cowboy:       'gunslinger',   sheriff:  'sheriff',
+  outlaw:       'outlaw',       deputy:   'guard',
+  gunfighter:   'gunslinger',   drifter:  'gunslinger',
+  // Cyberpunk
+  hacker:       'netrunner',    runner:   'netrunner',
+  netrunner:    'netrunner',    cyber:    'netrunner',
+  android:      'android',      corp:     'guard',
+  // Ninja / Samurai
+  samurai:      'samurai',      ronin:    'ronin',
+  shogun:       'shogun',       ninja:    'assassin',
+  shinobi:      'assassin',     daimyo:   'samurai',
+  // Post-Apoc
+  raider:       'raider',       mutant:   'mutant',
+  scavenger:    'scavenger',    wasteland:'bandit',
+  // Mythology
+  titan:        'demon',        cyclops:  'troll',
+  centaur:      'wolf',         harpy:    'ghost',
+  minotaur:     'troll',        gorgon:   'demon',
+  demigod:      'knight',       // Maps to knight silhouette
+  // Fairy tale
+  ogre:         'troll',        giant:    'troll',
+  enchanted:    'elder',        prince:   'guard',
+  // Historical
+  gladiator:    'knight',       legionary:'guard',
+  viking:       'orc',          pharaoh:  'elder',
+  centurion:    'guard',        barbarian:'orc',
+  // Ocean
+  pirate:       'pirate_npc',   buccaneer:'pirate_npc',
+  sailor:       'pirate_npc',   captain:  'sea_captain',
+  mermaid:      'mermaid',
 };
 
 export function roleToCreature(roleStr) {

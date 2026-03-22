@@ -959,6 +959,221 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
     }
   }
 
+  // ── Wasteland (Post-Apocalyptic) ──────────────────────────────────────
+  if (type === 'wasteland') {
+    // Harsh orange sun through dust
+    svg.appendChild(rc.circle(W*0.75, H*0.13, 30, {
+      stroke:pal.sun||'#FF9A3C', fill:pal.sun||'#FF9A3C', fillStyle:'solid', roughness:0.9
+    }));
+    // Dust haze
+    for (let i = 0; i < 4; i++) {
+      svg.appendChild(svgEl('ellipse', {
+        cx: String(sr()*W), cy: String(H*0.52), rx: String(80+sr()*100), ry: '12',
+        fill: 'rgba(180,120,50,0.07)'
+      }));
+    }
+    // Ruined buildings silhouettes
+    for (let i = 0; i < 5; i++) {
+      const bx = sr()*W; const bh = 20+sr()*55; const bw = 18+sr()*30;
+      const rust = pal.rust || '#884418';
+      // Main ruin
+      svg.appendChild(rc.rectangle(bx-bw/2, H*0.62-bh, bw, bh, {
+        stroke:shadeColor(rust,-20), fill:rust, fillStyle:'hachure', roughness:3.0, strokeWidth:1.5
+      }));
+      // Broken top
+      svg.appendChild(rc.polygon([[bx-bw/2,H*0.62-bh],[bx-bw/3,H*0.62-bh-8],[bx,H*0.62-bh-4],[bx+bw/3,H*0.62-bh-12],[bx+bw/2,H*0.62-bh]], {
+        stroke:shadeColor(rust,-30), fill:shadeColor(rust,-10), fillStyle:'solid', roughness:3.5
+      }));
+      // Broken windows
+      if (sr() > 0.4) svg.appendChild(rc.rectangle(bx-4, H*0.62-bh+8, 8, 6, {
+        stroke:'#1a1008', fill:'#0a0804', fillStyle:'solid', roughness:2
+      }));
+    }
+    // Radioactive barrel / wreckage hint
+    const ex = W*0.3 + sr()*W*0.4;
+    svg.appendChild(rc.rectangle(ex-5, H*0.65-16, 10, 16, {
+      stroke:'#604020', fill:'#804428', fillStyle:'solid', roughness:2
+    }));
+    svg.appendChild(svgEl('text', Object.assign(document.createElementNS('http://www.w3.org/2000/svg','text'), {})));
+    const hazardEl = svgEl('text', {'x':String(ex-2),'y':String(H*0.65-20),'fill':'#88ff44','font-size':'8','font-family':'monospace','opacity':'0.6'});
+    hazardEl.textContent = '☢';
+    svg.appendChild(hazardEl);
+  }
+
+  // ── Shrine / Temple (Ninja/Mythology) ──────────────────────────────────
+  if (type === 'shrine' || type === 'temple') {
+    // Moon always (sacred night setting)
+    svg.appendChild(rc.circle(W*0.68, H*0.14, 24, {
+      stroke:'#f5e68a', fill:'#fdf5b0', fillStyle:'solid', roughness:0.7
+    }));
+    // Stars
+    for (let i = 0; i < 30; i++) {
+      const stx=sr()*W, sty=sr()*H*0.45;
+      const starEl = svgEl('circle', {cx:stx, cy:sty, r:String(sr()*1.5+0.3), fill:'#FFFDE7', opacity:String(0.3+sr()*0.5)});
+      svg.appendChild(starEl);
+    }
+    // Torii gate or temple columns
+    const torii = type === 'shrine';
+    if (torii) {
+      // Torii gate pillars
+      const gc = pal.gold || '#C8A020';
+      svg.appendChild(rc.rectangle(W*0.35-4, H*0.35, 8, H*0.3, {stroke:shadeColor(gc,-20), fill:gc, fillStyle:'solid', roughness:1.5}));
+      svg.appendChild(rc.rectangle(W*0.65-4, H*0.35, 8, H*0.3, {stroke:shadeColor(gc,-20), fill:gc, fillStyle:'solid', roughness:1.5}));
+      // Crossbeam
+      svg.appendChild(rc.rectangle(W*0.3, H*0.35, W*0.4, 10, {stroke:shadeColor(gc,-30), fill:gc, fillStyle:'solid', roughness:1.5}));
+      svg.appendChild(rc.rectangle(W*0.32, H*0.28, W*0.36, 7, {stroke:shadeColor(gc,-30), fill:gc, fillStyle:'solid', roughness:1.5}));
+      // Hanging lanterns
+      [0.38, 0.62].forEach(lx => {
+        svg.appendChild(rc.ellipse(lx*W, H*0.42, 12, 16, {stroke:'#a06020', fill:pal.lantern||'#FF8040', fillStyle:'solid', roughness:1.5}));
+        svg.appendChild(rc.ellipse(lx*W, H*0.42, 6, 8, {stroke:'none', fill:'#ffcc80', fillStyle:'solid', roughness:0.8, opacity:0.7}));
+      });
+    } else {
+      // Temple columns — Greek/Egyptian
+      const col = pal.stone ? pal.stone[0] : '#6A5030';
+      [0.2, 0.38, 0.56, 0.74].forEach(cx => {
+        svg.appendChild(rc.rectangle(cx*W-7, H*0.28, 14, H*0.37, {stroke:shadeColor(col,-20), fill:col, fillStyle:'hachure', roughness:1.8}));
+        svg.appendChild(rc.rectangle(cx*W-10, H*0.28, 20, 8, {stroke:shadeColor(col,-30), fill:shadeColor(col,-10), fillStyle:'solid', roughness:1.5}));
+      });
+      // Entablature (top beam)
+      svg.appendChild(rc.rectangle(W*0.14, H*0.24, W*0.7, 16, {stroke:shadeColor(col,-20), fill:col, fillStyle:'hachure', roughness:1.6}));
+      // Pediment
+      svg.appendChild(rc.polygon([[W*0.14,H*0.24],[W*0.84,H*0.24],[W*0.49,H*0.08]], {stroke:shadeColor(col,-20), fill:col, fillStyle:'hachure', roughness:2.0}));
+    }
+    // Mist at ground
+    for (let i = 0; i < 4; i++) {
+      svg.appendChild(svgEl('ellipse', {
+        cx: String(sr()*W), cy: String(H*0.66),
+        rx: String(70+sr()*90), ry: '10',
+        fill: 'rgba(200,220,200,0.08)'
+      }));
+    }
+  }
+
+  // ── Saloon / Tavern Interior (Western) ─────────────────────────────────
+  if (type === 'saloon' || type === 'tavern') {
+    // Warm interior light from windows
+    svg.appendChild(rc.circle(W*0.8, H*0.12, 28, {
+      stroke:pal.sun||'#FFB84C', fill:pal.sun||'#FFB84C', fillStyle:'solid', roughness:0.8
+    }));
+    // Background building facades
+    for (let i = 0; i < 4; i++) {
+      const bx = 60 + i*(W/4) + sr()*15-8;
+      const bh = 40 + sr()*30;
+      const wood = pal.wood ? pal.wood[i%pal.wood.length] : '#6B4218';
+      svg.appendChild(rc.rectangle(bx-20, H*0.55-bh, 40, bh, {
+        stroke:shadeColor(wood,-20), fill:wood, fillStyle:'hachure', roughness:2.0, strokeWidth:1.5
+      }));
+      // False front (Western style raised facade)
+      svg.appendChild(rc.rectangle(bx-22, H*0.55-bh-12, 44, 14, {
+        stroke:shadeColor(wood,-30), fill:shadeColor(wood,-10), fillStyle:'solid', roughness:1.8
+      }));
+      // Sign board
+      if (sr() > 0.3) {
+        svg.appendChild(rc.rectangle(bx-12, H*0.55-bh-8, 24, 8, {
+          stroke:'#4a2808', fill:'#8B5A2B', fillStyle:'solid', roughness:1.5
+        }));
+      }
+      // Lit window
+      if (sr() > 0.4) {
+        svg.appendChild(rc.rectangle(bx-6, H*0.55-bh+8, 12, 10, {
+          stroke:'#a07030', fill:'rgba(255,180,80,0.8)', fillStyle:'solid', roughness:0.8
+        }));
+      }
+      // Hitching post
+      svg.appendChild(rc.line(bx-20, H*0.55, bx+20, H*0.55, {stroke:'#5C3A1E', strokeWidth:3, roughness:2}));
+      svg.appendChild(rc.line(bx-20, H*0.55, bx-20, H*0.55-12, {stroke:'#5C3A1E', strokeWidth:2.5, roughness:1.5}));
+      svg.appendChild(rc.line(bx+20, H*0.55, bx+20, H*0.55-12, {stroke:'#5C3A1E', strokeWidth:2.5, roughness:1.5}));
+    }
+    // Dirt road
+    svg.appendChild(rc.rectangle(0, H*0.62, W, H*0.1, {
+      stroke:'none', fill:pal.dust||'#C09050', fillStyle:'solid', roughness:2
+    }));
+    // Wagon wheel ruts
+    svg.appendChild(rc.line(0, H*0.65, W, H*0.65, {stroke:shadeColor(pal.dust||'#C09050',-20), strokeWidth:1, roughness:2, opacity:0.4}));
+    svg.appendChild(rc.line(0, H*0.68, W, H*0.68, {stroke:shadeColor(pal.dust||'#C09050',-20), strokeWidth:1, roughness:2, opacity:0.4}));
+    // Tumbleweed hint
+    const tw = W*0.15 + sr()*W*0.7;
+    svg.appendChild(rc.ellipse(tw, H*0.66, 10, 10, {stroke:'#8B5A2B', fill:'none', roughness:3.5, strokeWidth:1}));
+  }
+
+  // ── Ship deck (Ocean) ─────────────────────────────────────────────────
+  if (type === 'ship') {
+    // Sea on horizon
+    svg.appendChild(rc.rectangle(0, H*0.42, W, H*0.28, {
+      stroke:'none', fill: pal.wave || '#2A6090', fillStyle:'solid', roughness:1
+    }));
+    // Wave lines
+    for (let i = 0; i < 5; i++) {
+      const wy = H*0.45 + i*8;
+      svg.appendChild(rc.line(0, wy, W, wy+sr()*4-2, {
+        stroke:'#42A5F5', strokeWidth:1.5, roughness:2.5, opacity:0.4
+      }));
+    }
+    // Moon or sun
+    if (time === 'night') {
+      svg.appendChild(rc.circle(W*0.7, H*0.12, 22, {stroke:'#f5e68a', fill:'#fdf5b0', fillStyle:'solid', roughness:0.7}));
+    } else {
+      svg.appendChild(rc.circle(W*0.75, H*0.1, 28, {stroke:'#FFD700', fill:'#FFEE55', fillStyle:'solid', roughness:0.8}));
+    }
+    // Ship mast
+    svg.appendChild(rc.line(W*0.45, H*0.65, W*0.47, H*0.05, {stroke:pal.wood?pal.wood[0]:'#8B5A2B', strokeWidth:5, roughness:1.5}));
+    // Sail
+    svg.appendChild(rc.polygon([[W*0.47,H*0.08],[W*0.47,H*0.35],[W*0.7,H*0.32],[W*0.68,H*0.08]], {
+      stroke:'#c0b0a0', fill:pal.sail||'#E8E0D0', fillStyle:'solid', roughness:2.0
+    }));
+    // Rigging lines
+    svg.appendChild(rc.line(W*0.47, H*0.08, W*0.72, H*0.35, {stroke:'#8B5A2B', strokeWidth:1, roughness:1}));
+    svg.appendChild(rc.line(W*0.47, H*0.22, W*0.7, H*0.38, {stroke:'#8B5A2B', strokeWidth:1, roughness:1}));
+    // Crow's nest
+    svg.appendChild(rc.rectangle(W*0.44, H*0.16, 7, 6, {stroke:'#5C3A1E', fill:'#8B5A2B', fillStyle:'solid', roughness:1.5}));
+    // Ship hull (deck edge)
+    svg.appendChild(rc.rectangle(0, H*0.72, W, 18, {
+      stroke:shadeColor(pal.wood?pal.wood[0]:'#8B5A2B',-20),
+      fill:pal.wood?pal.wood[0]:'#8B5A2B', fillStyle:'hachure', roughness:2
+    }));
+    // Cannon ports
+    for (let i = 0; i < 4; i++) {
+      const cx2 = W*0.1 + i*(W*0.22);
+      svg.appendChild(rc.rectangle(cx2-4, H*0.72+2, 8, 6, {stroke:'#1a1008', fill:'#0a0804', fillStyle:'solid', roughness:1.5}));
+    }
+  }
+
+  // ── Road (travel scene) ────────────────────────────────────────────────
+  if (type === 'road') {
+    // Time-appropriate sun/moon
+    if (time === 'night') {
+      svg.appendChild(rc.circle(W*0.74, H*0.14, 24, {stroke:'#f5e68a', fill:'#fdf5b0', fillStyle:'solid', roughness:0.7}));
+    } else {
+      svg.appendChild(rc.circle(W*0.74, H*0.11, 30, {stroke:'#FFD080', fill:pal.sun||'#FFD080', fillStyle:'solid', roughness:0.8}));
+    }
+    // Rolling hills background
+    for (let i = 0; i < 3; i++) {
+      const hx = i*(W/3); const hr = 80+sr()*60;
+      svg.appendChild(rc.ellipse(hx+hr/2, H*0.55, hr*1.4, hr*0.4, {
+        stroke:'none', fill:shadeColor('#4A5A30',i*-8), fillStyle:'solid', roughness:1
+      }));
+    }
+    // Trees along road
+    for (let i = 0; i < 6; i++) {
+      const tx = i*(W/5.5) + sr()*15;
+      const th = 35 + sr()*25;
+      svg.appendChild(rc.line(tx, H*0.65, tx, H*0.65-th, {stroke:'#5C3A1E', strokeWidth:4, roughness:2}));
+      svg.appendChild(rc.ellipse(tx, H*0.65-th-10, th*0.6, th*0.7, {
+        stroke:'#1B5E20', fill:'#2D8B37', fillStyle:'solid', roughness:2.5
+      }));
+    }
+    // Road path
+    svg.appendChild(rc.path(`M ${W*0.35} ${H*0.65} Q ${W*0.5} ${H*0.55} ${W*0.65} ${H*0.65}`, {
+      stroke:pal.road||'#8A7050', strokeWidth:20, fill:'none', roughness:1.5
+    }));
+    // Road edges
+    svg.appendChild(rc.line(W*0.36, H*0.65, W*0.51, H*0.555, {stroke:shadeColor(pal.road||'#8A7050',-20), strokeWidth:1.5, roughness:2, opacity:0.5}));
+    svg.appendChild(rc.line(W*0.64, H*0.65, W*0.49, H*0.555, {stroke:shadeColor(pal.road||'#8A7050',-20), strokeWidth:1.5, roughness:2, opacity:0.5}));
+    // Milestone post
+    svg.appendChild(rc.rectangle(W*0.52, H*0.58, 5, 12, {stroke:'#5C3A1E', fill:'#8B6230', fillStyle:'solid', roughness:2}));
+    svg.appendChild(rc.rectangle(W*0.5, H*0.56, 10, 5, {stroke:'#5C3A1E', fill:'#A07040', fillStyle:'solid', roughness:1.5}));
+  }
+
   if (type === 'desert') {
     // Hot sun
     svg.appendChild(rc.circle(W*0.8, H*0.12, 38, {
