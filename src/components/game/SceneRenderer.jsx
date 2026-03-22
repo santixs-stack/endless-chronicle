@@ -376,6 +376,31 @@ function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
     svg.appendChild(rc.line(cx+18, hy-20, cx+28, hy-42, { stroke: '#e8e8d0', strokeWidth: 2, roughness: 0.6 }));
     svg.appendChild(rc.ellipse(cx+21, hy-26, 5, 2, { stroke:'#a08020', fill:'none', roughness:1, strokeWidth:1.5 }));
 
+  } else if (cls === 'bard') {
+    // Bard / Performer — colorful tunic, lute, feathered cap
+    // Flowing tunic
+    svg.appendChild(rc.polygon([
+      [cx-7,hy-34],[cx+7,hy-34],[cx+9,hy],[cx-9,hy]
+    ], opts(color, { roughness: 2.0 })));
+    // Contrast trim on tunic
+    svg.appendChild(rc.line(cx-7, hy-24, cx+7, hy-24, { stroke: darkColor, strokeWidth: 1.5, roughness: 1.5 }));
+    // Head
+    svg.appendChild(rc.ellipse(cx, hy-42, 13, 13, opts(shadeColor(color,-10))));
+    // Feathered cap (wide brim, feather)
+    svg.appendChild(rc.ellipse(cx, hy-48, 18, 4, opts(darkColor, {roughness:1.5})));
+    svg.appendChild(rc.rectangle(cx-6, hy-56, 12, 9, opts(darkColor, {roughness:1.5})));
+    svg.appendChild(rc.path(`M ${cx+6} ${hy-56} Q ${cx+14} ${hy-62} ${cx+12} ${hy-68} Q ${cx+8} ${hy-60} ${cx+6} ${hy-56}`,
+      { stroke: shadeColor(color,30), fill: shadeColor(color,20), fillStyle:'solid', roughness:2.5 }));
+    // Arms
+    svg.appendChild(rc.line(cx-7, hy-32, cx-13, hy-20, { stroke: color, strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx+7, hy-32, cx+14, hy-18, { stroke: color, strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    // Lute body (right hand)
+    svg.appendChild(rc.ellipse(cx+17, hy-14, 10, 12, opts(shadeColor(color,-20), {roughness:1.2})));
+    // Lute neck
+    svg.appendChild(rc.line(cx+14, hy-18, cx+10, hy-30, { stroke: shadeColor(color,-30), strokeWidth: 2.5, roughness:1.5 }));
+    // Lute strings
+    svg.appendChild(rc.line(cx+14, hy-18, cx+11, hy-30, { stroke: '#ddd', strokeWidth: 0.8, roughness:0.8 }));
+    svg.appendChild(rc.line(cx+15.5, hy-17, cx+12, hy-30, { stroke: '#ddd', strokeWidth: 0.8, roughness:0.8 }));
   } else if (cls === 'pirate' || cls === 'buccaneer') {
     svg.appendChild(rc.polygon([
       [cx-7,hy-32],[cx+7,hy-32],[cx+8,hy],[cx-8,hy]
@@ -554,6 +579,8 @@ function creatureTypeToClass(creatureType) {
 // class ids to the closest visual representation in drawCharacter.
 function resolveCharacterClass(classId, className) {
   const nameMap = {
+    // Space / Sci-fi
+    'alien': 'spaceranger', 'extraterrestrial': 'spaceranger',
     // Cyberpunk
     'netrunner': 'netrunner', 'hacker': 'netrunner', 'cyber': 'netrunner',
     'street samurai': 'warrior', 'cyber soldier': 'warrior',
@@ -570,6 +597,10 @@ function resolveCharacterClass(classId, className) {
     'samurai': 'samurai', 'ronin': 'samurai', 'shogun': 'samurai',
     'ninja': 'rogue', 'shinobi': 'rogue', 'kunoichi': 'rogue',
     'onmyoji': 'mage', 'yamabushi': 'healer',
+    // Performers / Social
+    'bard': 'bard', 'jester': 'bard', 'charlatan': 'bard',
+    'con artist': 'bard', 'gambler': 'bard', 'merchant': 'bard',
+    'trader': 'bard', 'kabuki actor': 'bard', 'cult leader': 'bard',
     // Post-Apocalyptic
     'raider': 'warrior', 'scavenger': 'rogue',
     'wasteland doc': 'healer', 'mechanic': 'mage',
@@ -579,6 +610,7 @@ function resolveCharacterClass(classId, className) {
     'oracle': 'mage', 'seer': 'mage',
     'champion': 'warrior', 'trickster god': 'rogue',
     // Fairy tale
+    'faerie': 'bard', 'creature': 'rogue', 'enchanter': 'bard',
     'knight errant': 'warrior', 'prince': 'warrior', 'princess': 'healer',
     'witch': 'mage', 'fairy godmother': 'mage',
     'rogue prince': 'rogue', 'shapeshifter': 'rogue',
@@ -593,7 +625,7 @@ function resolveCharacterClass(classId, className) {
     // Space
     'space ranger': 'spaceranger', 'pilot': 'spaceranger',
     'android': 'spaceranger', 'cyborg': 'spaceranger',
-    'xenobiologist': 'mage', 'engineer': 'mage',
+    'xenobiologist': 'mage', 'engineer': 'spaceranger', 'drone operator': 'spaceranger',
   };
 
   // Check display name first (className like "Netrunner")
