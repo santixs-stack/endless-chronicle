@@ -11,7 +11,7 @@ import { getItemDesc } from '../../data/startingGear.js';
 
 // ── Inventory list with React-state tooltips ───────────────────────────
 function InventoryList({ items }) {
-  const [hovered, setHovered] = useState(null);
+  const [tooltip, setTooltip] = useState(null); // { idx, desc, y }
   if (!items.length) return <span className={styles.empty}>Nothing yet…</span>;
   return (
     <div className={styles.inventoryList}>
@@ -19,14 +19,20 @@ function InventoryList({ items }) {
         const desc = getItemDesc(item);
         return (
           <div key={i} className={styles.inventoryItemWrap}
-            onMouseEnter={() => desc && setHovered(i)}
-            onMouseLeave={() => setHovered(null)}>
+            onMouseEnter={e => {
+              if (!desc) return;
+              const rect = e.currentTarget.getBoundingClientRect();
+              setTooltip({ idx: i, desc, y: rect.top });
+            }}
+            onMouseLeave={() => setTooltip(null)}>
             <div className={`${styles.inventoryItem} ${desc ? styles.inventoryItemTip : ''}`}>
               {item}
               {desc && <span className={styles.inventoryTipDot}>?</span>}
             </div>
-            {hovered === i && desc && (
-              <div className={styles.inventoryTooltip}>{desc}</div>
+            {tooltip?.idx === i && (
+              <div className={styles.inventoryTooltip} style={{ top: tooltip.y }}>
+                {tooltip.desc}
+              </div>
             )}
           </div>
         );
