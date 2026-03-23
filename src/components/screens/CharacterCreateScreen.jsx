@@ -262,6 +262,7 @@ Respond with ONLY the JSON object, no other text.`;
 function ConfirmCharacter({ char, playerIdx, playerCount, onConfirm, onBack }) {
   const [name, setName] = useState(char.name || '');
   const [age, setAge] = useState(char.age || '');
+  const [gender, setGender] = useState(char.gender || 'unspecified');
   const color = PLAYER_COLORS[playerIdx] || '#c4a84f';
 
   return (
@@ -295,6 +296,28 @@ function ConfirmCharacter({ char, playerIdx, playerCount, onConfirm, onBack }) {
         </div>
       </div>
 
+      {/* Gender selector */}
+      <div className={styles.genderRow}>
+        <span className={styles.confirmLabel}>Pronouns</span>
+        <div className={styles.genderBtns}>
+          {[
+            { id: 'male',       label: 'He / Him'   },
+            { id: 'female',     label: 'She / Her'  },
+            { id: 'nonbinary',  label: 'They / Them'},
+            { id: 'unspecified',label: 'Any'        },
+          ].map(g => (
+            <button
+              key={g.id}
+              className={`${styles.genderBtn} ${gender === g.id ? styles.genderBtnActive : ''}`}
+              style={gender === g.id ? { borderColor: color, color } : undefined}
+              onClick={() => setGender(g.id)}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className={styles.confirmDetails}>
         {char.role && <div className={styles.confirmRow}><span className={styles.confirmKey}>Background</span><span className={styles.confirmVal}>{char.role}</span></div>}
         {char.trait && <div className={styles.confirmRow}><span className={styles.confirmKey}>Trait</span><span className={styles.confirmVal}>{char.trait}</span></div>}
@@ -312,7 +335,7 @@ function ConfirmCharacter({ char, playerIdx, playerCount, onConfirm, onBack }) {
         <button className="btn-ghost" onClick={onBack}>← Regenerate</button>
         <button
           className="btn-primary"
-          onClick={() => onConfirm({ ...char, name: name || char.name, age: age || char.age })}
+          onClick={() => onConfirm({ ...char, name: name || char.name, age: age || char.age, gender })}
         >
           {playerCount > 1 && playerIdx < playerCount - 1
             ? `Confirm — Next Player →`
@@ -400,6 +423,7 @@ export default function CharacterCreateScreen() {
       motivation: char.motivation,
       backstory: char.backstory,
       class: cls.id,
+      gender: char.gender || 'unspecified',
       // Display name: use archetypeName if set (e.g. "Netrunner"), else DnD class name
       className: resolvedArchetypeName || cls.name,
       archetypeName: resolvedArchetypeName || null,  // keep for scene renderer lookup

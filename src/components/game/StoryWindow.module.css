@@ -394,3 +394,19 @@
   padding-right: 0.25rem;
   animation: fadeIn 0.4s ease;
 }
+
+/* ── Mobile story window ─────────────────── */
+@media (max-width: 640px) {
+  .outer { font-size: 0.9rem; }
+  .window { padding: 0.5rem 0.75rem; }
+  .narrator { font-size: 1rem; line-height: 1.65; }
+  .playerText { font-size: 0.9rem; }
+  .rollStrip { padding: 0.5rem 0.75rem; gap: 0.5rem; }
+  .rollDiceWrap { width: 38px; height: 38px; }
+  .rollDiceWrap svg { width: 38px; height: 38px; }
+  .rollOutcome { font-size: 0.75rem; }
+  .rollFlavor { display: none; }
+  .combatEvent { padding: 0.4rem 0.6rem; }
+  .sceneCard { font-size: 0.7rem; }
+  .thinkingWrap { padding: 0.75rem 0; }
+}

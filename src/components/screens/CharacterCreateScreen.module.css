@@ -199,3 +199,51 @@
 .genreBtnLabel { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); text-align: center; letter-spacing: 0.06em; }
 
 .footer { padding-top: 0.5rem; }
+
+/* ── Gender selector ─────────────────────── */
+.genderRow {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+.genderBtns {
+  display: flex; gap: 0.4rem; flex-wrap: wrap; flex: 1;
+}
+.genderBtn {
+  font-family: var(--font-mono); font-size: 0.64rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--bg-input); border: 1px solid var(--border);
+  color: var(--text-dim); border-radius: var(--radius-sm);
+  padding: 0.3rem 0.65rem; cursor: pointer;
+  transition: var(--transition);
+}
+.genderBtn:hover { border-color: var(--accent); color: var(--accent); }
+.genderBtnActive { font-weight: 700; }
+
+/* ── Mobile: confirm screen ──────────────── */
+@media (max-width: 640px) {
+  .confirmPanel { padding: 0.75rem; }
+  .confirmFields { flex-direction: column; gap: 0.5rem; }
+  .confirmInput[style] { width: 100% !important; }
+  .genderRow { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+  .genderBtns { gap: 0.35rem; }
+  .genderBtn { font-size: 0.7rem; padding: 0.45rem 0.8rem; }
+  .confirmActions { flex-direction: column; gap: 0.5rem; }
+  .confirmActions button { width: 100%; justify-content: center; }
+}
+
+/* ── Mobile character creation ───────────── */
+@media (max-width: 640px) {
+  .screen { padding: 0.75rem; }
+  .archetypeGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.4rem; }
+  .archetypeCard { padding: 0.75rem 0.5rem; }
+  .archetypeIcon { font-size: 1.4rem; }
+  .archetypeName { font-size: 0.75rem; }
+  .archetypeDesc { font-size: 0.62rem; }
+  .genreGrid { grid-template-columns: repeat(3, 1fr) !important; gap: 0.4rem; }
+  .genreBtn { padding: 0.65rem 0.4rem; }
+  .genreBtnIcon svg, .genreBtnIcon img { width: 22px !important; height: 22px !important; }
+  .genreBtnLabel { font-size: 0.6rem; }
+  .detectedBanner { font-size: 0.7rem; padding: 0.4rem 0.75rem; }
+  .freeformBox { padding: 0.75rem; }
+  .chatPanel { padding: 0.5rem; }
+}
