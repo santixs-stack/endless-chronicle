@@ -5,6 +5,7 @@ import { showNotif } from '../ui/Notification.jsx';
 import { SFX } from './SoundEngine.js';
 import GameIcon from '../ui/GameIcon.jsx';
 import styles from './GameSidebar.module.css';
+import { getItemDesc } from '../../data/startingGear.js';
 
 export default function GameSidebar({ open, onClose, onSave, onSettings, onJournal, onExport, onRecap, onCloud, onSearch, onCharSheet, onDebug }) {
   const { state, set, reset } = useGame();
@@ -81,9 +82,16 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
           <div className={styles.inventoryList}>
             {(state.sharedInventory || []).length === 0
               ? <span className={styles.empty}>Nothing yet…</span>
-              : (state.sharedInventory || []).slice(0, 12).map((item, i) => (
-                <div key={i} className={styles.inventoryItem}>{item}</div>
-              ))
+              : (state.sharedInventory || []).slice(0, 12).map((item, i) => {
+                const desc = getItemDesc(item);
+                return (
+                  <div key={i} className={`${styles.inventoryItem} ${desc ? styles.inventoryItemTip : ''}`}
+                    title={desc || undefined}>
+                    {item}
+                    {desc && <span className={styles.inventoryTipDot}>?</span>}
+                  </div>
+                );
+              })
             }
           </div>
 

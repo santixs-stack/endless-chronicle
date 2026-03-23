@@ -1,18 +1,31 @@
 import { useState } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { PLAYER_COLORS } from '../../lib/constants.js';
+import GameIcon from '../ui/GameIcon.jsx';
 import styles from './CharacterSheetOverlay.module.css';
 
-const CLASS_ABILITIES = {
-  warrior:     ['⚔ Power Strike — heavy weapon attack', '🛡 Shield Wall — reduce incoming damage', '💪 Battle Cry — boost party morale'],
-  mage:        ['🔮 Arcane Bolt — magical ranged attack', '✨ Spellweave — combine two spells', '🌀 Blink — short-range teleport'],
-  rogue:       ['🗡 Backstab — high damage from stealth', '🌑 Shadow Step — move unseen', '🎯 Exploit Weakness — find enemy weak point'],
-  ranger:      ['🏹 Precise Shot — long-range accuracy', '🐾 Track — follow any trail', '🌿 Nature Bond — communicate with animals'],
-  healer:      ['💚 Mend — restore HP to any ally', '✝ Cleanse — remove curses and poison', '🌟 Revive — bring downed ally back'],
-  bard:        ['🎵 Inspire — buff all party members', '📖 Lore Check — recall useful knowledge', '🎭 Disguise — alter appearance briefly'],
-  spaceranger: ['🔫 Plasma Shot — ranged energy attack', '🚀 Jetpack Dash — rapid movement', '📡 Scan — analyze any object or creature'],
-  pirate:      ['⚓ Boarding Strike — overwhelming attack', '🏴 Intimidate — frighten single enemy', '💰 Loot — find hidden valuables'],
+// Base class secondary abilities (2 per class — always available regardless of genre)
+const BASE_CLASS_ABILITIES = {
+  warrior:     ['🛡 Endure — shrug off a hit that would stop anyone else', '💪 Cleave — hit every enemy in reach with one strike'],
+  mage:        ['✨ Improvise — attempt any magical effect once per scene', '🌀 Counter — disrupt an enemy action with opposing magic'],
+  rogue:       ['🌑 Vanish — disappear into any shadow or crowd instantly', '🎯 Exploit — find and use one hidden weakness per target'],
+  ranger:      ['🐾 Track — follow any trail no matter how old or hidden', '🌿 Bond — one animal nearby will do one thing you ask'],
+  healer:      ['💚 Stabilize — stop anyone from dying, right now', '🌟 Cleanse — remove one curse, poison, or condition instantly'],
+  bard:        ['🎭 Read the Room — know exactly what anyone wants to hear', '📖 Recall — know one relevant fact about anything you encounter'],
+  spaceranger: ['📡 Scan — analyze any object, creature, or system in seconds', '🔧 MacGyver — improvise any device from available parts'],
+  pirate:      ['💰 Loot — find something valuable in any situation', '🏴 Intimidate — make one enemy hesitate or back down'],
 };
+
+// Build the abilities list for a player from their actual stored data
+function getPlayerAbilities(player) {
+  const cls = (player.class || 'warrior').toLowerCase();
+  const base = BASE_CLASS_ABILITIES[cls] || BASE_CLASS_ABILITIES.warrior;
+  // Signature ability comes from player.special (set during char creation, genre-aware)
+  const sig = player.special
+    ? [`⭐ ${player.archetypeName || 'Signature'}: ${player.special}`]
+    : [];
+  return [...sig, ...base];
+}
 
 const XP_THRESHOLDS = [0, 100, 250, 450, 700, 1000];
 
@@ -42,7 +55,7 @@ export default function CharacterSheetOverlay({ onClose }) {
 
   const color = PLAYER_COLORS[activeIdx] || '#c4a84f';
   const cls = (player.class || player.className || '').toLowerCase();
-  const abilities = CLASS_ABILITIES[cls] || CLASS_ABILITIES.warrior;
+  const abilities = getPlayerAbilities(player);
   const hpPct = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   const status = hpPct === 0 ? 'Fallen' : hpPct < 30 ? 'Critical' : hpPct < 60 ? 'Bloodied' : 'Healthy';
   const statusColor = hpPct === 0 ? '#e05555' : hpPct < 30 ? '#e05555' : hpPct < 60 ? '#e09030' : '#6dbb7c';
@@ -52,7 +65,12 @@ export default function CharacterSheetOverlay({ onClose }) {
       <div className={styles.sheet}>
         <div className={styles.header} style={{ borderTopColor: color }}>
           <div className={styles.headerLeft}>
-            <div className={styles.classIcon}>{player.classIcon || '⚔'}</div>
+            <div className={styles.classIcon}>
+              {player.classIcon && player.classIcon.includes('/')
+                ? <GameIcon path={player.classIcon} size={28} tint="accent" />
+                : <span style={{ fontSize: '1.6rem' }}>{player.classIcon || '⚔'}</span>
+              }
+            </div>
             <div>
               <div className={styles.playerName} style={{ color }}>{player.name}</div>
               <div className={styles.playerSub}>{player.className} · Age {player.age || '?'} · Level {player.level || 1}</div>

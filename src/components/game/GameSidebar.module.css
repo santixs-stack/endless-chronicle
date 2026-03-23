@@ -53,3 +53,50 @@
     z-index: 280;
   }
 }
+
+/* ── Inventory item tooltips ── */
+.inventoryItemTip {
+  position: relative;
+  padding-right: 1.4rem;
+  cursor: help;
+}
+
+.inventoryItemTip:hover {
+  color: var(--accent);
+  background: rgba(196,168,79,0.06);
+  border-radius: 4px;
+}
+
+.inventoryItemTip[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 8px;
+  background: #1a1624;
+  border: 1px solid rgba(196,168,79,0.25);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: #c8c0d8;
+  width: 200px;
+  white-space: normal;
+  z-index: 100;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.inventoryTipDot {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.55rem;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  opacity: 0.5;
+  line-height: 1;
+  font-weight: 700;
+}
