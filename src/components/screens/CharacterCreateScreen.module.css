@@ -31,7 +31,7 @@
 }
 .sectionHeader { margin-bottom: 1rem; }
 .sectionTitle { font-family: var(--font-title); font-size: 1rem; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; display: block; }
-.sectionSub { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; display: block; margin-top: 0.2rem; }
+.sectionSub { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.08em; display: block; margin-top: 0.2rem; }
 
 /* Archetype grid — 4 cols, wraps to 2 */
 .archetypeGrid {
@@ -55,12 +55,12 @@
 }
 .archetypeIcon { font-size: 1.5rem; }
 .archetypeName { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
-.archetypeDesc { font-family: var(--font-body); font-size: 0.72rem; color: var(--text-dim); line-height: 1.4; }
+.archetypeDesc { font-family: var(--font-body); font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
 
 /* Or divider */
 .orDivider { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.9rem; }
 .orLine { flex: 1; height: 1px; background: var(--border); }
-.orText { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; white-space: nowrap; }
+.orText { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.1em; white-space: nowrap; }
 
 /* Free-form */
 .freeformRow { display: flex; gap: 0.7rem; align-items: flex-end; }
@@ -71,7 +71,7 @@
   resize: none; transition: var(--transition);
 }
 .freeformInput:focus { outline: none; border-color: var(--accent); }
-.freeformInput::placeholder { color: var(--text-dim); }
+.freeformInput::placeholder { color: var(--text-muted); }
 .freeformBtn {
   font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em;
   text-transform: uppercase; white-space: nowrap;
@@ -89,7 +89,7 @@
 }
 .quickHeader { margin-bottom: 0.8rem; }
 .quickTitle { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
-.quickSub { font-family: var(--font-mono); font-size: 0.58rem; color: var(--text-dim); letter-spacing: 0.06em; display: block; margin-top: 0.15rem; }
+.quickSub { font-family: var(--font-mono); font-size: 0.58rem; color: var(--text-muted); letter-spacing: 0.06em; display: block; margin-top: 0.15rem; }
 
 /* Preset grid — horizontal scroll on small screens */
 .presetGrid {
@@ -108,7 +108,7 @@
 .presetIcon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
 .presetInfo { min-width: 0; }
 .presetName { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; }
-.presetTagline { font-family: var(--font-body); font-size: 0.68rem; color: var(--text-dim); line-height: 1.35; margin-top: 0.1rem; }
+.presetTagline { font-family: var(--font-body); font-size: 0.68rem; color: var(--text-muted); line-height: 1.35; margin-top: 0.1rem; }
 
 /* AI Chat panel */
 .chatPanel {
@@ -154,7 +154,7 @@
   border: none; border-radius: var(--radius-sm); padding: 0.5rem 0.9rem;
   cursor: pointer; white-space: nowrap;
 }
-.chatBack { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-dim); background: none; border: none; cursor: pointer; align-self: flex-start; letter-spacing: 0.06em; }
+.chatBack { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); background: none; border: none; cursor: pointer; align-self: flex-start; letter-spacing: 0.06em; }
 .chatBack:hover { color: var(--text); }
 
 /* Confirm panel */
@@ -165,11 +165,11 @@
 }
 .confirmHeader { }
 .confirmTitle { font-family: var(--font-title); font-size: 1rem; font-weight: 700; letter-spacing: 0.08em; }
-.confirmSub { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.06em; margin-top: 0.2rem; }
+.confirmSub { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.06em; margin-top: 0.2rem; }
 
 .confirmFields { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; }
 .confirmField { display: flex; flex-direction: column; gap: 0.25rem; }
-.confirmLabel { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; color: var(--text-dim); }
+.confirmLabel { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; color: var(--text-muted); }
 .confirmInput {
   background: var(--bg-input); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: 0.4rem 0.6rem;
@@ -183,7 +183,7 @@
 .confirmKey { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; flex-shrink: 0; min-width: 90px; }
 .confirmVal { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
 .confirmBackstory { font-family: var(--font-body); font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; font-style: italic; padding: 0.6rem 0.8rem; background: var(--bg-input); border-radius: 5px; border-left: 2px solid var(--accent); }
-.confirmClass { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.06em; }
+.confirmClass { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.06em; }
 .confirmClass strong { color: var(--accent); }
 
 .confirmActions { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: auto; flex-wrap: wrap; }
@@ -212,7 +212,7 @@
   font-family: var(--font-mono); font-size: 0.64rem;
   letter-spacing: 0.06em; text-transform: uppercase;
   background: var(--bg-input); border: 1px solid var(--border);
-  color: var(--text-dim); border-radius: var(--radius-sm);
+  color: var(--text-muted); border-radius: var(--radius-sm);
   padding: 0.3rem 0.65rem; cursor: pointer;
   transition: var(--transition);
 }

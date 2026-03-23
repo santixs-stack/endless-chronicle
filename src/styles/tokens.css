@@ -9,16 +9,16 @@
   --bg: #0a0812;
   --bg-card: #120f1c;
   --bg-panel: #0e0b18;
-  --bg-input: #0a0912;
+  --bg-input: #0e0b18;
 
   /* Borders */
-  --border: #1e1a2e;
-  --border-accent: #2e2848;
+  --border: #2e2844;
+  --border-accent: #4a4068;
 
   /* Text */
-  --text: #e8e0f0;
-  --text-muted: #a098b8;
-  --text-dim: #5a5270;
+  --text: #eee8f8;
+  --text-muted: #c0b8d8;
+  --text-dim: #8880a8;
 
   /* Accent — gold */
   --accent: #c4a84f;

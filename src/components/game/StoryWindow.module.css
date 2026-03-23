@@ -44,7 +44,7 @@
 }
 .playerHeader { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem; }
 .playerArrow  { font-size: 0.65rem; opacity: 0.8; }
-.playerName   { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+.playerName   { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: inherit; }
 .playerText   { font-family: var(--font-body); font-size: 0.92rem; color: #c8c0d8; font-style: italic; line-height: 1.55; }
 
 /* Combat block wrapper */
@@ -153,7 +153,7 @@
   display: flex; align-items: center; gap: 0.65rem;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
   animation: slideIn 0.3s ease;
 }
 .npcFriendly { background: rgba(109,187,124,0.06); border-color: rgba(109,187,124,0.18); }
@@ -180,7 +180,7 @@
 .npcRelBadge[data-rel="hostile"] { background: rgba(224,85,85,0.15); color: #e05555; }
 .npcRelBadge[data-rel="friendly"],
 .npcRelBadge[data-rel="ally"]    { background: rgba(109,187,124,0.15); color: #6dbb7c; }
-.npcRelBadge[data-rel="neutral"] { background: rgba(255,255,255,0.06); color: var(--text-dim); }
+.npcRelBadge[data-rel="neutral"] { background: rgba(255,255,255,0.1); color: var(--text-dim); }
 
 /* ── Scene change card ──────────────────── */
 .sceneCard {
@@ -195,7 +195,7 @@
 .sceneLabel {
   font-family: var(--font-mono); font-size: 0.55rem;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
 
 /* ── Player entry with icon ─────────────── */
@@ -260,7 +260,7 @@
   padding: 0.45rem 0.8rem;
   margin: 0.5rem 0;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
   border-left: 3px solid var(--player-color, var(--accent));
   background: rgba(255,255,255,0.02);
   animation: slideIn 0.35s ease;
@@ -292,7 +292,7 @@
   gap: 0.75rem;
   padding: 0.6rem 1rem;
   margin: 0.3rem 0;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 8px;
   background: rgba(255,255,255,0.025);
   overflow: hidden;

@@ -65,12 +65,12 @@
 
 .statLabelShort {
   font-family: var(--font-mono); font-size: 0.6rem;
-  letter-spacing: 0.08em; color: var(--text-dim);
+  letter-spacing: 0.08em; color: var(--text-muted);
   font-weight: 700;
 }
 
 .statBarTrack {
-  height: 4px; background: rgba(255,255,255,0.06);
+  height: 4px; background: rgba(255,255,255,0.1);
   border-radius: 2px; overflow: hidden;
 }
 

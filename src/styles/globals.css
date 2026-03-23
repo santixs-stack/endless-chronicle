@@ -14,7 +14,7 @@ html, body, #root {
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a2535; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: #3a3550; border-radius: 2px; }
 
 /* ── SCREEN SYSTEM ── */
 .app-root {

@@ -2,8 +2,8 @@
 
 /* Action chips */
 .chips { display: flex; align-items: center; flex-wrap: wrap; gap: 0.35rem; padding: 0.5rem 1rem 0; }
-.chipsLabel { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
-.chip { font-family: var(--font-body); font-size: 0.82rem; color: var(--text-muted); background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.18rem 0.55rem; cursor: pointer; transition: var(--transition); }
+.chipsLabel { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+.chip { font-family: var(--font-body); font-size: 0.82rem; color: var(--text); background: var(--bg-input); border: 1px solid var(--border-accent); border-radius: var(--radius-sm); padding: 0.18rem 0.55rem; cursor: pointer; transition: var(--transition); }
 .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--mode-glow); }
 .assessChip { border-color: rgba(85,149,224,0.4); color: #5595e0; }
 .assessChip:hover { border-color: #5595e0; background: rgba(85,149,224,0.1); color: #7ab4f0; }
