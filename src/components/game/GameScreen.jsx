@@ -206,9 +206,31 @@ export default function GameScreen() {
     ];
     set({ hiddenArc: arc, sharedInventory: seedInventory });
     const g = state.goal;
-    const goalCtx = g ? `Quest: ${g.name}. ${g.start || g.hint}` : 'Begin the story.';
-    const partyNames = state.players.map(p => `${p.name} the ${p.className}`).join(' and ');
-    const prompt = `${goalCtx}\n\nParty: ${partyNames}.\n\nWrite the opening scene SHORT (2-4 sentences). Drop players straight into action. End with a direct question to ${state.players[0]?.name || 'Player 1'}. Include [SCENE:...] and [ACTIONS:...] tags.`;
+    const goalCtx = g ? `Quest: "${g.name}". Hook: ${g.start || g.hint}` : 'Begin the story.';
+    const world = state.world;
+    const worldCtx = world ? `World: ${world.world}. Starting location: ${world.location}. Tone: ${world.tone}.` : '';
+    const partyLines = state.players.map(p =>
+      `- ${p.name} (${p.className}): ${p.role || p.trait || p.backstory || ''}`
+    ).join('\n');
+
+    const prompt = `${goalCtx}
+
+${worldCtx}
+
+Party members:
+${partyLines}
+
+Write a rich OPENING SCENE for this adventure. Structure it in three clear beats:
+
+1. ATMOSPHERE (2-3 sentences): Paint the setting with sensory detail — sights, sounds, smells. Make the world feel real and specific. Reference the location and tone.
+
+2. PARTY INTRODUCTION (1-2 sentences per character): Briefly establish each character in this world — what they look like here, what they're doing, why they're here. Ground each character in the scene.
+
+3. THE HOOK (2-3 sentences): Something is happening RIGHT NOW that demands attention. Create immediate dramatic tension that ties directly to the quest. End by asking ${state.players[0]?.name || 'the first player'} what they do.
+
+Keep the total to 3-4 short paragraphs. No exposition dumps — show don't tell. Make it vivid and immediate.
+
+Include [SCENE:...] and [ACTIONS:...] tags.`;
     const msgs = [{ role: 'user', content: prompt }];
     set({ isLoading: true });
     setApiError(null);
