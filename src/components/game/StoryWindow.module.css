@@ -283,3 +283,53 @@
   letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--text-dim);
 }
+
+/* ── Dice result on player action ────────── */
+.diceResultWrap {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  margin-left: 0.4rem; flex-shrink: 0;
+  animation: diceReveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.diceD20 {
+  display: inline-flex; align-items: center; gap: 0.18rem;
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 5px;
+  padding: 0.1rem 0.35rem;
+  font-family: var(--font-mono); font-size: 0.65rem;
+  background: rgba(255,255,255,0.04);
+}
+
+.diceCrit {
+  animation: diceReveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), dicePulse 0.8s ease 0.4s 2;
+  box-shadow: 0 0 8px rgba(240,192,64,0.5);
+}
+
+.diceFumble {
+  animation: diceReveal 0.4s ease, diceShake 0.4s ease 0.4s;
+}
+
+.diceIcon { font-size: 0.55rem; opacity: 0.7; }
+.diceNum  { font-weight: 700; }
+
+.diceLabel {
+  font-family: var(--font-mono); font-size: 0.55rem;
+  letter-spacing: 0.06em; font-weight: 700; opacity: 0.85;
+  text-transform: uppercase;
+}
+
+@keyframes diceReveal {
+  0%   { transform: scale(0) rotate(-180deg); opacity: 0; }
+  60%  { transform: scale(1.15) rotate(8deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes dicePulse {
+  0%,100% { box-shadow: 0 0 8px rgba(240,192,64,0.5); }
+  50%     { box-shadow: 0 0 16px rgba(240,192,64,0.8); }
+}
+
+@keyframes diceShake {
+  0%,100% { transform: translateX(0); }
+  25%     { transform: translateX(-3px); }
+  75%     { transform: translateX(3px); }
+}

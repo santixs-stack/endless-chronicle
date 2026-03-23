@@ -244,9 +244,27 @@ export default function GameScreen() {
       const actualLevel = newLevel === -1 ? XP_LEVELS.length : newLevel;
 
       if (actualLevel > oldLevel) {
-        setPlayer(target, { xp: newXP, level: actualLevel });
-        showNotif(`⬆ ${player.name} reached Level ${actualLevel}!`, 'success');
-        addJournal(`${player.name} leveled up to Level ${actualLevel}!`);
+        // Apply stat bumps for each level gained
+        const bumps = LEVEL_STAT_BUMPS[player.class || 'warrior'] || {};
+        const levelsGained = actualLevel - oldLevel;
+        const statUpdates = {
+          xp: newXP,
+          level: actualLevel,
+          str: (player.str || 10) + (bumps.str || 0) * levelsGained,
+          dex: (player.dex || 10) + (bumps.dex || 0) * levelsGained,
+          int: (player.int || 10) + (bumps.int || 0) * levelsGained,
+          wis: (player.wis || 10) + (bumps.wis || 0) * levelsGained,
+          con: (player.con || 10) + (bumps.con || 0) * levelsGained,
+          hp: Math.min((player.hp || player.maxHp), (player.maxHp || 10) + (bumps.hp || 0) * levelsGained),
+          maxHp: (player.maxHp || 10) + (bumps.hp || 0) * levelsGained,
+        };
+        setPlayer(target, statUpdates);
+        const bumpDesc = Object.entries(bumps)
+          .filter(([,v]) => v > 0)
+          .map(([k,v]) => `+${v*levelsGained} ${k.toUpperCase()}`)
+          .join(', ');
+        showNotif(`⬆ ${player.name} reached Level ${actualLevel}! ${bumpDesc}`, 'success');
+        addJournal(`${player.name} leveled up to Level ${actualLevel}! Gained: ${bumpDesc}`);
         SFX.levelUp();
       } else {
         setPlayer(target, { xp: newXP });
@@ -296,6 +314,7 @@ export default function GameScreen() {
         updates.sharedInventory = merged;
       }
 
+      if (parsed.rolls?.length)   updates.lastRoll    = parsed.rolls[0];   // e.g. 'd20=17'
       if (parsed.scene)           updates.lastScene   = parsed.scene;
       if (parsed.location)        updates.location    = parsed.location;
       if (parsed.milestone != null) updates.milestones = parsed.milestone;

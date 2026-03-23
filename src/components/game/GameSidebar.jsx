@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
@@ -6,6 +7,33 @@ import { SFX } from './SoundEngine.js';
 import GameIcon from '../ui/GameIcon.jsx';
 import styles from './GameSidebar.module.css';
 import { getItemDesc } from '../../data/startingGear.js';
+
+
+// ── Inventory list with React-state tooltips ───────────────────────────
+function InventoryList({ items }) {
+  const [hovered, setHovered] = useState(null);
+  if (!items.length) return <span className={styles.empty}>Nothing yet…</span>;
+  return (
+    <div className={styles.inventoryList}>
+      {items.slice(0, 12).map((item, i) => {
+        const desc = getItemDesc(item);
+        return (
+          <div key={i} className={styles.inventoryItemWrap}
+            onMouseEnter={() => desc && setHovered(i)}
+            onMouseLeave={() => setHovered(null)}>
+            <div className={`${styles.inventoryItem} ${desc ? styles.inventoryItemTip : ''}`}>
+              {item}
+              {desc && <span className={styles.inventoryTipDot}>?</span>}
+            </div>
+            {hovered === i && desc && (
+              <div className={styles.inventoryTooltip}>{desc}</div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function GameSidebar({ open, onClose, onSave, onSettings, onJournal, onExport, onRecap, onCloud, onSearch, onCharSheet, onDebug }) {
   const { state, set, reset } = useGame();
@@ -84,21 +112,7 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
 
           {/* Inventory */}
           <div className={styles.sectionTitle} style={{ marginTop: '0.6rem' }}>Inventory</div>
-          <div className={styles.inventoryList}>
-            {(state.sharedInventory || []).length === 0
-              ? <span className={styles.empty}>Nothing yet…</span>
-              : (state.sharedInventory || []).slice(0, 12).map((item, i) => {
-                const desc = getItemDesc(item);
-                return (
-                  <div key={i} className={`${styles.inventoryItem} ${desc ? styles.inventoryItemTip : ''}`}
-                    title={desc || undefined}>
-                    {item}
-                    {desc && <span className={styles.inventoryTipDot}>?</span>}
-                  </div>
-                );
-              })
-            }
-          </div>
+          <InventoryList items={state.sharedInventory || []} />
 
           {/* Journal preview */}
           {(state.journal || []).length > 0 && (

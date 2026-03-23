@@ -111,6 +111,33 @@ export default function CharacterSheetOverlay({ onClose }) {
               </div>
             </div>
             <XpBar current={player.xp || 0} level={player.level || 1} />
+
+            {/* ── Stats grid ── */}
+            <div className={styles.sectionTitle} style={{ marginTop: '0.8rem' }}>Attributes</div>
+            <div className={styles.statsGrid}>
+              {[
+                { key: 'str', label: 'STR', desc: 'Strength' },
+                { key: 'dex', label: 'DEX', desc: 'Dexterity' },
+                { key: 'int', label: 'INT', desc: 'Intelligence' },
+                { key: 'wis', label: 'WIS', desc: 'Wisdom' },
+                { key: 'con', label: 'CON', desc: 'Constitution' },
+              ].map(({ key, label, desc }) => {
+                const val = player[key] || 10;
+                const mod = Math.floor((val - 10) / 2);
+                const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
+                const barPct = Math.min(100, (val / 20) * 100);
+                return (
+                  <div key={key} className={styles.statRow} title={desc}>
+                    <span className={styles.statLabelShort}>{label}</span>
+                    <div className={styles.statBarTrack}>
+                      <div className={styles.statBarFill} style={{ width: `${barPct}%` }} />
+                    </div>
+                    <span className={styles.statValNum}>{val}</span>
+                    <span className={styles.statMod}>{modStr}</span>
+                  </div>
+                );
+              })}
+            </div>
             <div className={styles.sectionTitle} style={{ marginTop: '0.8rem' }}>Character</div>
             <div className={styles.statBlock}>
               <div className={styles.statLabel}>Background</div>

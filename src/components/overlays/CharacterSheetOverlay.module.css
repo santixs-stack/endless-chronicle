@@ -48,3 +48,44 @@
   .body { grid-template-columns:1fr; }
 }
 @keyframes fadeIn { from{opacity:0;transform:scale(.98)} to{opacity:1;transform:scale(1)} }
+
+/* ── Stats grid ── */
+.statsGrid {
+  display: flex; flex-direction: column; gap: 0.28rem;
+  margin-top: 0.3rem;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr 1.8rem 2rem;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: default;
+}
+
+.statLabelShort {
+  font-family: var(--font-mono); font-size: 0.6rem;
+  letter-spacing: 0.08em; color: var(--text-dim);
+  font-weight: 700;
+}
+
+.statBarTrack {
+  height: 4px; background: rgba(255,255,255,0.06);
+  border-radius: 2px; overflow: hidden;
+}
+
+.statBarFill {
+  height: 100%; background: var(--accent);
+  border-radius: 2px; opacity: 0.7;
+  transition: width 0.5s ease;
+}
+
+.statValNum {
+  font-family: var(--font-mono); font-size: 0.72rem;
+  color: #e8e0f0; text-align: right; font-weight: 600;
+}
+
+.statMod {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  color: var(--accent); opacity: 0.7; text-align: right;
+}

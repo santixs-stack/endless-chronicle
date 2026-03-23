@@ -259,6 +259,30 @@ function TurnHandoff({ playerName, playerColor, playerIcon }) {
   );
 }
 
+
+// ── Animated dice result shown after player action ──────────────────────
+function DiceResult({ roll, color }) {
+  const isCrit = roll === 20;
+  const isFumble = roll === 1;
+  const isGreat = roll >= 15;
+  const isWeak  = roll <= 5;
+  const label = isCrit ? 'CRIT!' : isFumble ? 'FUMBLE' : isGreat ? 'Great' : isWeak ? 'Miss' : null;
+  const resultColor = isCrit ? '#f0c040' : isFumble ? '#e05555' : isGreat ? '#6dbb7c' : isWeak ? '#e09030' : color;
+
+  return (
+    <span className={styles.diceResultWrap}>
+      <span className={`${styles.diceD20} ${isCrit ? styles.diceCrit : isFumble ? styles.diceFumble : ''}`}
+        style={{ borderColor: resultColor + '88', color: resultColor }}>
+        <span className={styles.diceIcon}>⬡</span>
+        <span className={styles.diceNum}>{roll}</span>
+      </span>
+      {label && (
+        <span className={styles.diceLabel} style={{ color: resultColor }}>{label}</span>
+      )}
+    </span>
+  );
+}
+
 // ── Main StoryWindow ───────────────────────
 export default function StoryWindow() {
   const { state } = useGame();
@@ -317,7 +341,22 @@ export default function StoryWindow() {
     if (msg.role === 'user') {
       const clean = msg.content.replace(/^\[.+?'s turn\]:\s*/, '').trim();
       const pIdx  = playerTurnCount % (state.playerCount || 1);
-      timeline.push({ type: 'player', text: clean, playerIdx: pIdx });
+      // Look ahead to next assistant message for roll result
+      const nextMsg = msgs[i + 1];
+      let rollResult = null;
+      if (nextMsg?.role === 'assistant') {
+        const nextParsed = parseAllTags(nextMsg.content);
+        if (nextParsed.rolls?.length) {
+          // e.g. 'd20=17' → extract number
+          const m = nextParsed.rolls[0].match(/=(\d+)/);
+          if (m) rollResult = parseInt(m[1]);
+        }
+        // Also check HPDELTA roll
+        if (!rollResult && nextParsed.hpDeltas?.length) {
+          rollResult = nextParsed.hpDeltas[0].roll || null;
+        }
+      }
+      timeline.push({ type: 'player', text: clean, playerIdx: pIdx, roll: rollResult });
       playerTurnCount++;
     } else if (msg.role === 'assistant' && msg !== firstAssistant) {
       const parsed    = parseAllTags(msg.content);
@@ -411,6 +450,9 @@ export default function StoryWindow() {
                     </div>
                     <span className={styles.playerName}>{playerName}</span>
                     <span className={styles.playerArrow}>▶</span>
+                    {item.roll != null && (
+                      <DiceResult roll={item.roll} color={playerColor} />
+                    )}
                   </div>
                   <div className={styles.playerText}>{item.text}</div>
                 </div>

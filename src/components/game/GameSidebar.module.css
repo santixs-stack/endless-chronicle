@@ -55,6 +55,10 @@
 }
 
 /* ── Inventory item tooltips ── */
+.inventoryItemWrap {
+  position: relative;
+}
+
 .inventoryItemTip {
   position: relative;
   padding-right: 1.4rem;
@@ -67,13 +71,11 @@
   border-radius: 4px;
 }
 
-.inventoryItemTip[title]:hover::after {
-  content: attr(title);
+.inventoryTooltip {
   position: absolute;
-  left: 100%;
+  left: calc(100% + 8px);
   top: 50%;
   transform: translateY(-50%);
-  margin-left: 8px;
   background: #1a1624;
   border: 1px solid rgba(196,168,79,0.25);
   border-radius: 6px;
@@ -83,9 +85,10 @@
   color: #c8c0d8;
   width: 200px;
   white-space: normal;
-  z-index: 100;
+  z-index: 200;
   pointer-events: none;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+  animation: fadeIn 0.15s ease;
 }
 
 .inventoryTipDot {
