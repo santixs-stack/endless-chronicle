@@ -410,3 +410,59 @@
   .sceneCard { font-size: 0.7rem; }
   .thinkingWrap { padding: 0.75rem 0; }
 }
+
+/* ── Collapsible scene wrapper ───────────── */
+.sceneWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sceneCollapseBtn {
+  display: none; /* desktop: hidden */
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+.sceneCollapseIcon {
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.sceneCollapseLabel {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.sceneCollapsed .sceneCollapseBtn {
+  border-bottom: none;
+}
+
+@media (max-width: 640px) {
+  .sceneCollapseBtn {
+    display: flex; /* mobile: show toggle */
+  }
+}
+
+/* ── Mobile: maximize story area height ───── */
+@media (max-width: 640px) {
+  .outer {
+    min-height: 0; /* prevent flex overflow */
+  }
+  .window {
+    padding: 0.7rem 0.9rem;
+    gap: 0.65rem;
+    /* Ensure story area scrolls and fills remaining space */
+    flex: 1;
+    min-height: 0;
+  }
+}

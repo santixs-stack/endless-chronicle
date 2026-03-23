@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { parseAllTags } from '../../engine/tags.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
@@ -333,6 +333,9 @@ export default function StoryWindow() {
   const { state } = useGame();
   const lastPlayerEntryRef = useRef(null);
   const windowRef = useRef(null);
+  // Mobile: scene collapsed by default on small screens
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 640;
+  const [sceneCollapsed, setSceneCollapsed] = useState(isMobile);
 
   useEffect(() => {
     if (lastPlayerEntryRef.current) {
@@ -449,14 +452,26 @@ export default function StoryWindow() {
   return (
     <div className={`${styles.outer} ${state.inCombat ? styles.combatMode : ''}`}>
       {state.lastScene && (
-        <SceneRenderer
-          scene={state.lastScene}
-          players={state.players}
-          turnCount={state.turnCount || 0}
-          inCombat={state.inCombat || false}
-          enemy={state.combatants?.find(c => c.relationship === 'enemy' || c.relationship === 'hostile')?.name || null}
-          npcs={state.npcs || []}
-        />
+        <div className={`${styles.sceneWrap} ${sceneCollapsed ? styles.sceneCollapsed : ''}`}>
+          <div className={styles.sceneCollapseBtn} onClick={() => setSceneCollapsed(c => !c)}>
+            <span className={styles.sceneCollapseIcon}>{sceneCollapsed ? '▲' : '▼'}</span>
+            <span className={styles.sceneCollapseLabel}>
+              {sceneCollapsed
+                ? `${state.lastScene.type || 'Scene'} · tap to expand`
+                : 'tap to collapse'}
+            </span>
+          </div>
+          {!sceneCollapsed && (
+            <SceneRenderer
+              scene={state.lastScene}
+              players={state.players}
+              turnCount={state.turnCount || 0}
+              inCombat={state.inCombat || false}
+              enemy={state.combatants?.find(c => c.relationship === 'enemy' || c.relationship === 'hostile')?.name || null}
+              npcs={state.npcs || []}
+            />
+          )}
+        </div>
       )}
 
       {state.inCombat && (

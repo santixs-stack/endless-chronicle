@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { RL_LABELS } from '../../data/readingLevels.js';
-import { stopMusic, setMusicVol } from '../game/MusicEngine.js';
+import { playTrack, stopMusic, setMusicVol, getMusicActive, getMusicVol } from '../game/MusicEngine.js';
 import { setSfxMuted, setSfxVolume, getSfxMuted, getSfxVolume } from '../game/SoundEngine.js';
 import { SFX } from '../game/SoundEngine.js';
 import styles from './SettingsOverlay.module.css';
@@ -15,10 +15,27 @@ const MODES = [
 
 export default function SettingsOverlay({ onClose }) {
   const { state, set, reset } = useGame();
+  const [musicActive, setMusicActive] = useState(getMusicActive());
+  const [musicVol,   setMusicVolState] = useState(getMusicVol());
   const [sfxMuted, setSfxMutedState] = useState(getSfxMuted());
   const [sfxVol,   setSfxVolState]   = useState(getSfxVolume());
 
   function setRL(level) { set({ readingLevel: level }); SFX.modeChange(); }
+
+  function toggleMusic() {
+    if (musicActive) {
+      stopMusic();
+      setMusicActive(null);
+    } else {
+      playTrack('peaceful');
+      setMusicActive('peaceful');
+    }
+  }
+
+  function handleMusicVol(v) {
+    setMusicVolState(v);
+    setMusicVol(v);
+  }
 
   function toggleSfx() {
     const next = !sfxMuted;
@@ -95,12 +112,21 @@ export default function SettingsOverlay({ onClose }) {
 
         {/* Music */}
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>Music Volume</div>
-          <div className={styles.sliderRow}>
-            <span className={styles.sliderIcon}>🎵</span>
-            <input type="range" min="0" max="1" step="0.05"
-              defaultValue="0.4" className={styles.slider}
-              onChange={e => setMusicVol(parseFloat(e.target.value))} />
+          <div className={styles.sectionTitle}>Music</div>
+          <div className={styles.sfxRow}>
+            <div className={styles.sliderRow} style={{ flex: 1, opacity: musicActive ? 1 : 0.4 }}>
+              <span className={styles.sliderIcon}>🎵</span>
+              <input type="range" min="0" max="1" step="0.05"
+                value={musicVol} className={styles.slider}
+                disabled={!musicActive}
+                onChange={e => handleMusicVol(parseFloat(e.target.value))} />
+            </div>
+            <button
+              className={`${styles.muteBtn} ${musicActive ? styles.muteBtnActive : ''}`}
+              onClick={toggleMusic}
+            >
+              {musicActive ? '🎵 On' : '🎵 Off'}
+            </button>
           </div>
         </div>
 

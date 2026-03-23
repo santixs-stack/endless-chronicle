@@ -108,3 +108,25 @@
   .hint { padding: 0 0.75rem 0.4rem; font-size: 0.6rem; }
   .turnRow { padding: 0.3rem 0.75rem 0; }
 }
+
+/* ── Mobile: chips single row, hide keyboard hint ── */
+@media (max-width: 640px) {
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    /* Fade right edge to hint at more chips */
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    padding: 0.22rem 0.5rem;
+    white-space: nowrap;
+  }
+  .hint { display: none; }
+}
