@@ -389,9 +389,12 @@ export default function StoryWindow() {
           const player        = state.players?.[item.playerIdx || 0];
           const playerName    = player?.name || 'Player';
 
-          // Get player's archetype icon
-          const genreIcons    = ARCHETYPE_ICONS['fantasy'] || {};
-          const playerIcon    = genreIcons[player?.class] || 'lorc/plain-dagger';
+          // Use player's stored classIcon (already a game-icons path set during char creation)
+          // Falls back to archetype lookup, then plain-dagger
+          const genreIcons = ARCHETYPE_ICONS['fantasy'] || {};
+          const playerIcon = (player?.classIcon && player.classIcon.includes('/'))
+            ? player.classIcon
+            : (genreIcons[player?.class] || 'lorc/plain-dagger');
 
           return (
             <div

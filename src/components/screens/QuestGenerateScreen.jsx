@@ -249,7 +249,11 @@ Respond ONLY with a JSON array of 4 objects, each with:
       <div className={styles.partyBanner}>
         {players.map((p, i) => (
           <span key={i} className={styles.partyChip}>
-            <span className={styles.partyIcon}>{p.classIcon || '⚔'}</span>
+            <span className={styles.partyIcon}>
+              {p.classIcon && p.classIcon.includes('/')
+                ? <GameIcon path={p.classIcon} size={14} tint="accent" />
+                : <span>{p.classIcon || '⚔'}</span>}
+            </span>
             <span className={styles.partyName}>{p.name}</span>
           </span>
         ))}

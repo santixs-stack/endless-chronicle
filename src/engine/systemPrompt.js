@@ -21,7 +21,7 @@ export function buildSystemPrompt(state) {
   const partyDesc = players.map((p, i) => {
     const lines = [
       `  Player ${i + 1} (${p.colorName}) — ${p.name}, ${p.age}`,
-      `    Role: ${p.role} | Class: ${p.className} ${p.classIcon} | HP: ${p.hp}/${p.maxHp} | Level: ${p.level || 1}`,
+      `    Role: ${p.role} | Class: ${p.className} | HP: ${p.hp}/${p.maxHp} | Level: ${p.level || 1}`,
       `    STR:${p.str} DEX:${p.dex} INT:${p.int} WIS:${p.wis} CON:${p.con}`,
       `    Signature Ability: ${p.special || 'none'}`,
     ];

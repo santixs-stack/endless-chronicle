@@ -48,7 +48,12 @@ export default function GameSidebar({ open, onClose, onSave, onSettings, onJourn
               <div className={styles.cardHeader}>
                 <span className={styles.cardDot} style={{ background: PLAYER_COLORS[i] }} />
                 <span className={styles.cardName}>{p.name}</span>
-                <span className={styles.cardClass}>{p.classIcon} {p.className}</span>
+                <span className={styles.cardClass}>
+                  {p.classIcon && p.classIcon.includes('/')
+                    ? <GameIcon path={p.classIcon} size={12} tint="muted" style={{marginRight:'0.25rem'}} />
+                    : <span style={{marginRight:'0.2rem'}}>{p.classIcon}</span>}
+                  {p.className}
+                </span>
                 <span className={styles.cardLevel}>Lv {p.level || 1}</span>
               </div>
               <div className={styles.hpRow}>
