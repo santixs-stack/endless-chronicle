@@ -405,6 +405,11 @@ export default function CharacterCreateScreen() {
       archetypeName: resolvedArchetypeName || null,  // keep for scene renderer lookup
       classIcon: gameIconPath,
       hp: cls.hp, maxHp: cls.hp,
+      str: cls.str || 10,
+      dex: cls.dex || 10,
+      int: cls.int || 10,
+      wis: cls.wis || 10,
+      con: cls.con || 10,
       xp: 0, level: 1,
       color: PLAYER_COLORS[idx],
       // Genre-aware starting gear and special
@@ -476,6 +481,11 @@ export default function CharacterCreateScreen() {
       archetypeName: preset.char.className || null,
       classIcon: preset.icon,
       hp: cls.hp, maxHp: cls.hp,
+      str: cls.str || 10,
+      dex: cls.dex || 10,
+      int: cls.int || 10,
+      wis: cls.wis || 10,
+      con: cls.con || 10,
       xp: 0, level: 1,
       color: PLAYER_COLORS[idx],
       startingGear: getStartingGear(defaultWorld.genre || genre, cls.id),
