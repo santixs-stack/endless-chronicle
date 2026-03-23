@@ -361,14 +361,16 @@ export default function StoryWindow() {
 
   return (
     <div className={`${styles.outer} ${state.inCombat ? styles.combatMode : ''}`}>
-      <SceneRenderer
-        scene={state.lastScene}
-        players={state.players}
-        turnCount={state.turnCount || 0}
-        inCombat={state.inCombat || false}
-        enemy={state.combatants?.find(c => c.relationship === 'enemy' || c.relationship === 'hostile')?.name || null}
-        npcs={state.npcs || []}
-      />
+      {state.lastScene && (
+        <SceneRenderer
+          scene={state.lastScene}
+          players={state.players}
+          turnCount={state.turnCount || 0}
+          inCombat={state.inCombat || false}
+          enemy={state.combatants?.find(c => c.relationship === 'enemy' || c.relationship === 'hostile')?.name || null}
+          npcs={state.npcs || []}
+        />
+      )}
 
       {state.inCombat && (
         <div className={styles.combatBorderTop}>⚔ COMBAT ⚔</div>
