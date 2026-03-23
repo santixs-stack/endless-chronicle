@@ -238,7 +238,13 @@ Include [SCENE:...] and [ACTIONS:...] tags.`;
     withRetry(() => callAPI(msgs, sysPrompt), 2)
       .then(text => {
         const parsed = parseAllTags(text);
-        set({ messages: [...msgs, { role: 'assistant', content: text }], isLoading: false, lastScene: parsed.scene || null, currentActions: parsed.actions || [] });
+        const openSceneUpdate = parsed.scene || (parsed.image ? {
+          type: parsed.image.setting || parsed.image.type,
+          time: parsed.image.time || 'day',
+          weather: parsed.image.weather || 'clear',
+          mood: parsed.image.mood || 'exciting',
+        } : null);
+        set({ messages: [...msgs, { role: 'assistant', content: text }], isLoading: false, lastScene: openSceneUpdate || null, currentActions: parsed.actions || [] });
         // Music handled in main handler below to respect combat/mood priority
       })
       .catch(err => {
@@ -337,7 +343,15 @@ Include [SCENE:...] and [ACTIONS:...] tags.`;
       }
 
       if (parsed.rolls?.length)   updates.lastRoll    = parsed.rolls[0];   // e.g. 'd20=17'
-      if (parsed.scene)           updates.lastScene   = parsed.scene;
+      // Update scene from [SCENE:...] OR fall back to [IMAGE:...] which is what the AI uses
+      const sceneUpdate = parsed.scene || (parsed.image ? {
+        type: parsed.image.setting || parsed.image.type,
+        time: parsed.image.time || 'day',
+        weather: parsed.image.weather || 'clear',
+        mood: parsed.image.mood || 'exciting',
+        inCombat: scene?.inCombat || false,
+      } : null);
+      if (sceneUpdate)            updates.lastScene   = sceneUpdate;
       if (parsed.location)        updates.location    = parsed.location;
       if (parsed.milestone != null) updates.milestones = parsed.milestone;
       if (parsed.stats?.health != null) updates.stats = { ...state.stats, health: parsed.stats.health };

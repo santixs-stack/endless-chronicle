@@ -96,7 +96,15 @@ TAGS — append after EVERY narrative response:
   5-15 for smart actions, 15-30 for major accomplishments, 30-50 for boss/milestone.
 
 When NPCs are introduced or change: [NPC:{"name":"Grax","role":"goblin scout","creatureType":"goblin","relationship":"enemy","note":""}]
-Always include creatureType — it drives the scene illustration. Valid types: goblin, goblin_archer, orc, skeleton, ghost, wraith, zombie, dragon, troll, demon, vampire, wolf, spider, alien_grey, robot_drone, kraken, bandit, thief, assassin, merchant, mage_npc, elder, knight, guard, rat, bat
+Always include creatureType — it drives the scene illustration. Pick the CLOSEST match:
+  Fantasy:    goblin | goblin_archer | orc | skeleton | ghost | wraith | zombie | dragon | troll | demon | vampire | wolf | spider | knight | guard | bandit | thief | assassin | merchant | mage_npc | elder | rat | bat | witch | mummy | yeti | djinn | pirate_npc
+  Cyberpunk:  netrunner | android | robot_drone | street_samurai | raider
+  Western:    gunslinger | sheriff | outlaw | desert_bandit
+  Ninja/Hist: samurai | ronin | shogun
+  Ocean/Myth: pirate_npc | mermaid | kraken | sea_captain
+  Post-Apoc:  raider | mutant | scavenger
+  Space:      alien_grey | robot_drone | android
+  Fallback:   bandit (humans), elder (wise NPCs), mage_npc (magic users), guard (soldiers)
 When journal-worthy: [JOURNAL:"one sentence entry"]
 When party advances toward goal: [MILESTONE:N]
 When something important is discovered: [CODEX:{"title":"","category":"person|place|item|lore","body":"1-2 sentences"}]

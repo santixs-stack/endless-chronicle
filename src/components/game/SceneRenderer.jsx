@@ -1590,6 +1590,11 @@ export default function SceneRenderer({ scene, players, turnCount = 0, inCombat,
     npcs: npcs || [],
   };
 
+  // Stable serialized key for NPC list — forces redraw when NPCs change
+  const npcsKey = npcs ? npcs.map(n => `${n.name}:${n.relationship}:${n.creatureType || n.role}`).join('|') : '';
+  // Stable key for players
+  const playersKey = players ? players.map(p => `${p.name}:${p.class}:${p.hp}`).join('|') : '';
+
   useEffect(() => {
     if (!svgRef.current) return;
     try {
@@ -1597,7 +1602,8 @@ export default function SceneRenderer({ scene, players, turnCount = 0, inCombat,
     } catch(e) {
       console.warn('SceneRenderer error:', e);
     }
-  }, [scene?.type, scene?.time, scene?.weather, scene?.inCombat, scene?.enemy, players, turnCount, inCombat, enemy, npcs]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene?.type, scene?.time, scene?.weather, scene?.mood, scene?.inCombat, scene?.enemy, playersKey, turnCount, inCombat, enemy, npcsKey]);
 
   return (
     <div className={styles.wrapper}>
