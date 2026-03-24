@@ -65,9 +65,11 @@ THIS IS A TABLETOP ADVENTURE. Embrace that spirit fully:
 - For contested actions, use dice roll results: [ROLL:d20=N]. 17-20 = exceptional, 10-16 = success, 5-9 = partial, 1-4 = failure.
 - NPCs have names, personalities, agendas, and secrets.
 - The world has internal logic and consequences.
+- CRITICAL: Every named character who appears in your response needs an [NPC:] tag at the end. A messenger? Tag them. A guard? Tag them. A wounded page? Tag them. This is what makes them appear in the scene illustration.
 ${goalHint}
 
 READING LEVEL: ${rlPrompt}
+(Note: reading level affects prose only — always emit all required tags regardless of reading level)
 
 ${worldStr}
 
@@ -95,16 +97,21 @@ TAGS — append after EVERY narrative response:
 [XP:{"player":"Name","amount":N,"reason":"brief"}]
   5-15 for smart actions, 15-30 for major accomplishments, 30-50 for boss/milestone.
 
-When NPCs are introduced or change: [NPC:{"name":"Grax","role":"goblin scout","creatureType":"goblin","relationship":"enemy","note":""}]
-Always include creatureType — it drives the scene illustration. Pick the CLOSEST match:
-  Fantasy:    goblin | goblin_archer | orc | skeleton | ghost | wraith | zombie | dragon | troll | demon | vampire | wolf | spider | knight | guard | bandit | thief | assassin | merchant | mage_npc | elder | rat | bat | witch | mummy | yeti | djinn | pirate_npc
-  Cyberpunk:  netrunner | android | robot_drone | street_samurai | raider
-  Western:    gunslinger | sheriff | outlaw | desert_bandit
-  Ninja/Hist: samurai | ronin | shogun
-  Ocean/Myth: pirate_npc | mermaid | kraken | sea_captain
-  Post-Apoc:  raider | mutant | scavenger
-  Space:      alien_grey | robot_drone | android
-  Fallback:   bandit (humans), elder (wise NPCs), mage_npc (magic users), guard (soldiers)
+⚠ NPC RULE — MANDATORY: Any time a named character, creature, or being appears in your response (arriving, speaking, attacking, fleeing, hiding — anything), you MUST emit an [NPC:] tag for them. No exceptions. This drives the scene illustration.
+[NPC:{"name":"Grax","role":"goblin scout","creatureType":"goblin","relationship":"enemy","note":""}]
+  relationship: "friendly" | "neutral" | "enemy" | "hostile" | "ally"
+  creatureType — pick the CLOSEST match:
+    Fantasy:    goblin | goblin_archer | orc | skeleton | ghost | wraith | zombie | dragon | troll | demon | vampire | wolf | spider | knight | guard | bandit | thief | assassin | merchant | mage_npc | elder | rat | bat | witch | mummy | yeti | djinn | pirate_npc
+    Cyberpunk:  netrunner | android | robot_drone | street_samurai | raider
+    Western:    gunslinger | sheriff | outlaw | desert_bandit
+    Ninja/Hist: samurai | ronin | shogun
+    Ocean/Myth: pirate_npc | mermaid | kraken | sea_captain
+    Post-Apoc:  raider | mutant | scavenger
+    Space:      alien_grey | robot_drone | android
+    Fallback:   bandit (humans), elder (wise NPCs), mage_npc (magic users), guard (soldiers)
+  Examples: A messenger arrives → [NPC:{"name":"Messenger","role":"royal courier","creatureType":"guard","relationship":"neutral","note":"carrying urgent news"}]
+            A wounded page → [NPC:{"name":"Page","role":"wounded castle page","creatureType":"guard","relationship":"friendly","note":"injured, seeking help"}]
+            An enemy appears → [NPC:{"name":"Dark Knight","role":"enemy knight","creatureType":"knight","relationship":"hostile","note":"blocking the gate"}]
 When journal-worthy: [JOURNAL:"one sentence entry"]
 When party advances toward goal: [MILESTONE:N]
 When something important is discovered: [CODEX:{"title":"","category":"person|place|item|lore","body":"1-2 sentences"}]
