@@ -174,3 +174,42 @@
   .questActions button { width: 100%; font-size: 0.7rem; }
   .craftScreen { padding: 1rem; }
 }
+
+/* ── Preset quest genre filter ─────────────── */
+.presetGenreRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.presetGenreBtn {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.55rem;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.presetGenreBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.presetGenreBtnActive {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--mode-glow);
+}
+
+@media (max-width: 640px) {
+  .presetGenreRow { gap: 0.25rem; }
+  .presetGenreBtn { font-size: 0.55rem; padding: 0.18rem 0.45rem; }
+}

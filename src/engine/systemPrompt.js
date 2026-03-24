@@ -20,9 +20,9 @@ export function buildSystemPrompt(state) {
   // Party description
   const partyDesc = players.map((p, i) => {
     const pronouns = { male:'he/him', female:'she/her', nonbinary:'they/them' };
-    const pronoun = pronouns[p.gender] || 'any pronouns';
+    const pronoun = pronouns[p.gender] || null;
     const lines = [
-      `  Player ${i + 1} (${p.colorName}) — ${p.name}, ${p.age} (${pronoun})`,
+      `  Player ${i + 1} (${p.colorName}) — ${p.name}, ${p.age}${pronoun ? ` (${pronoun})` : ''}`,
       `    Role: ${p.role} | Class: ${p.className} | HP: ${p.hp}/${p.maxHp} | Level: ${p.level || 1}`,
       `    STR:${p.str} DEX:${p.dex} INT:${p.int} WIS:${p.wis} CON:${p.con}`,
       `    Signature Ability: ${p.special || 'none'}`,

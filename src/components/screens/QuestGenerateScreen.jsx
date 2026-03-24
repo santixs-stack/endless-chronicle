@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { RL_QUEST_GUIDANCE } from '../../data/readingLevels.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { callAPI } from '../../engine/api.js';
@@ -118,10 +119,13 @@ export default function QuestGenerateScreen() {
   const [customText, setCustomText] = useState('');
   const [showCustom, setShowCustom] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
+  const detectedGenre = state.world?.genre || 'fantasy';
+  const [presetGenreFilter, setPresetGenreFilter] = useState(detectedGenre);
   const [error, setError] = useState(false);
 
   const players = state.players || [];
   const world = state.world;
+  const readingLevel = state.readingLevel || '4th';
   const names = players.map(p => p.name).join(' and ') || 'the party';
   const worldName = world?.world || 'your world';
 
@@ -155,6 +159,8 @@ ${world?.world || 'A fantasy world'}
 Location: ${world?.location || 'Unknown'}
 Tone: ${world?.tone || 'Epic & Exciting'}
 ${world?.extra ? `Extra lore: ${world.extra}` : ''}
+
+${RL_QUEST_GUIDANCE[readingLevel] || ''}
 
 Generate exactly 4 quest hooks that feel personally tailored to THIS specific party in THIS specific world. Reference the characters by name. Use their backstories and motivations to make the quest personal.
 
@@ -329,8 +335,20 @@ Respond ONLY with a JSON array of 4 objects, each with:
       {showPresets && (
         <div className={styles.presetSection}>
           <div className={styles.presetTitle}>Preset Quests</div>
+          {/* Genre filter pills */}
+          <div className={styles.presetGenreRow}>
+            {['fantasy','space','ocean','horror','western','postapoc','cyberpunk','mythology','fairytale','ninja','historical'].map(g => (
+              <button
+                key={g}
+                className={`${styles.presetGenreBtn} ${presetGenreFilter === g ? styles.presetGenreBtnActive : ''}`}
+                onClick={() => setPresetGenreFilter(g)}
+              >
+                {g.charAt(0).toUpperCase() + g.slice(1)}
+              </button>
+            ))}
+          </div>
           <div className={styles.presetGrid}>
-            {STORY_GOALS.map(quest => (
+            {STORY_GOALS.filter(q => !presetGenreFilter || q.genre === presetGenreFilter || !q.genre).map(quest => (
               <button
                 key={quest.id}
                 className={styles.presetCard}

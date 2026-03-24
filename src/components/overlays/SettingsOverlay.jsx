@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
-import { RL_LABELS } from '../../data/readingLevels.js';
+import { RL_LABELS, RL_SHORT } from '../../data/readingLevels.js';
 import { playTrack, stopMusic, setMusicVol, getMusicActive, getMusicVol } from '../game/MusicEngine.js';
 import { setSfxMuted, setSfxVolume, getSfxMuted, getSfxVolume } from '../game/SoundEngine.js';
 import { SFX } from '../game/SoundEngine.js';
@@ -95,7 +95,7 @@ export default function SettingsOverlay({ onClose }) {
 
         {/* Reading level */}
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>Reading Level</div>
+          <div className={styles.sectionTitle}>Experience Level</div>
           <div className={styles.rlGrid}>
             {LEVELS.map(lvl => (
               <button
@@ -103,7 +103,7 @@ export default function SettingsOverlay({ onClose }) {
                 className={`${styles.rlBtn} ${state.readingLevel === lvl ? styles.rlActive : ''}`}
                 onClick={() => setRL(lvl)}
               >
-                <div className={styles.rlLabel}>{RL_LABELS[lvl].split(' ')[0]}</div>
+                <div className={styles.rlLabel}>{RL_SHORT[lvl]}</div>
                 <div className={styles.rlSub}>{RL_LABELS[lvl].split('(')[1]?.replace(')', '') || ''}</div>
               </button>
             ))}

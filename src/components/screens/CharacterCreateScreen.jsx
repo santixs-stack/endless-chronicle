@@ -262,7 +262,7 @@ Respond with ONLY the JSON object, no other text.`;
 function ConfirmCharacter({ char, playerIdx, playerCount, onConfirm, onBack }) {
   const [name, setName] = useState(char.name || '');
   const [age, setAge] = useState(char.age || '');
-  const [gender, setGender] = useState(char.gender || 'unspecified');
+  const [gender, setGender] = useState(char.gender || '');
   const color = PLAYER_COLORS[playerIdx] || '#c4a84f';
 
   return (
@@ -301,10 +301,9 @@ function ConfirmCharacter({ char, playerIdx, playerCount, onConfirm, onBack }) {
         <span className={styles.confirmLabel}>Pronouns</span>
         <div className={styles.genderBtns}>
           {[
-            { id: 'male',       label: 'He / Him'   },
-            { id: 'female',     label: 'She / Her'  },
-            { id: 'nonbinary',  label: 'They / Them'},
-            { id: 'unspecified',label: 'Any'        },
+            { id: 'male',      label: 'He / Him'    },
+            { id: 'female',    label: 'She / Her'   },
+            { id: 'nonbinary', label: 'They / Them' },
           ].map(g => (
             <button
               key={g.id}
@@ -423,7 +422,7 @@ export default function CharacterCreateScreen() {
       motivation: char.motivation,
       backstory: char.backstory,
       class: cls.id,
-      gender: char.gender || 'unspecified',
+      gender: char.gender || '',
       // Display name: use archetypeName if set (e.g. "Netrunner"), else DnD class name
       className: resolvedArchetypeName || cls.name,
       archetypeName: resolvedArchetypeName || null,  // keep for scene renderer lookup
