@@ -1111,6 +1111,45 @@ const SCENE_MAP = {
   tavern:  { day:'village_day', night:'village_night' },
   road:    { day:'plains_day', night:'peaceful' },
   ship:    { day:'ocean_day',  night:'ocean_night' },
+  // New scene types
+  tower:          { day:'mysterious',  night:'dungeon' },
+  temple:         { day:'mysterious',  night:'ruins' },
+  shrine:         { day:'peaceful',    night:'mysterious' },
+  manor:          { day:'tension',     night:'dungeon' },
+  market:         { day:'village_day', night:'village_night' },
+  interior:       { day:'peaceful',    night:'peaceful' },
+  arena:          { day:'battle',      night:'battle' },
+  jail:           { day:'tension',     night:'dungeon' },
+  wasteland:      { day:'desert',      night:'tension' },
+  jungle:         { day:'forest_day',  night:'forest_night' },
+  // Space
+  spaceship:      { day:'space',       night:'space' },
+  space_station:  { day:'space',       night:'space' },
+  alien_planet:   { day:'mysterious',  night:'space' },
+  // Western
+  prairie:        { day:'plains_day',  night:'peaceful' },
+  saloon:         { day:'village_day', night:'village_night' },
+  frontier_town:  { day:'plains_day',  night:'peaceful' },
+  canyon:         { day:'desert',      night:'tension' },
+  mine:           { day:'dungeon',     night:'dungeon' },
+  // Horror
+  graveyard:      { day:'tension',     night:'dungeon' },
+  crypt:          { day:'dungeon',     night:'dungeon' },
+  asylum:         { day:'tension',     night:'dungeon' },
+  // Cyberpunk
+  neon_city:      { day:'tension',     night:'village_night' },
+  back_alley:     { day:'tension',     night:'tension' },
+  corp_building:  { day:'tension',     night:'tension' },
+  // Mythology
+  olympus:        { day:'triumphant',  night:'mysterious' },
+  underworld:     { day:'dungeon',     night:'dungeon' },
+  // Ninja / Samurai
+  dojo:           { day:'peaceful',    night:'peaceful' },
+  bamboo_forest:  { day:'forest_day',  night:'forest_night' },
+  fortress_jp:    { day:'castle_day',  night:'ruins' },
+  // Post-Apocalyptic
+  bunker:         { day:'tension',     night:'dungeon' },
+  ruined_city:    { day:'tension',     night:'tension' },
 };
 
 // FIX: Complete MOOD_MAP — covers all values AI can output

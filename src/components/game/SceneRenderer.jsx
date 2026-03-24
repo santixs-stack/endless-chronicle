@@ -2027,6 +2027,607 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
       }));
     }
   }
+
+  // ── Market / Town Square ────────────────────────────────────────────────
+  if (type === 'market') {
+    // Sun or moon
+    if (time === 'night') {
+      svg.appendChild(rc.circle(W*0.82, H*0.13, 22, { stroke:'#f5e68a', fill:'#fdf5b0', fillStyle:'solid', roughness:0.7 }));
+    } else {
+      svg.appendChild(rc.circle(W*0.82, H*0.12, 30, { stroke: pal.sun||'#FFE066', fill: pal.sun||'#FFE066', fillStyle:'solid', roughness:0.8 }));
+    }
+    // Background buildings
+    for (let i = 0; i < 8; i++) {
+      const bx = i*(W/7) + sr()*10-5;
+      const bh = 30 + sr()*50;
+      const bw = 28 + sr()*20;
+      const stone = pal.stone ? pal.stone[i%2] : '#9E8E7A';
+      svg.appendChild(rc.rectangle(bx-bw/2, H*0.66-bh, bw, bh, { stroke:shadeColor(stone,-20), fill:stone, fillStyle:'hachure', roughness:1.8, strokeWidth:1.2 }));
+      svg.appendChild(rc.rectangle(bx-bw/2-2, H*0.66-bh-6, bw+4, 8, { stroke:shadeColor(stone,-30), fill:pal.roof||'#A0522D', fillStyle:'solid', roughness:1.5 }));
+    }
+    // Market stalls — colourful awnings
+    const awningColors = pal.awning || ['#CC2222','#2244CC','#22AA44'];
+    for (let i = 0; i < 5; i++) {
+      const sx = W*0.08 + i*(W/5.2);
+      const sy = H*0.62;
+      const aw = awningColors[i%awningColors.length];
+      // Stall frame
+      svg.appendChild(rc.line(sx, sy, sx, sy-22, { stroke:'#6B4423', strokeWidth:3, roughness:1.5 }));
+      svg.appendChild(rc.line(sx+32, sy, sx+32, sy-22, { stroke:'#6B4423', strokeWidth:3, roughness:1.5 }));
+      // Awning
+      svg.appendChild(rc.polygon([[sx-4,sy-18],[sx+36,sy-18],[sx+32,sy-8],[sx,sy-8]], { stroke:shadeColor(aw,-20), fill:aw, fillStyle:'solid', roughness:1.8 }));
+      // Awning stripes
+      for (let s = 0; s < 3; s++) {
+        svg.appendChild(rc.line(sx+4+s*10, sy-18, sx+2+s*10, sy-8, { stroke:shadeColor(aw,30), strokeWidth:2, roughness:1.2 }));
+      }
+      // Counter / goods
+      svg.appendChild(rc.rectangle(sx-2, sy-8, 36, 5, { stroke:'#6B4423', fill:'#8B5A2A', fillStyle:'solid', roughness:1.5 }));
+    }
+    // Cobblestone ground hint
+    for (let i = 0; i < 12; i++) {
+      svg.appendChild(rc.ellipse(sr()*W, H*0.66+sr()*8, 14+sr()*10, 5, { stroke:shadeColor(pal.ground||'#8B7355',-10), fill:'none', roughness:2.0 }));
+    }
+  }
+
+  // ── Tower (Wizard / Watch Tower) ─────────────────────────────────────────
+  if (type === 'tower') {
+    // Night sky with moon
+    svg.appendChild(rc.circle(W*0.78, H*0.12, 22, { stroke:'#c8c0a0', fill:'#f5eecc', fillStyle:'solid', roughness:0.8 }));
+    // Stars
+    for (let i = 0; i < 30; i++) {
+      const sx = sr()*W, sy = sr()*H*0.5;
+      svg.appendChild(rc.circle(sx, sy, 1.2+sr()*1.5, { stroke:'none', fill:'#FFFDE7', fillStyle:'solid', roughness:0.3 }));
+    }
+    // Distant landscape — dark hills
+    svg.appendChild(rc.polygon([[0,H*0.72],[W*0.3,H*0.55],[W*0.6,H*0.62],[W,H*0.58],[W,H],[0,H]], { stroke:'none', fill:pal.far||'#1A1228', fillStyle:'solid', roughness:3 }));
+    // Tower structure — central
+    const tw = 60, tx = W*0.5;
+    const tBase = H*0.78, tTop = H*0.08;
+    svg.appendChild(rc.rectangle(tx-tw/2, tTop, tw, tBase-tTop, { stroke:pal.stone?pal.stone[0]:'#5A4870', fill:pal.stone?pal.stone[1]:'#4A3860', fillStyle:'hachure', roughness:1.5, strokeWidth:2 }));
+    // Battlements at top
+    for (let i = 0; i < 5; i++) {
+      svg.appendChild(rc.rectangle(tx-tw/2+i*14, tTop-10, 10, 12, { stroke:pal.stone?pal.stone[0]:'#5A4870', fill:pal.stone?pal.stone[1]:'#4A3860', fillStyle:'solid', roughness:1.5 }));
+    }
+    // Glowing windows
+    const winColor = pal.window || '#AAFFCC';
+    for (let i = 0; i < 4; i++) {
+      const wy = tTop + 20 + i*((tBase-tTop-40)/4);
+      svg.appendChild(rc.ellipse(tx, wy, 12, 16, { stroke:winColor, fill:winColor+'88', fillStyle:'solid', roughness:0.8 }));
+      // Glow
+      const glowEl = svgEl('ellipse', { cx:String(tx), cy:String(wy), rx:'20', ry:'22', fill:winColor, opacity:'0.12' });
+      svg.appendChild(glowEl);
+    }
+    // Tower door arch
+    svg.appendChild(rc.path(`M ${tx-10} ${tBase} Q ${tx} ${tBase-18} ${tx+10} ${tBase}`, { stroke:'#2A1828', fill:'#110814', fillStyle:'solid', roughness:1.2, strokeWidth:2 }));
+    // Flanking trees
+    for (let side of [-1,1]) {
+      const treex = tx + side*(tw/2+30);
+      svg.appendChild(rc.line(treex, H*0.78, treex, H*0.45, { stroke:pal.trunk||'#3A2018', strokeWidth:5, roughness:2 }));
+      svg.appendChild(rc.ellipse(treex, H*0.42, 25, 30, { stroke:'#1A3010', fill:'#1E3A14', fillStyle:'hachure', roughness:2.5 }));
+    }
+  }
+
+  // ── Prairie (Western open landscape) ─────────────────────────────────────
+  if (type === 'prairie') {
+    // Big sky sun
+    svg.appendChild(rc.circle(W*0.72, H*0.14, 38, { stroke:pal.sun||'#FFE566', fill:pal.sun||'#FFE566', fillStyle:'solid', roughness:0.7 }));
+    // Distant mesa/butte shapes
+    for (let i = 0; i < 4; i++) {
+      const mx = W*(0.1+i*0.22) + sr()*20;
+      const mh = 20 + sr()*35;
+      const mw = 40 + sr()*60;
+      svg.appendChild(rc.polygon([[mx-mw/2,H*0.64],[mx-mw/2+8,H*0.64-mh],[mx+mw/2-8,H*0.64-mh],[mx+mw/2,H*0.64]], {
+        stroke:shadeColor(pal.rock||'#A07840',-20), fill:pal.rock||'#A07840', fillStyle:'hachure', roughness:2.5
+      }));
+    }
+    // Fence posts
+    for (let i = 0; i < 9; i++) {
+      const px = i*(W/8);
+      svg.appendChild(rc.line(px, H*0.63, px, H*0.63-16, { stroke:'#6B4220', strokeWidth:3, roughness:2 }));
+    }
+    svg.appendChild(rc.line(0, H*0.63-8, W, H*0.63-9, { stroke:'#6B4220', strokeWidth:2, roughness:3 }));
+    svg.appendChild(rc.line(0, H*0.63-13, W, H*0.63-12, { stroke:'#6B4220', strokeWidth:1.5, roughness:3 }));
+    // Tumbleweeds
+    for (let i = 0; i < 3; i++) {
+      const tx2 = sr()*W, ty2 = H*0.63 + sr()*6;
+      svg.appendChild(rc.circle(tx2, ty2, 8+sr()*6, { stroke:'#8B6020', fill:'none', roughness:3.5 }));
+    }
+    // Grass tufts
+    for (let i = 0; i < 15; i++) {
+      const gx = sr()*W, gy = H*0.63 + sr()*8;
+      svg.appendChild(rc.line(gx, gy, gx+sr()*6-3, gy-8-sr()*6, { stroke:pal.grass?pal.grass[0]:'#A09040', strokeWidth:1.5, roughness:2 }));
+    }
+  }
+
+  // ── Frontier Town ─────────────────────────────────────────────────────────
+  if (type === 'frontier_town') {
+    // Sunset sky glow
+    svg.appendChild(rc.circle(W*0.7, H*0.15, 34, { stroke:pal.sun||'#FFE566', fill:pal.sun||'#FFE566', fillStyle:'solid', roughness:0.8 }));
+    // Western buildings — wooden facades
+    const woodColors = pal.wood || ['#8B5A2A','#7A4A1A','#9B6A3A'];
+    const buildingWidths = [70,55,80,65,75,60,70];
+    let bxPos = -10;
+    for (let i = 0; i < 7; i++) {
+      const bw2 = buildingWidths[i];
+      const bh2 = 35 + sr()*40;
+      const wood2 = woodColors[i%woodColors.length];
+      // Main wall
+      svg.appendChild(rc.rectangle(bxPos, H*0.65-bh2, bw2, bh2, { stroke:shadeColor(wood2,-25), fill:wood2, fillStyle:'hachure', roughness:2.2, strokeWidth:1.5 }));
+      // False front (raised facade)
+      svg.appendChild(rc.rectangle(bxPos-3, H*0.65-bh2-14, bw2+6, 16, { stroke:shadeColor(wood2,-30), fill:shadeColor(wood2,-10), fillStyle:'solid', roughness:1.8 }));
+      // Sign
+      if (i%2===0) {
+        svg.appendChild(rc.rectangle(bxPos+bw2*0.2, H*0.65-bh2+5, bw2*0.6, 10, { stroke:'#4A2808', fill:'#C4901A', fillStyle:'solid', roughness:1.5 }));
+      }
+      // Window
+      svg.appendChild(rc.rectangle(bxPos+bw2*0.25, H*0.65-bh2+18, bw2*0.2, bw2*0.18, { stroke:'#3A2010', fill:time==='night'?'#FFD060':'#A8C4D8', fillStyle:'solid', roughness:1.2 }));
+      bxPos += bw2 + 2;
+    }
+    // Dirt road markings
+    for (let i = 0; i < 5; i++) {
+      svg.appendChild(rc.line(sr()*W, H*0.66, sr()*W, H*0.68, { stroke:pal.dust||'#C4A060', strokeWidth:1, roughness:2.5 }));
+    }
+  }
+
+  // ── Canyon ─────────────────────────────────────────────────────────────────
+  if (type === 'canyon') {
+    // Hot sun
+    svg.appendChild(rc.circle(W*0.75, H*0.1, 32, { stroke:'#FFD060', fill:'#FFE080', fillStyle:'solid', roughness:0.7 }));
+    // Canyon walls — left and right towering rock faces
+    const rockColors = pal.rock || ['#C07040','#A85A30','#D08050'];
+    // Left wall
+    svg.appendChild(rc.polygon([[0,0],[W*0.28,0],[W*0.32,H*0.55],[W*0.18,H*0.65],[0,H*0.65]], {
+      stroke:shadeColor(rockColors[0],-20), fill:rockColors[0], fillStyle:'hachure', roughness:2.5, strokeWidth:1.5
+    }));
+    // Left wall strata lines
+    for (let i = 0; i < 5; i++) {
+      svg.appendChild(rc.line(0, H*(0.1+i*0.08), W*0.28-i*4, H*(0.12+i*0.08), { stroke:shadeColor(rockColors[0],-30), strokeWidth:1.5, roughness:2.5 }));
+    }
+    // Right wall
+    svg.appendChild(rc.polygon([[W,0],[W*0.72,0],[W*0.68,H*0.55],[W*0.82,H*0.65],[W,H*0.65]], {
+      stroke:shadeColor(rockColors[1],-20), fill:rockColors[1], fillStyle:'hachure', roughness:2.5, strokeWidth:1.5
+    }));
+    // Right wall strata
+    for (let i = 0; i < 5; i++) {
+      svg.appendChild(rc.line(W, H*(0.1+i*0.08), W*0.72+i*4, H*(0.12+i*0.08), { stroke:shadeColor(rockColors[1],-30), strokeWidth:1.5, roughness:2.5 }));
+    }
+    // Canyon floor shadow
+    svg.appendChild(rc.polygon([[W*0.18,H*0.65],[W*0.82,H*0.65],[W*0.85,H*0.72],[W*0.15,H*0.72]], {
+      stroke:'none', fill:pal.shadow||'#602010', fillStyle:'solid', roughness:1
+    }));
+    // Distant arch/rock formation
+    svg.appendChild(rc.path(`M ${W*0.4} ${H*0.45} Q ${W*0.5} ${H*0.28} ${W*0.6} ${H*0.45}`, { stroke:rockColors[2], fill:'none', roughness:2.5, strokeWidth:3 }));
+  }
+
+  // ── Graveyard ─────────────────────────────────────────────────────────────
+  if (type === 'graveyard') {
+    // Full moon
+    svg.appendChild(rc.circle(W*0.76, H*0.13, 28, { stroke:'#BBCCDD', fill:'#CCD8E8', fillStyle:'solid', roughness:0.8 }));
+    // Clouds over moon
+    svg.appendChild(rc.ellipse(W*0.76+20, H*0.13-5, 50, 18, { stroke:'none', fill:'rgba(40,50,60,0.7)', fillStyle:'solid', roughness:2 }));
+    // Dead trees
+    for (let i = 0; i < 4; i++) {
+      const dtx = sr()*W*0.9 + W*0.05;
+      const dty = H*0.67;
+      const dth = 35 + sr()*30;
+      svg.appendChild(rc.line(dtx, dty, dtx, dty-dth, { stroke:'#2A2820', strokeWidth:4, roughness:2.5 }));
+      // Branches
+      svg.appendChild(rc.line(dtx, dty-dth*0.6, dtx-15-sr()*10, dty-dth*0.8, { stroke:'#2A2820', strokeWidth:2, roughness:2 }));
+      svg.appendChild(rc.line(dtx, dty-dth*0.5, dtx+12+sr()*8, dty-dth*0.7, { stroke:'#2A2820', strokeWidth:2, roughness:2 }));
+    }
+    // Gravestones
+    for (let i = 0; i < 8; i++) {
+      const gsx = W*0.06 + sr()*(W*0.88);
+      const gsy = H*0.62 + sr()*8;
+      const gsw = 10 + sr()*8, gsh = 14 + sr()*10;
+      const stone2 = pal.stone ? pal.stone[i%pal.stone.length] : '#4A4A50';
+      // Stone body
+      svg.appendChild(rc.rectangle(gsx-gsw/2, gsy-gsh, gsw, gsh, { stroke:shadeColor(stone2,-20), fill:stone2, fillStyle:'solid', roughness:2 }));
+      // Rounded top
+      svg.appendChild(rc.ellipse(gsx, gsy-gsh, gsw, 7, { stroke:shadeColor(stone2,-20), fill:stone2, fillStyle:'solid', roughness:1.5 }));
+    }
+    // Ground fog
+    const fogEl = svgEl('rect', { x:'0', y:String(H*0.60), width:String(W), height:String(H*0.1), fill:'url(#fogGrad)', opacity:'0.5' });
+    svg.appendChild(fogEl);
+  }
+
+  // ── Crypt / Dungeon variant ──────────────────────────────────────────────
+  if (type === 'crypt') {
+    // Deep underground — stalactites replaced by stone arches
+    for (let i = 0; i < 5; i++) {
+      const ax = W*0.1 + i*(W*0.2);
+      // Stone arch pillars
+      svg.appendChild(rc.rectangle(ax-8, H*0.1, 16, H*0.65, { stroke:pal.stone?pal.stone[0]:'#2A283A', fill:pal.stone?pal.stone[1]:'#1E1C30', fillStyle:'hachure', roughness:1.8, strokeWidth:1.5 }));
+    }
+    // Bone details on floor
+    for (let i = 0; i < 6; i++) {
+      const bx2 = sr()*W, by2 = H*0.72 + sr()*8;
+      svg.appendChild(rc.line(bx2, by2, bx2+12, by2+3, { stroke:pal.bone||'#C8C0A8', strokeWidth:2.5, roughness:2 }));
+    }
+    // Glowing runes on walls
+    for (let i = 0; i < 4; i++) {
+      const rx2 = W*0.15 + i*(W*0.22);
+      const ry2 = H*0.25 + sr()*20;
+      svg.appendChild(rc.circle(rx2, ry2, 8, { stroke:pal.glow||'#4422AA', fill:'none', roughness:1.5 }));
+      svg.appendChild(rc.line(rx2-5, ry2, rx2+5, ry2, { stroke:pal.glow||'#4422AA', strokeWidth:1.5, roughness:1 }));
+    }
+    // Torches
+    for (let i = 0; i < 3; i++) {
+      const torchX = W*0.2 + i*(W*0.3);
+      svg.appendChild(rc.line(torchX, H*0.3, torchX, H*0.42, { stroke:'#5A3010', strokeWidth:3, roughness:1.5 }));
+      svg.appendChild(rc.circle(torchX, H*0.28, 7, { stroke:'#FF8030', fill:'#FF6020', fillStyle:'solid', roughness:1.2 }));
+      const glowEl2 = svgEl('ellipse', { cx:String(torchX), cy:String(H*0.28), rx:'18', ry:'14', fill:'#FF6020', opacity:'0.12' });
+      svg.appendChild(glowEl2);
+    }
+  }
+
+  // ── Spaceship interior ────────────────────────────────────────────────────
+  if (type === 'spaceship' || type === 'space_station') {
+    // Black void outside windows
+    // Hull walls — metal panels
+    for (let i = 0; i < 6; i++) {
+      const px2 = i*(W/5.5);
+      const ph = H*0.55 + sr()*20;
+      const metal = pal.metal ? pal.metal[i%pal.metal.length] : '#2A3A4A';
+      svg.appendChild(rc.rectangle(px2, H*0.12, W/5.5-2, ph, { stroke:shadeColor(metal,-15), fill:metal, fillStyle:'hachure', roughness:0.8, strokeWidth:1 }));
+      // Panel rivets
+      svg.appendChild(rc.circle(px2+8, H*0.16, 3, { stroke:shadeColor(metal,-30), fill:shadeColor(metal,10), fillStyle:'solid', roughness:0.5 }));
+      svg.appendChild(rc.circle(px2+8, H*0.16+12, 3, { stroke:shadeColor(metal,-30), fill:shadeColor(metal,10), fillStyle:'solid', roughness:0.5 }));
+    }
+    // Viewport windows showing stars
+    for (let i = 0; i < 3; i++) {
+      const vx = W*0.12 + i*(W*0.3);
+      const vy = H*0.18;
+      svg.appendChild(rc.rectangle(vx, vy, 60, 38, { stroke:pal.glow||'#00CCFF', fill:pal.window||'#004466', fillStyle:'solid', roughness:0.5, strokeWidth:2 }));
+      // Stars in viewport
+      for (let s = 0; s < 8; s++) {
+        svg.appendChild(rc.circle(vx+5+sr()*50, vy+3+sr()*30, 1+sr()*1.5, { stroke:'none', fill:'#FFFDE7', fillStyle:'solid', roughness:0.3 }));
+      }
+      // Planet visible
+      if (i===1) {
+        svg.appendChild(rc.circle(vx+30, vy+20, 12, { stroke:'#44AAFF', fill:'#226688', fillStyle:'solid', roughness:0.6 }));
+      }
+    }
+    // Alert lights
+    if (type === 'space_station') {
+      for (let i = 0; i < 4; i++) {
+        const alertEl = svgEl('circle', { cx:String(W*0.05+i*(W*0.3)), cy:String(H*0.08), r:'5', fill:pal.alert||'#FF4444', opacity:'0.8' });
+        svg.appendChild(alertEl);
+      }
+    }
+    // Floor grating lines
+    for (let i = 0; i < 8; i++) {
+      svg.appendChild(rc.line(i*(W/7), H*0.70, i*(W/7)+W/10, H*0.82, { stroke:shadeColor(pal.metal?pal.metal[0]:'#2A3A4A',-10), strokeWidth:1, roughness:0.6 }));
+    }
+  }
+
+  // ── Alien Planet ─────────────────────────────────────────────────────────
+  if (type === 'alien_planet') {
+    // Alien sun — wrong color
+    svg.appendChild(rc.circle(W*0.7, H*0.1, 30, { stroke:'#AA44FF', fill:'#CC66FF', fillStyle:'solid', roughness:0.8 }));
+    // Twin moons
+    svg.appendChild(rc.circle(W*0.2, H*0.15, 14, { stroke:'#44AAFF', fill:'#226688', fillStyle:'solid', roughness:1.2 }));
+    // Crystal formations
+    const crystalColors = pal.crystal || ['#8844FF','#AA66FF','#6622DD'];
+    for (let i = 0; i < 8; i++) {
+      const cx2 = sr()*W;
+      const cy2 = H*0.62 - sr()*20;
+      const ch = 20 + sr()*40;
+      const cw2 = 8 + sr()*10;
+      const cc = crystalColors[i%crystalColors.length];
+      svg.appendChild(rc.polygon([[cx2-cw2/2,cy2],[cx2+cw2/2,cy2],[cx2+cw2/4,cy2-ch],[cx2-cw2/4,cy2-ch]], {
+        stroke:shadeColor(cc,-20), fill:cc+'88', fillStyle:'solid', roughness:1.5, strokeWidth:1.5
+      }));
+    }
+    // Spore particles
+    for (let i = 0; i < 12; i++) {
+      const spEl = svgEl('circle', { cx:String(sr()*W), cy:String(H*0.3+sr()*0.3*H), r:String(2+sr()*3), fill:pal.spore||'#44FFAA', opacity:String(0.3+sr()*0.4) });
+      svg.appendChild(spEl);
+    }
+    // Alien vegetation
+    for (let i = 0; i < 5; i++) {
+      const vx2 = sr()*W;
+      const vy2 = H*0.62;
+      svg.appendChild(rc.line(vx2, vy2, vx2+sr()*10-5, vy2-15-sr()*20, { stroke:pal.glow||'#88FF44', strokeWidth:3, roughness:2.5 }));
+      svg.appendChild(rc.ellipse(vx2, vy2-15-sr()*15, 10+sr()*8, 6, { stroke:pal.glow||'#88FF44', fill:pal.glow||'#44FF88'+'66', fillStyle:'solid', roughness:2 }));
+    }
+  }
+
+  // ── Neon City (Cyberpunk) ─────────────────────────────────────────────────
+  if (type === 'neon_city' || type === 'back_alley') {
+    // Deep night sky — no stars, smog
+    const smogEl = svgEl('rect', { x:'0', y:'0', width:String(W), height:String(H*0.55), fill:pal.smog||'rgba(20,10,40,0.4)' });
+    svg.appendChild(smogEl);
+    // Towering dark buildings
+    for (let i = 0; i < 14; i++) {
+      const bx3 = i*(W/12) + sr()*8-4;
+      const bh3 = 50 + sr()*120;
+      const bw3 = 20 + sr()*32;
+      const build = pal.build ? pal.build[i%pal.build.length] : '#1A1830';
+      svg.appendChild(rc.rectangle(bx3-bw3/2, H*0.68-bh3, bw3, bh3, { stroke:shadeColor(build,-15), fill:build, fillStyle:'hachure', roughness:0.9, strokeWidth:1 }));
+      // Neon sign glow
+      const neonColors2 = pal.neon || ['#FF00FF','#00FFFF','#FF4400','#00FF88'];
+      if (sr() > 0.4) {
+        const nc = neonColors2[Math.floor(sr()*neonColors2.length)];
+        svg.appendChild(rc.line(bx3-bw3/4, H*0.68-bh3+12, bx3+bw3/4, H*0.68-bh3+12, { stroke:nc, strokeWidth:2.5, roughness:1.2 }));
+        const neonGlow = svgEl('line', { x1:String(bx3-bw3/4), y1:String(H*0.68-bh3+12), x2:String(bx3+bw3/4), y2:String(H*0.68-bh3+12), stroke:nc, 'stroke-width':'8', opacity:'0.15' });
+        svg.appendChild(neonGlow);
+      }
+      // Lit windows
+      const floors2 = Math.floor(bh3/12);
+      for (let row = 1; row < Math.min(floors2,8); row++) {
+        if (sr() > 0.5) {
+          const winC = sr() > 0.8 ? neonColors2[Math.floor(sr()*neonColors2.length)] : '#FFEE55';
+          svg.appendChild(rc.rectangle(bx3-bw3/4, H*0.68-bh3+row*12+5, bw3*0.35, 6, { stroke:'none', fill:winC, fillStyle:'solid', roughness:0.4 }));
+        }
+      }
+    }
+    // Ground neon reflections — puddles
+    for (let i = 0; i < 5; i++) {
+      const nc2 = (pal.neon||['#FF00FF','#00FFFF'])[i%2];
+      const puddleEl = svgEl('ellipse', { cx:String(sr()*W), cy:String(H*0.70+sr()*6), rx:String(20+sr()*30), ry:'4', fill:nc2, opacity:'0.12' });
+      svg.appendChild(puddleEl);
+    }
+    // Rain effect for cyberpunk
+    for (let i = 0; i < 30; i++) {
+      const rainEl = svgEl('line', { x1:String(sr()*W), y1:String(sr()*H*0.7), x2:String(sr()*W-2), y2:String(sr()*H*0.7+10), stroke:'rgba(100,150,255,0.25)', 'stroke-width':'1' });
+      svg.appendChild(rainEl);
+    }
+  }
+
+  // ── Corp Building (Cyberpunk office tower) ───────────────────────────────
+  if (type === 'corp_building') {
+    // Glass tower facade — massive and imposing
+    const glassColors = pal.glass || ['#102030','#0A1828','#182838'];
+    for (let i = 0; i < 5; i++) {
+      const gx = i*(W/4.5);
+      const gh = 80 + sr()*60;
+      const gw = W/4.5 - 4;
+      svg.appendChild(rc.rectangle(gx, H*0.68-gh, gw, gh, { stroke:shadeColor(glassColors[0],-10), fill:glassColors[i%glassColors.length], fillStyle:'hachure', roughness:0.6, strokeWidth:1.5 }));
+      // Floor divider lines
+      for (let f = 0; f < Math.floor(gh/15); f++) {
+        svg.appendChild(rc.line(gx, H*0.68-gh+f*15, gx+gw, H*0.68-gh+f*15, { stroke:shadeColor(glassColors[0],10), strokeWidth:0.7, roughness:0.5 }));
+      }
+    }
+    // Logo on top of central building
+    svg.appendChild(rc.circle(W/2, H*0.1, 15, { stroke:pal.logo||'#FF4400', fill:'none', roughness:1.2, strokeWidth:2.5 }));
+    // Corporate light beams
+    for (let i = 0; i < 2; i++) {
+      const beamEl = svgEl('line', { x1:String(W*(0.35+i*0.3)), y1:String(H*0.08), x2:String(W*(0.1+i*0.6)), y2:String(0), stroke:pal.light||'#0066CC', 'stroke-width':'4', opacity:'0.2' });
+      svg.appendChild(beamEl);
+    }
+    // Security lights — sweeping
+    svg.appendChild(rc.circle(W*0.1, H*0.5, 5, { stroke:pal.light||'#0066CC', fill:pal.light||'#0066CC', fillStyle:'solid', roughness:0.5 }));
+    svg.appendChild(rc.circle(W*0.9, H*0.5, 5, { stroke:pal.light||'#0066CC', fill:pal.light||'#0066CC', fillStyle:'solid', roughness:0.5 }));
+  }
+
+  // ── Olympus (bright clouds, marble) ──────────────────────────────────────
+  if (type === 'olympus') {
+    // Brilliant sun
+    svg.appendChild(rc.circle(W*0.75, H*0.1, 40, { stroke:'#FFE040', fill:'#FFF380', fillStyle:'solid', roughness:0.6 }));
+    // Sun rays
+    for (let i = 0; i < 12; i++) {
+      const a2 = (i/12)*Math.PI*2;
+      svg.appendChild(rc.line(W*0.75+Math.cos(a2)*24, H*0.1+Math.sin(a2)*24, W*0.75+Math.cos(a2)*38, H*0.1+Math.sin(a2)*38, { stroke:'#FFE040', strokeWidth:2, roughness:1.5 }));
+    }
+    // Cloud layers
+    for (let c = 0; c < 8; c++) {
+      const cx3 = sr()*W, cy3 = H*(0.1+sr()*0.45);
+      const cw3 = 50+sr()*80;
+      svg.appendChild(rc.ellipse(cx3, cy3, cw3, 18+sr()*12, { stroke:'#e8e8e8', fill:'white', fillStyle:'solid', roughness:2.5 }));
+    }
+    // Marble pillars
+    for (let i = 0; i < 5; i++) {
+      const pillarX = W*0.08 + i*(W/5);
+      const pillarColor = pal.pillar || '#F0E8D8';
+      svg.appendChild(rc.rectangle(pillarX-7, H*0.15, 14, H*0.5, { stroke:shadeColor(pillarColor,-15), fill:pillarColor, fillStyle:'hachure', roughness:1.2, strokeWidth:1.5 }));
+      // Capital
+      svg.appendChild(rc.rectangle(pillarX-11, H*0.15-8, 22, 10, { stroke:shadeColor(pillarColor,-20), fill:pillarColor, fillStyle:'solid', roughness:1.2 }));
+      // Base
+      svg.appendChild(rc.rectangle(pillarX-10, H*0.65-2, 20, 8, { stroke:shadeColor(pillarColor,-20), fill:pillarColor, fillStyle:'solid', roughness:1.2 }));
+    }
+    // Golden trim on ground
+    svg.appendChild(rc.line(0, H*0.65, W, H*0.65, { stroke:pal.gold||'#FFD700', strokeWidth:3, roughness:2 }));
+  }
+
+  // ── Underworld (fire, lava, darkness) ────────────────────────────────────
+  if (type === 'underworld') {
+    // Lava glow from below — permeates everything
+    const lavaGlowEl = svgEl('rect', { x:'0', y:String(H*0.5), width:String(W), height:String(H*0.5), fill:'rgba(180,40,0,0.25)', opacity:'1' });
+    svg.appendChild(lavaGlowEl);
+    // Distant lava river
+    svg.appendChild(rc.path(`M 0 ${H*0.68} Q ${W*0.3} ${H*0.64} ${W*0.5} ${H*0.67} Q ${W*0.7} ${H*0.70} ${W} ${H*0.66}`, {
+      stroke:(pal.lava||['#FF4400'])[0], fill:(pal.lava||['#FF6600'])[1]||'#FF6600', fillStyle:'solid', roughness:2, strokeWidth:2
+    }));
+    // Lava glow
+    const lavaEl = svgEl('ellipse', { cx:String(W*0.5), cy:String(H*0.67), rx:String(W*0.45), ry:'18', fill:'#FF4400', opacity:'0.2' });
+    svg.appendChild(lavaEl);
+    // Bone columns
+    for (let i = 0; i < 4; i++) {
+      const colX = W*0.1 + i*(W*0.25);
+      svg.appendChild(rc.rectangle(colX-8, H*0.12, 16, H*0.56, { stroke:shadeColor(pal.bone||'#C8B898',-20), fill:pal.bone||'#C8B898', fillStyle:'hachure', roughness:2, strokeWidth:1.5 }));
+    }
+    // Skull motifs
+    for (let i = 0; i < 5; i++) {
+      const skx = sr()*W, sky2 = H*0.15+sr()*0.35*H;
+      svg.appendChild(rc.circle(skx, sky2, 7, { stroke:'#CC4400', fill:'none', roughness:1.5 }));
+      svg.appendChild(rc.circle(skx-3, sky2-1, 2, { stroke:'none', fill:'#FF4400', fillStyle:'solid', roughness:0.5 }));
+      svg.appendChild(rc.circle(skx+3, sky2-1, 2, { stroke:'none', fill:'#FF4400', fillStyle:'solid', roughness:0.5 }));
+    }
+    // Smoke columns
+    for (let i = 0; i < 4; i++) {
+      const smokeEl = svgEl('ellipse', { cx:String(W*0.15+i*(W*0.25)), cy:String(H*0.4), rx:'12', ry:'30', fill:pal.smoke||'rgba(60,10,10,0.4)', opacity:'0.6' });
+      svg.appendChild(smokeEl);
+    }
+  }
+
+  // ── Dojo (Japanese training hall) ────────────────────────────────────────
+  if (type === 'dojo') {
+    // Warm lantern light
+    for (let i = 0; i < 4; i++) {
+      const lx = W*0.12 + i*(W*0.26);
+      svg.appendChild(rc.ellipse(lx, H*0.18, 14, 20, { stroke:pal.lacquer||'#AA2222', fill:pal.lamp||'#FFD060', fillStyle:'solid', roughness:1.2 }));
+      const lanternGlow = svgEl('ellipse', { cx:String(lx), cy:String(H*0.18), rx:'28', ry:'22', fill:pal.lamp||'#FFD060', opacity:'0.1' });
+      svg.appendChild(lanternGlow);
+      svg.appendChild(rc.line(lx, H*0.08, lx, H*0.18-10, { stroke:'#4A2810', strokeWidth:2, roughness:1.5 }));
+    }
+    // Wooden wall panels
+    const woodPanels = pal.wood ? pal.wood : ['#6B4423','#8B5A2A'];
+    for (let i = 0; i < 5; i++) {
+      const px3 = i*(W/4.8);
+      svg.appendChild(rc.rectangle(px3, H*0.08, W/5-3, H*0.57, { stroke:shadeColor(woodPanels[i%2],-15), fill:woodPanels[i%2], fillStyle:'hachure', roughness:1.5, strokeWidth:1.2 }));
+    }
+    // Tatami mat floor hint
+    for (let i = 0; i < 4; i++) {
+      svg.appendChild(rc.rectangle(i*(W/4), H*0.67, W/4-2, H*0.12, { stroke:shadeColor(pal.mat||'#8A7040',-15), fill:pal.mat||'#8A7040', fillStyle:'hachure', roughness:1.5 }));
+    }
+    // Calligraphy scroll on wall
+    svg.appendChild(rc.rectangle(W*0.44, H*0.14, 20, 38, { stroke:'#2A1808', fill:pal.paper||'#F0E8D0', fillStyle:'solid', roughness:1.2 }));
+    svg.appendChild(rc.line(W*0.454, H*0.17, W*0.454, H*0.14+30, { stroke:'#2A1808', strokeWidth:1.5, roughness:2 }));
+    // Weapon rack
+    svg.appendChild(rc.line(W*0.88, H*0.3, W*0.88, H*0.65, { stroke:'#4A2810', strokeWidth:4, roughness:1.5 }));
+    for (let i = 0; i < 3; i++) {
+      svg.appendChild(rc.line(W*0.82, H*0.35+i*10, W*0.94, H*0.35+i*10, { stroke:'#8B6020', strokeWidth:2.5, roughness:1.2 }));
+    }
+  }
+
+  // ── Bamboo Forest ─────────────────────────────────────────────────────────
+  if (type === 'bamboo_forest') {
+    // Filtered light through canopy
+    if (time === 'day' || !time) {
+      svg.appendChild(rc.circle(W*0.5, H*0.05, 25, { stroke:'#E8FF88', fill:'#F0FF99', fillStyle:'solid', roughness:0.8 }));
+    }
+    // Bamboo stalks — dense forest
+    const bambooColors = pal.bamboo || ['#6A9A30','#8AB840','#5A8A28'];
+    for (let i = 0; i < 20; i++) {
+      const bstX = sr()*W;
+      const bstColor = bambooColors[i%bambooColors.length];
+      const bstH = H*0.6 + sr()*0.2*H;
+      svg.appendChild(rc.line(bstX, H*0.75, bstX, H*0.75-bstH, { stroke:bstColor, strokeWidth:5+sr()*4, roughness:0.6 }));
+      // Node segments
+      for (let n = 0; n < 5; n++) {
+        const ny = H*0.75 - (n+1)*(bstH/6);
+        if (ny > H*0.1) {
+          svg.appendChild(rc.line(bstX-4, ny, bstX+4, ny, { stroke:shadeColor(bstColor,-20), strokeWidth:2, roughness:1 }));
+        }
+      }
+      // Leaves at top
+      if (sr() > 0.3) {
+        svg.appendChild(rc.ellipse(bstX + sr()*20-10, H*0.75-bstH+5, 18+sr()*10, 6, { stroke:pal.leaf||'#A8D840', fill:pal.leaf||'#A8D840'+'88', fillStyle:'solid', roughness:2 }));
+      }
+    }
+    // Mist layer
+    const mistEl = svgEl('rect', { x:'0', y:String(H*0.4), width:String(W), height:String(H*0.2), fill:pal.mist||'rgba(80,140,50,0.3)', opacity:'0.8' });
+    svg.appendChild(mistEl);
+    // Stone lantern
+    svg.appendChild(rc.rectangle(W*0.45, H*0.58, 18, 10, { stroke:'#4A4040', fill:'#5A5050', fillStyle:'solid', roughness:1.5 }));
+    svg.appendChild(rc.rectangle(W*0.43, H*0.68, 22, 6, { stroke:'#4A4040', fill:'#5A5050', fillStyle:'solid', roughness:1.5 }));
+    svg.appendChild(rc.ellipse(W*0.454, H*0.55, 14, 14, { stroke:'#4A4040', fill:pal.lantern||'#FFD080'+'88', fillStyle:'solid', roughness:1.5 }));
+  }
+
+  // ── Japanese Fortress ─────────────────────────────────────────────────────
+  if (type === 'fortress_jp') {
+    // Night sky, stars
+    for (let i = 0; i < 25; i++) {
+      svg.appendChild(rc.circle(sr()*W, sr()*H*0.45, 1+sr()*1.5, { stroke:'none', fill:'#FFFDE7', fillStyle:'solid', roughness:0.3 }));
+    }
+    // Fortress walls — dark stone
+    const stoneF = pal.stone ? pal.stone[0] : '#3A3848';
+    svg.appendChild(rc.rectangle(0, H*0.42, W, H*0.28, { stroke:shadeColor(stoneF,-15), fill:stoneF, fillStyle:'hachure', roughness:1.8, strokeWidth:1.5 }));
+    // Battlements
+    for (let i = 0; i < 16; i++) {
+      svg.appendChild(rc.rectangle(i*(W/15)-2, H*0.38, W/16, 6, { stroke:shadeColor(stoneF,-20), fill:stoneF, fillStyle:'solid', roughness:1.5 }));
+    }
+    // Central tower gate
+    svg.appendChild(rc.rectangle(W*0.38, H*0.18, W*0.24, H*0.25, { stroke:shadeColor(stoneF,-10), fill:pal.stone?pal.stone[1]:stoneF, fillStyle:'hachure', roughness:1.5 }));
+    // Pagoda-style roof on gate
+    svg.appendChild(rc.polygon([[W*0.32,H*0.22],[W*0.68,H*0.22],[W*0.6,H*0.12],[W*0.4,H*0.12]], { stroke:shadeColor(pal.wood?pal.wood[0]:'#4A3018',-20), fill:pal.wood?pal.wood[0]:'#4A3018', fillStyle:'solid', roughness:1.8 }));
+    svg.appendChild(rc.polygon([[W*0.36,H*0.18],[W*0.64,H*0.18],[W*0.57,H*0.10],[W*0.43,H*0.10]], { stroke:shadeColor(pal.lacquer||'#CC2222',-20), fill:pal.lacquer||'#CC2222', fillStyle:'solid', roughness:1.5 }));
+    // Banners
+    for (let b = 0; b < 4; b++) {
+      const banX = W*0.1 + b*(W*0.25);
+      svg.appendChild(rc.line(banX, H*0.30, banX, H*0.42, { stroke:'#3A2010', strokeWidth:2.5, roughness:1.5 }));
+      svg.appendChild(rc.rectangle(banX-1, H*0.30, 12, 18, { stroke:pal.banner||'#CC2222', fill:pal.banner||'#CC2222', fillStyle:'solid', roughness:1.8 }));
+    }
+    // Torches on walls
+    for (let t = 0; t < 3; t++) {
+      const tx3 = W*0.2 + t*(W*0.3);
+      svg.appendChild(rc.circle(tx3, H*0.40, 6, { stroke:pal.torch||'#FF8030', fill:pal.torch||'#FF6020', fillStyle:'solid', roughness:1 }));
+      const torchGlow = svgEl('ellipse', { cx:String(tx3), cy:String(H*0.40), rx:'16', ry:'12', fill:pal.torch||'#FF8030', opacity:'0.15' });
+      svg.appendChild(torchGlow);
+    }
+  }
+
+  // ── Bunker (Post-Apoc interior) ───────────────────────────────────────────
+  if (type === 'bunker') {
+    // Concrete walls — industrial grey
+    const metalB = pal.metal ? pal.metal[0] : '#3A3A3A';
+    for (let i = 0; i < 4; i++) {
+      const bpX = i*(W/3.5);
+      svg.appendChild(rc.rectangle(bpX, H*0.08, W/3.8, H*0.60, { stroke:shadeColor(metalB,-15), fill:pal.metal?pal.metal[i%pal.metal.length]:metalB, fillStyle:'hachure', roughness:0.8, strokeWidth:1.2 }));
+    }
+    // Emergency lighting — green strips
+    for (let i = 0; i < 5; i++) {
+      const lightEl = svgEl('rect', { x:String(i*(W/5)), y:String(H*0.68), width:String(W/5.5), height:'4', fill:pal.light||'#88AA44', opacity:'0.7' });
+      svg.appendChild(lightEl);
+      const glowEl3 = svgEl('rect', { x:String(i*(W/5)-4), y:String(H*0.65), width:String(W/5.5+8), height:'10', fill:pal.light||'#88AA44', opacity:'0.1' });
+      svg.appendChild(glowEl3);
+    }
+    // Pipes on ceiling
+    for (let i = 0; i < 3; i++) {
+      svg.appendChild(rc.line(0, H*(0.12+i*0.05), W, H*(0.12+i*0.05), { stroke:pal.pipe||'#4A4A4A', strokeWidth:4+i*2, roughness:0.8 }));
+    }
+    // Vault door in background
+    svg.appendChild(rc.circle(W*0.5, H*0.38, 38, { stroke:pal.metal?pal.metal[1]:'#2E2E2E', fill:pal.metal?pal.metal[0]:'#3A3A3A', fillStyle:'solid', roughness:0.6, strokeWidth:4 }));
+    // Vault handle
+    svg.appendChild(rc.line(W*0.5-18, H*0.38, W*0.5+18, H*0.38, { stroke:pal.rust||'#6A3018', strokeWidth:6, roughness:0.5 }));
+    // Rust stains
+    for (let i = 0; i < 6; i++) {
+      const rEl = svgEl('ellipse', { cx:String(sr()*W), cy:String(H*0.2+sr()*0.4*H), rx:String(4+sr()*8), ry:String(2+sr()*4), fill:pal.rust||'#6A3018', opacity:String(0.2+sr()*0.3) });
+      svg.appendChild(rEl);
+    }
+  }
+
+  // ── Ruined City (Post-Apoc exterior) ────────────────────────────────────
+  if (type === 'ruined_city') {
+    // Hazy smog sky — no visible sun
+    const smogEl2 = svgEl('rect', { x:'0', y:'0', width:String(W), height:String(H*0.6), fill:pal.smoke||'rgba(80,60,40,0.35)' });
+    svg.appendChild(smogEl2);
+    // Crumbled skyscrapers
+    for (let i = 0; i < 10; i++) {
+      const rx3 = i*(W/9) + sr()*12-6;
+      const rh = 30 + sr()*100;
+      const rw = 20 + sr()*35;
+      const rubble = pal.rubble ? pal.rubble[i%pal.rubble.length] : '#5A4A38';
+      // Jagged top — ruined
+      const jaggedTop = [
+        [rx3-rw/2, H*0.65-rh],
+        [rx3-rw/2+sr()*8, H*0.65-rh+sr()*15],
+        [rx3, H*0.65-rh-sr()*10],
+        [rx3+rw/3, H*0.65-rh+sr()*12],
+        [rx3+rw/2, H*0.65-rh],
+        [rx3+rw/2, H*0.65],
+        [rx3-rw/2, H*0.65],
+      ];
+      svg.appendChild(rc.polygon(jaggedTop, { stroke:shadeColor(rubble,-20), fill:rubble, fillStyle:'hachure', roughness:2.8, strokeWidth:1.5 }));
+      // Broken windows — dark holes
+      for (let w2 = 0; w2 < 3; w2++) {
+        if (sr() > 0.4) {
+          svg.appendChild(rc.rectangle(rx3-rw/2+4+w2*10, H*0.65-rh+8+sr()*10, 7, 8, { stroke:'none', fill:'#1A1410', fillStyle:'solid', roughness:1.5 }));
+        }
+      }
+    }
+    // Fire glow on horizon
+    for (let f = 0; f < 3; f++) {
+      const fireEl = svgEl('ellipse', { cx:String(W*(0.2+f*0.3)), cy:String(H*0.65), rx:String(25+sr()*20), ry:'12', fill:pal.fire||'#FF6030', opacity:String(0.15+sr()*0.1) });
+      svg.appendChild(fireEl);
+    }
+    // Rubble mounds on ground
+    for (let i = 0; i < 8; i++) {
+      const rmX = sr()*W, rmY = H*0.64+sr()*8;
+      svg.appendChild(rc.ellipse(rmX, rmY, 20+sr()*30, 8, { stroke:shadeColor(pal.rubble?pal.rubble[0]:'#5A4A38',-10), fill:pal.rubble?pal.rubble[1]:'#4A3A28', fillStyle:'solid', roughness:2.5 }));
+    }
+  }
 }
 
 // ── Foreground elements ────────────────────

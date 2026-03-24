@@ -348,7 +348,7 @@ Include [SCENE:...] and [ACTIONS:...] tags.`;
         time: parsed.image.time || 'day',
         weather: parsed.image.weather || 'clear',
         mood: parsed.image.mood || 'exciting',
-        inCombat: scene?.inCombat || false,
+        inCombat: state.lastScene?.inCombat || false,
       } : null);
       if (sceneUpdate)            updates.lastScene   = sceneUpdate;
       if (parsed.location)        updates.location    = parsed.location;
