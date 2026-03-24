@@ -100,15 +100,21 @@ TAGS — append after EVERY narrative response:
 ⚠ NPC RULE — MANDATORY: Any time a named character, creature, or being appears in your response (arriving, speaking, attacking, fleeing, hiding — anything), you MUST emit an [NPC:] tag for them. No exceptions. This drives the scene illustration.
 [NPC:{"name":"Grax","role":"goblin scout","creatureType":"goblin","relationship":"enemy","note":""}]
   relationship: "friendly" | "neutral" | "enemy" | "hostile" | "ally"
-  creatureType — pick the CLOSEST match:
-    Fantasy:    goblin | goblin_archer | orc | skeleton | ghost | wraith | zombie | dragon | troll | demon | vampire | wolf | spider | knight | guard | bandit | thief | assassin | merchant | mage_npc | elder | rat | bat | witch | mummy | yeti | djinn | pirate_npc
-    Cyberpunk:  netrunner | android | robot_drone | street_samurai | raider
-    Western:    gunslinger | sheriff | outlaw | desert_bandit
-    Ninja/Hist: samurai | ronin | shogun
-    Ocean/Myth: pirate_npc | mermaid | kraken | sea_captain
-    Post-Apoc:  raider | mutant | scavenger
-    Space:      alien_grey | robot_drone | android
-    Fallback:   bandit (humans), elder (wise NPCs), mage_npc (magic users), guard (soldiers)
+  creatureType — pick the CLOSEST match from this list. Always use exact strings:
+    Fantasy:     goblin | goblin_archer | goblin_shaman | orc | orc_berserker | skeleton | skeleton_archer | zombie | ghost | wraith | vampire | dragon | troll | demon | wolf | spider | witch | mummy | yeti | djinn | lich | gargoyle | fairy | treant | will_o_wisp | rat | bat | kraken | slime | golem
+    Fantasy+:    kobold | kobold_archer | lizardfolk | gnoll | bugbear | hobgoblin | imp | pixie | cultist | dark_elf | high_elf | dwarf_npc | dire_wolf | owlbear | harpy | manticore | wyvern | giant_spider | centaur | werewolf | banshee | revenant | ghoul | doppelganger | chimera | griffin | satyr | medusa | sphinx | cerberus | hydra
+    NPCs:        knight | guard | bandit | thief | assassin | merchant | mage_npc | elder | ranger_npc | traveling_bard | child_npc | investigator | blood_knight
+    Space:       alien_grey | robot_drone | android | space_marine | alien_bug | alien_beast | security_drone | corrupted_ai | ai_entity | scientist_npc | pilot_npc | mechanic_npc | bounty_hunter | mercenary | rebel_soldier
+    Ocean:       pirate_npc | ghost_sailor | sea_captain | mermaid | kraken | siren | deep_one | shark | sea_serpent | leviathan | sailor | naval_officer | harbormaster | smuggler | undead_sailor
+    Horror:      werewolf | banshee | poltergeist | revenant | ghoul | doppelganger | blood_knight | shadow_beast | investigator
+    Western:     gunslinger | sheriff | outlaw | desert_bandit | deputy | bartender | preacher | frontier_doc | prospector | cattle_rustler | train_robber | native_warrior | gambler_npc | drifter
+    Post-Apoc:   raider | mutant | scavenger | super_mutant | ghoul_raider | ghoul_npc | feral_dog | wasteland_beast | vault_dweller | survivor | tribesman | tech_priest | wasteland_trader | warlord_npc
+    Cyberpunk:   netrunner | android | street_samurai | corpo_agent | security_guard | gang_member | street_thug | fixer_npc | ripperdoc | maxtac_officer | gang_boss | hacker_npc | yakuza_cyber
+    Ninja/Hist:  samurai | ronin | shogun | ninja | kunoichi | onmyoji | daimyo | tengu | kappa | oni | kitsune | war_monk | temple_guardian | yakuza | geisha | monk
+    Mythology:   titan_npc | cyclops | minotaur | centaur | harpy | medusa | hydra | sphinx | satyr | cerberus | griffin | chimera | olympian | fury | demigod | pegasus
+    Fairy Tale:  fairy | pixie | witch | treant | wolf | dark_fairy | enchanted_knight | evil_queen | cursed_beast | forest_spirit | wood_elf | talking_animal | helpful_mouse | beanstalk_giant | princess_npc
+    Historical:  gladiator | roman_soldier | centurion | spartan | greek_hoplite | crusader | templar | viking | barbarian | aztec_warrior | egyptian_priest | medieval_soldier | feudal_lord | condottiere | senator
+    Fallback:    bandit (generic humans), elder (wise/old NPCs), mage_npc (any magic user), guard (soldiers/enforcers), merchant (traders/shopkeepers)
   Examples: A messenger arrives → [NPC:{"name":"Messenger","role":"royal courier","creatureType":"guard","relationship":"neutral","note":"carrying urgent news"}]
             A wounded page → [NPC:{"name":"Page","role":"wounded castle page","creatureType":"guard","relationship":"friendly","note":"injured, seeking help"}]
             An enemy appears → [NPC:{"name":"Dark Knight","role":"enemy knight","creatureType":"knight","relationship":"hostile","note":"blocking the gate"}]
