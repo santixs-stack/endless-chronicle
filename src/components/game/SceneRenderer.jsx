@@ -262,7 +262,7 @@ function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
     // Right arm drawn back pulling arrow
     svg.appendChild(rc.line(cx+6, hy-32, cx+10, hy-38, { stroke: color, strokeWidth: 4, roughness: 1.5, strokeLinecap:'round' }));
     // Bow (arc)
-    const bowPath = \`M \${cx-16} \${hy-52} Q \${cx-24} \${hy-38} \${cx-16} \${hy-22}\`;
+    const bowPath = `M ${cx-16} ${hy-52} Q ${cx-24} ${hy-38} ${cx-16} ${hy-22}`;
     svg.appendChild(rc.path(bowPath, { stroke: '#8B4513', strokeWidth: 2, fill: 'none', roughness: 1.5 }));
     svg.appendChild(rc.line(cx-16, hy-52, cx-16, hy-22, { stroke: '#8B4513', strokeWidth: 1, roughness: 0.5 }));
     // Arrow nocked and drawn
