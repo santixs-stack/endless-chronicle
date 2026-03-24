@@ -87,8 +87,11 @@ export function buildScenePopulation(npcs, inCombat, combatants, sceneType, turn
     const terrainY = getTerrainY(xPos, terrainPts);
     const yPos = terrainY + dep.yOffset * H;
 
-    // Scale from depth
-    const scale = (sz / H) * dep.scale;
+    // Scale from depth plane + size class.
+    // Creatures are designed at sc=1.0 to be ~62px tall on a 300px canvas.
+    // dep.scale (0.55/0.78/1.0) handles depth, size ratio handles small/large variation.
+    const sizeRatio = sz / SIZE.medium; // small=0.65, medium=1.0, large=1.35
+    const scale = dep.scale * sizeRatio;
 
     // Status from combat
     let status = 'healthy';
@@ -132,7 +135,7 @@ export function buildScenePopulation(npcs, inCombat, combatants, sceneType, turn
         type,
         x: xPos,
         y: terrainY + DEPTH.far.yOffset * H,
-        scale: (sz / H) * DEPTH.far.scale * 0.8,
+        scale: DEPTH.far.scale * (sz / SIZE.medium) * 0.8,
         faction: 'enemy',
         status: 'healthy',
         plane: 'far',
