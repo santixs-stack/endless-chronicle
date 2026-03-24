@@ -413,6 +413,34 @@ function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
     // Cutlass
     svg.appendChild(rc.line(cx+10, hy-28, cx+22, hy-46, { stroke: '#ddd', strokeWidth: 2.5, roughness: 0.8 }));
     svg.appendChild(rc.ellipse(cx+10, hy-28, 8, 4, { stroke:'#888', fill:'none', roughness: 1 }));
+  } else if (cls === 'slime') {
+    // Slime — wobbly blob, cute face, jelly drips
+    const slimeColor = color || '#4caf50';
+    const innerColor = shadeColor(slimeColor, 30);
+    svg.appendChild(rc.ellipse(cx, hy + 3, 38, 9, { stroke: 'none', fill: 'rgba(0,0,0,0.2)', fillStyle: 'solid', roughness: 1 }));
+    svg.appendChild(rc.ellipse(cx, hy - 14, 42, 30, { stroke: slimeColor, strokeWidth: 2, fill: innerColor, fillStyle: 'solid', roughness: 3.5, bowing: 2.5 }));
+    svg.appendChild(rc.ellipse(cx - 4, hy - 20, 14, 10, { stroke: 'none', fill: shadeColor(slimeColor, 60), fillStyle: 'solid', roughness: 1.5 }));
+    svg.appendChild(rc.ellipse(cx - 15, hy - 2, 8, 12, { stroke: slimeColor, strokeWidth: 1.5, fill: innerColor, fillStyle: 'solid', roughness: 3 }));
+    svg.appendChild(rc.ellipse(cx + 12, hy - 1, 7, 10, { stroke: slimeColor, strokeWidth: 1.5, fill: innerColor, fillStyle: 'solid', roughness: 3 }));
+    svg.appendChild(rc.circle(cx - 7, hy - 17, 6, { stroke: 'none', fill: '#1a2a10', fillStyle: 'solid', roughness: 0.5 }));
+    svg.appendChild(rc.circle(cx + 7, hy - 17, 6, { stroke: 'none', fill: '#1a2a10', fillStyle: 'solid', roughness: 0.5 }));
+    svg.appendChild(rc.circle(cx - 5, hy - 19, 2, { stroke: 'none', fill: '#fff', fillStyle: 'solid', roughness: 0.3 }));
+    svg.appendChild(rc.circle(cx + 9, hy - 19, 2, { stroke: 'none', fill: '#fff', fillStyle: 'solid', roughness: 0.3 }));
+    const mouthPath = `M ${cx - 5} ${hy - 10} Q ${cx} ${hy - 5} ${cx + 5} ${hy - 10}`;
+    svg.appendChild(rc.path(mouthPath, { stroke: '#1a2a10', strokeWidth: 1.5, fill: 'none', roughness: 1.2 }));
+    svg.appendChild(rc.ellipse(cx + 5, hy - 30, 6, 8, { stroke: slimeColor, strokeWidth: 1.5, fill: innerColor, fillStyle: 'solid', roughness: 2.5 }));
+  } else if (cls === 'golem') {
+    // Stone golem — blocky, rune-etched
+    svg.appendChild(rc.rectangle(cx - 11, hy - 36, 22, 26, opts(shadeColor(color, -30), { roughness: 0.7 })));
+    svg.appendChild(rc.rectangle(cx - 8, hy - 52, 16, 18, opts(color, { roughness: 0.8 })));
+    svg.appendChild(rc.rectangle(cx - 20, hy - 32, 9, 9, opts(shadeColor(color, -20), { roughness: 0.9 })));
+    svg.appendChild(rc.rectangle(cx + 11, hy - 32, 9, 9, opts(shadeColor(color, -20), { roughness: 0.9 })));
+    svg.appendChild(rc.circle(cx - 4, hy - 46, 4, { stroke: 'none', fill: '#00eeff', fillStyle: 'solid', roughness: 0.4 }));
+    svg.appendChild(rc.circle(cx + 4, hy - 46, 4, { stroke: 'none', fill: '#00eeff', fillStyle: 'solid', roughness: 0.4 }));
+    svg.appendChild(rc.line(cx - 6, hy - 28, cx + 6, hy - 28, { stroke: '#00eeff', strokeWidth: 1, roughness: 0.8 }));
+    svg.appendChild(rc.line(cx, hy - 32, cx, hy - 22, { stroke: '#00eeff', strokeWidth: 1, roughness: 0.8 }));
+    svg.appendChild(rc.rectangle(cx - 9, hy - 10, 8, 12, opts(shadeColor(color, -40), { roughness: 0.7 })));
+    svg.appendChild(rc.rectangle(cx + 1, hy - 10, 8, 12, opts(shadeColor(color, -40), { roughness: 0.7 })));
   } else {
     // Default — generic adventurer
     svg.appendChild(rc.polygon([
@@ -577,7 +605,7 @@ function creatureTypeToClass(creatureType) {
 // ── Resolve character class to visual type ───────────────────────────────
 // Maps archetype display names (Netrunner, Samurai, Gunslinger) and DnD
 // class ids to the closest visual representation in drawCharacter.
-function resolveCharacterClass(classId, className) {
+function resolveCharacterClass(classId, className, role) {
   const nameMap = {
     // Space / Sci-fi
     'alien': 'spaceranger', 'extraterrestrial': 'spaceranger',
@@ -609,6 +637,12 @@ function resolveCharacterClass(classId, className) {
     'demigod': 'warrior', 'hero': 'warrior', 'titan': 'warrior',
     'oracle': 'mage', 'seer': 'mage',
     'champion': 'warrior', 'trickster god': 'rogue',
+    // Creature / monster player types
+    'slime': 'slime', 'ooze': 'slime', 'blob': 'slime', 'gelatinous': 'slime',
+    'golem': 'golem', 'construct': 'golem', 'automaton': 'golem',
+    'skeleton': 'skeleton_pc', 'undead': 'skeleton_pc', 'bones': 'skeleton_pc',
+    'ghost': 'ghost_pc', 'spirit': 'ghost_pc', 'wraith_pc': 'ghost_pc',
+    'shapeshifter': 'slime',
     // Fairy tale
     'faerie': 'bard', 'creature': 'rogue', 'enchanter': 'bard',
     'knight errant': 'warrior', 'prince': 'warrior', 'princess': 'healer',
@@ -637,6 +671,15 @@ function resolveCharacterClass(classId, className) {
       if (key.includes(k) || k.includes(key)) return v;
     }
   }
+  // Check role for creature keywords (e.g. role = "Sentient slime who gained consciousness")
+  if (role) {
+    const roleKey = role.toLowerCase();
+    for (const [k, v] of Object.entries(nameMap)) {
+      if (roleKey.includes(k)) return v;
+    }
+  }
+  // Check classId itself against nameMap (catches 'slime', 'golem' etc set as class id)
+  if (classId && nameMap[classId.toLowerCase()]) return nameMap[classId.toLowerCase()];
   // Fall back to DnD class id
   return classId || 'warrior';
 }
@@ -714,7 +757,7 @@ function drawScene(svgEl2, scene, players, turnCount) {
       // Resolve archetype name to visual class
       // p.class is the DnD class id (mage/warrior/rogue etc)
       // but we want genre-flavored visuals
-      const pClass = resolveCharacterClass(p.class, p.className);
+      const pClass = resolveCharacterClass(p.class, p.className, p.role);
       drawCharacter(rc, svgEl2, cx, groundY, pClass,
         p.color || PLAYER_COLORS[i % PLAYER_COLORS.length],
         p.name || '', sr);

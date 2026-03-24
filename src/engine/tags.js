@@ -99,10 +99,28 @@ export function parseAllTags(raw) {
   xpMatches.forEach(m => { try { result.xpAwards.push(JSON.parse(m[1])); } catch(e) { logTagParseError("XP", m[1], e); } });
   text = text.replace(/\[XP:[^\]]+\]/g, '').trim();
 
-  // NPCs
-  const npcMatches = [...text.matchAll(/\[NPC:(\{[^}]+\})\]/g)];
-  npcMatches.forEach(m => { try { result.npcs.push(JSON.parse(m[1])); } catch(e) { logTagParseError("NPC", m[1], e); } });
-  text = text.replace(/\[NPC:[^\]]+\]/g, '').trim();
+  // NPCs — robust regex handles } inside quoted string values (e.g. note field)
+  const npcMatches = [...text.matchAll(/\[NPC:\s*(\{(?:[^{}"']|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')*\})\]/g)];
+  npcMatches.forEach(m => {
+    const raw = m[1];
+    let parsed = null;
+    // 1) Direct JSON parse
+    try { parsed = JSON.parse(raw); } catch {}
+    // 2) Field-by-field fallback (handles unescaped quotes in note values)
+    if (!parsed) {
+      try {
+        const grab = (field) => {
+          const fm = raw.match(new RegExp('"' + field + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"'));
+          return fm ? fm[1] : '';
+        };
+        const name = grab('name');
+        if (name) parsed = { name, role: grab('role'), creatureType: grab('creatureType'), relationship: grab('relationship'), note: grab('note') };
+      } catch(e) { logTagParseError("NPC", raw, e); }
+    }
+    if (parsed) result.npcs.push(parsed);
+    else logTagParseError("NPC", raw, new Error("unrecoverable parse failure"));
+  });
+  text = text.replace(/\[NPC:\s*\{(?:[^{}"']|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')*\}\]/g, '').trim();
 
   // Journal
   const journalM = text.match(/\[JOURNAL:"([^"]+)"\]/);
