@@ -257,12 +257,22 @@ function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
     svg.appendChild(rc.polygon([
       [cx-9,hy-46],[cx+9,hy-46],[cx+5,hy-34],[cx-5,hy-34]
     ], opts(shadeColor(color,-20), { roughness: 1.9 })));
+    // Left arm extended holding bow
+    svg.appendChild(rc.line(cx-6, hy-32, cx-16, hy-42, { stroke: color, strokeWidth: 4, roughness: 1.5, strokeLinecap:'round' }));
+    // Right arm drawn back pulling arrow
+    svg.appendChild(rc.line(cx+6, hy-32, cx+10, hy-38, { stroke: color, strokeWidth: 4, roughness: 1.5, strokeLinecap:'round' }));
     // Bow (arc)
-    const bowPath = `M ${cx-16} ${hy-52} Q ${cx-24} ${hy-38} ${cx-16} ${hy-22}`;
+    const bowPath = \`M \${cx-16} \${hy-52} Q \${cx-24} \${hy-38} \${cx-16} \${hy-22}\`;
     svg.appendChild(rc.path(bowPath, { stroke: '#8B4513', strokeWidth: 2, fill: 'none', roughness: 1.5 }));
     svg.appendChild(rc.line(cx-16, hy-52, cx-16, hy-22, { stroke: '#8B4513', strokeWidth: 1, roughness: 0.5 }));
-    // Arrow
-    svg.appendChild(rc.line(cx-14, hy-38, cx+8, hy-38, { stroke: '#8B4513', strokeWidth: 1.5, roughness: 0.6 }));
+    // Arrow nocked and drawn
+    svg.appendChild(rc.line(cx-14, hy-38, cx+10, hy-38, { stroke: '#8B4513', strokeWidth: 1.5, roughness: 0.6 }));
+    // Arrow tip
+    svg.appendChild(rc.polygon([[cx-14,hy-40],[cx-14,hy-36],[cx-18,hy-38]], { stroke:'#888', fill:'#aaa', fillStyle:'solid', roughness:0.6 }));
+    // Quiver on back
+    svg.appendChild(rc.rectangle(cx+4, hy-34, 5, 18, opts(shadeColor(color,-30), {roughness:1.5})));
+    svg.appendChild(rc.line(cx+5, hy-34, cx+7, hy-40, { stroke: '#8B4513', strokeWidth: 1.5, roughness: 1 }));
+    svg.appendChild(rc.line(cx+7, hy-34, cx+7, hy-40, { stroke: '#8B4513', strokeWidth: 1.5, roughness: 1 }));
     // Legs
     svg.appendChild(rc.line(cx-3, hy-10, cx-4, hy+10, { stroke: color, strokeWidth: 5, roughness: 1 }));
     svg.appendChild(rc.line(cx+3, hy-10, cx+5, hy+10, { stroke: color, strokeWidth: 5, roughness: 1 }));
@@ -274,9 +284,15 @@ function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
     svg.appendChild(rc.ellipse(cx, hy - 40, 13, 13, opts(color)));
     // Halo
     svg.appendChild(rc.ellipse(cx, hy - 50, 20, 6, { stroke: '#FFD700', strokeWidth: 1.5, fill: 'none', roughness: 2.0 }));
+    // Arms — left arm outstretched (healing gesture), right holds staff
+    svg.appendChild(rc.line(cx-7, hy-30, cx-16, hy-20, { stroke: color, strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx-16, hy-20, cx-20, hy-14, { stroke: color, strokeWidth: 4, roughness: 1.5, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx+7, hy-30, cx+13, hy-20, { stroke: color, strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
     // Staff with cross
     svg.appendChild(rc.line(cx+12, hy, cx+12, hy-55, { stroke: '#FFD700', strokeWidth: 2.5, roughness: 1.2 }));
     svg.appendChild(rc.line(cx+6, hy-45, cx+18, hy-45, { stroke: '#FFD700', strokeWidth: 2.5, roughness: 1.2 }));
+    // Healing glow on outstretched hand
+    svg.appendChild(rc.circle(cx-20, hy-14, 5, { stroke: '#FFD700', fill: 'rgba(255,220,50,0.4)', fillStyle:'solid', roughness: 1.5 }));
   } else if (cls === 'spaceranger' || cls === 'pilot') {
     // Space suit - round helmet, chunky suit
     svg.appendChild(rc.rectangle(cx-9, hy-30, 18, 22, opts(color, { roughness: 0.8 })));
@@ -402,17 +418,48 @@ function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
     svg.appendChild(rc.line(cx+14, hy-18, cx+11, hy-30, { stroke: '#ddd', strokeWidth: 0.8, roughness:0.8 }));
     svg.appendChild(rc.line(cx+15.5, hy-17, cx+12, hy-30, { stroke: '#ddd', strokeWidth: 0.8, roughness:0.8 }));
   } else if (cls === 'pirate' || cls === 'buccaneer') {
+    // Legs — wide stance, one boot
+    svg.appendChild(rc.rectangle(cx-8, hy-14, 7, 14, opts(shadeColor(color,-40), {roughness:1.5})));
+    svg.appendChild(rc.rectangle(cx+1, hy-14, 7, 14, opts(shadeColor(color,-40), {roughness:1.5})));
+    // Right boot
+    svg.appendChild(rc.ellipse(cx+4, hy+1, 10, 5, opts(shadeColor(color,-60), {roughness:1.2})));
+    // Left boot (cuffed)
+    svg.appendChild(rc.ellipse(cx-4, hy+1, 10, 5, opts(shadeColor(color,-60), {roughness:1.2})));
+    svg.appendChild(rc.line(cx-9, hy-5, cx+1, hy-5, { stroke: shadeColor(color,-20), strokeWidth: 2, roughness: 1.5 }));
+    // Long coat
     svg.appendChild(rc.polygon([
-      [cx-7,hy-32],[cx+7,hy-32],[cx+8,hy],[cx-8,hy]
-    ], opts(darkColor, { roughness: 1.8 })));
-    svg.appendChild(rc.ellipse(cx, hy - 40, 13, 13, opts(color)));
-    // Tricorn hat
+      [cx-9,hy-34],[cx+9,hy-34],[cx+11,hy-6],[cx+16,hy],[cx+12,hy+2],[cx+8,hy-4],
+      [cx-8,hy-4],[cx-12,hy+2],[cx-16,hy],[cx-11,hy-6]
+    ], opts(shadeColor(color,-30), { roughness: 2.0 })));
+    // Shirt / vest beneath
+    svg.appendChild(rc.rectangle(cx-5, hy-32, 10, 16, opts(shadeColor(color,20), {roughness:1.2})));
+    // Head
+    svg.appendChild(rc.ellipse(cx, hy-42, 13, 13, opts(color)));
+    // Eye patch
+    svg.appendChild(rc.ellipse(cx+3, hy-43, 6, 4, { stroke:'#111', fill:'#111', fillStyle:'solid', roughness:0.8 }));
+    svg.appendChild(rc.line(cx, hy-43, cx+6, hy-43, { stroke:'#333', strokeWidth: 1, roughness: 1 }));
+    // Stubble / beard
+    svg.appendChild(rc.line(cx-4, hy-38, cx+4, hy-38, { stroke: shadeColor(color,-20), strokeWidth: 1.5, roughness: 2.5 }));
+    svg.appendChild(rc.line(cx-3, hy-36, cx+3, hy-36, { stroke: shadeColor(color,-20), strokeWidth: 1, roughness: 2.5 }));
+    // Tricorn hat — proper brim and crown
+    svg.appendChild(rc.ellipse(cx, hy-49, 24, 5, opts('#1a1a1a', {roughness:1.5})));
     svg.appendChild(rc.polygon([
-      [cx-12,hy-46],[cx+12,hy-46],[cx+8,hy-58],[cx-8,hy-58]
+      [cx-8,hy-49],[cx+8,hy-49],[cx+7,hy-62],[cx-7,hy-62]
     ], opts('#1a1a1a', { roughness: 1.5 })));
+    // Hat feather
+    svg.appendChild(rc.path(`M ${cx+7} ${hy-62} Q ${cx+16} ${hy-70} ${cx+14} ${hy-76} Q ${cx+10} ${hy-68} ${cx+7} ${hy-62}`,
+      { stroke: shadeColor(color,20), fill: shadeColor(color,10), fillStyle:'solid', roughness:2.5 }));
+    // Left arm — hand on hip
+    svg.appendChild(rc.line(cx-9, hy-32, cx-16, hy-20, { stroke: color, strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx-16, hy-20, cx-14, hy-12, { stroke: color, strokeWidth: 4, roughness: 1.5, strokeLinecap:'round' }));
+    // Right arm raised with cutlass
+    svg.appendChild(rc.line(cx+9, hy-32, cx+16, hy-22, { stroke: color, strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
     // Cutlass
-    svg.appendChild(rc.line(cx+10, hy-28, cx+22, hy-46, { stroke: '#ddd', strokeWidth: 2.5, roughness: 0.8 }));
-    svg.appendChild(rc.ellipse(cx+10, hy-28, 8, 4, { stroke:'#888', fill:'none', roughness: 1 }));
+    svg.appendChild(rc.line(cx+16, hy-22, cx+28, hy-44, { stroke: '#ddd', strokeWidth: 2.5, roughness: 0.8 }));
+    svg.appendChild(rc.ellipse(cx+16, hy-22, 8, 4, { stroke:'#888', fill:'#666', fillStyle:'solid', roughness: 1 }));
+    // Belt
+    svg.appendChild(rc.line(cx-9, hy-16, cx+9, hy-16, { stroke: shadeColor(color,-50), strokeWidth: 2, roughness: 1.2 }));
+    svg.appendChild(rc.rectangle(cx-2, hy-18, 4, 4, { stroke:'#888', fill:'#aaa', fillStyle:'solid', roughness:0.8 }));
   } else if (cls === 'slime') {
     // Slime — wobbly blob, cute face, jelly drips
     const slimeColor = color || '#4caf50';
@@ -441,6 +488,121 @@ function drawCharacter(rc, svg, cx, groundY, cls, color, name, r) {
     svg.appendChild(rc.line(cx, hy - 32, cx, hy - 22, { stroke: '#00eeff', strokeWidth: 1, roughness: 0.8 }));
     svg.appendChild(rc.rectangle(cx - 9, hy - 10, 8, 12, opts(shadeColor(color, -40), { roughness: 0.7 })));
     svg.appendChild(rc.rectangle(cx + 1, hy - 10, 8, 12, opts(shadeColor(color, -40), { roughness: 0.7 })));
+  } else if (cls === 'mermaid') {
+    // Mermaid — human upper body, fish tail lower half
+    const tailColor = shadeColor(color, -20);
+    const scaleColor = shadeColor(color, 10);
+    // Fish tail (replaces legs) — wide sweeping fin
+    svg.appendChild(rc.polygon([
+      [cx-10,hy-8],[cx+10,hy-8],[cx+8,hy+8],[cx+16,hy+14],[cx+6,hy+12],
+      [cx,hy+18],[cx-6,hy+12],[cx-16,hy+14],[cx-8,hy+8]
+    ], opts(tailColor, { roughness: 2.5, bowing: 1.5 })));
+    // Tail scales (pattern lines)
+    svg.appendChild(rc.line(cx-8, hy-2, cx+8, hy-2, { stroke: scaleColor, strokeWidth: 1, roughness: 1.5 }));
+    svg.appendChild(rc.line(cx-7, hy+4, cx+7, hy+4, { stroke: scaleColor, strokeWidth: 1, roughness: 1.5 }));
+    // Upper body
+    svg.appendChild(rc.polygon([
+      [cx-8,hy-30],[cx+8,hy-30],[cx+9,hy-8],[cx-9,hy-8]
+    ], opts(color, { roughness: 1.5 })));
+    // Shell or wrap accent across chest
+    svg.appendChild(rc.line(cx-8, hy-22, cx+8, hy-22, { stroke: shadeColor(color,-30), strokeWidth: 2, roughness: 2 }));
+    // Head
+    svg.appendChild(rc.ellipse(cx, hy-40, 13, 13, opts(color)));
+    // Long flowing hair
+    svg.appendChild(rc.path(`M ${cx-6} ${hy-46} Q ${cx-18} ${hy-38} ${cx-16} ${hy-20}`,
+      { stroke: shadeColor(color,-10), strokeWidth: 4, fill:'none', roughness: 2.5 }));
+    svg.appendChild(rc.path(`M ${cx+4} ${hy-46} Q ${cx+16} ${hy-36} ${cx+15} ${hy-22}`,
+      { stroke: shadeColor(color,-10), strokeWidth: 3, fill:'none', roughness: 2.5 }));
+    // Arms — one raised, one at side
+    svg.appendChild(rc.line(cx-8, hy-28, cx-18, hy-18, { stroke: color, strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx+8, hy-28, cx+16, hy-20, { stroke: color, strokeWidth: 5, roughness: 1.5, strokeLinecap:'round' }));
+    // Trident in right hand
+    svg.appendChild(rc.line(cx+16, hy-20, cx+20, hy-48, { stroke: '#7aaccc', strokeWidth: 2, roughness: 1.2 }));
+    svg.appendChild(rc.line(cx+18, hy-46, cx+18, hy-50, { stroke: '#7aaccc', strokeWidth: 1.5, roughness: 0.8 }));
+    svg.appendChild(rc.line(cx+20, hy-46, cx+20, hy-50, { stroke: '#7aaccc', strokeWidth: 1.5, roughness: 0.8 }));
+    svg.appendChild(rc.line(cx+22, hy-46, cx+22, hy-50, { stroke: '#7aaccc', strokeWidth: 1.5, roughness: 0.8 }));
+    // Shimmer gloss on tail
+    svg.appendChild(rc.ellipse(cx-2, hy, 6, 10, { stroke:'none', fill: 'rgba(255,255,255,0.18)', fillStyle:'solid', roughness: 1.5 }));
+  } else if (cls === 'druid') {
+    // Druid — earthy robe, antler staff, leaf crown
+    // Robe — wide and flowing, earth tones
+    svg.appendChild(rc.polygon([
+      [cx-9,hy-32],[cx+9,hy-32],[cx+14,hy],[cx-14,hy]
+    ], opts(shadeColor(color,-20), { roughness: 2.5, bowing: 1.5 })));
+    // Inner robe detail line
+    svg.appendChild(rc.line(cx, hy-32, cx, hy-6, { stroke: shadeColor(color,20), strokeWidth: 1.5, roughness: 2 }));
+    // Head
+    svg.appendChild(rc.ellipse(cx, hy-42, 13, 13, opts(color)));
+    // Leaf/twig crown
+    svg.appendChild(rc.path(`M ${cx-8} ${hy-48} Q ${cx-12} ${hy-56} ${cx-6} ${hy-54}`,
+      { stroke: '#4a8a20', strokeWidth: 2, fill: 'none', roughness: 2.5 }));
+    svg.appendChild(rc.path(`M ${cx} ${hy-48} Q ${cx} ${hy-58} ${cx+2} ${hy-55}`,
+      { stroke: '#4a8a20', strokeWidth: 2, fill: 'none', roughness: 2.5 }));
+    svg.appendChild(rc.path(`M ${cx+8} ${hy-48} Q ${cx+12} ${hy-56} ${cx+6} ${hy-54}`,
+      { stroke: '#4a8a20', strokeWidth: 2, fill: 'none', roughness: 2.5 }));
+    // Arms — wide, open gesture (nature communion)
+    svg.appendChild(rc.line(cx-9, hy-30, cx-18, hy-18, { stroke: shadeColor(color,-20), strokeWidth: 5, roughness: 1.8, strokeLinecap:'round' }));
+    svg.appendChild(rc.line(cx+9, hy-30, cx+16, hy-22, { stroke: shadeColor(color,-20), strokeWidth: 5, roughness: 1.8, strokeLinecap:'round' }));
+    // Gnarled wooden staff (antler-topped)
+    svg.appendChild(rc.line(cx-18, hy-18, cx-20, hy-52, { stroke: '#6B3A1F', strokeWidth: 3, roughness: 2.5 }));
+    svg.appendChild(rc.path(`M ${cx-20} ${hy-52} Q ${cx-28} ${hy-60} ${cx-24} ${hy-62}`,
+      { stroke: '#6B3A1F', strokeWidth: 2, fill: 'none', roughness: 3 }));
+    svg.appendChild(rc.path(`M ${cx-20} ${hy-52} Q ${cx-14} ${hy-60} ${cx-16} ${hy-64}`,
+      { stroke: '#6B3A1F', strokeWidth: 2, fill: 'none', roughness: 3 }));
+    // Floating leaf orb at staff tip
+    svg.appendChild(rc.circle(cx-20, hy-56, 6, { stroke: '#4a8a20', fill: 'rgba(100,200,50,0.5)', fillStyle:'solid', roughness: 2 }));
+    // Belt pouch with herbs
+    svg.appendChild(rc.ellipse(cx+4, hy-10, 8, 6, opts(shadeColor(color,-40), {roughness:1.5})));
+  } else if (cls === 'skeleton_pc') {
+    // Skeleton player character — bony, dressed, wielding a weapon
+    // Legs — bone thin
+    svg.appendChild(rc.line(cx-4, hy-8, cx-5, hy+10, { stroke: '#e8dcc8', strokeWidth: 3, roughness: 2 }));
+    svg.appendChild(rc.line(cx+4, hy-8, cx+5, hy+10, { stroke: '#e8dcc8', strokeWidth: 3, roughness: 2 }));
+    // Rib cage body
+    svg.appendChild(rc.rectangle(cx-7, hy-30, 14, 22, { stroke: '#e8dcc8', fill: 'none', roughness: 2.2 }));
+    // Ribs (3 pairs)
+    for (let i = 0; i < 3; i++) {
+      const ry = hy-26 + i*6;
+      svg.appendChild(rc.line(cx-6, ry, cx-1, ry+2, { stroke: '#e8dcc8', strokeWidth: 1.5, roughness: 1.5 }));
+      svg.appendChild(rc.line(cx+6, ry, cx+1, ry+2, { stroke: '#e8dcc8', strokeWidth: 1.5, roughness: 1.5 }));
+    }
+    // Skull
+    svg.appendChild(rc.ellipse(cx, hy-40, 14, 14, { stroke: '#e8dcc8', fill: '#d4c8a8', fillStyle:'solid', roughness: 2 }));
+    // Eye sockets — glowing with player color
+    svg.appendChild(rc.circle(cx-4, hy-42, 4, { stroke: 'none', fill: color, fillStyle:'solid', roughness: 0.5 }));
+    svg.appendChild(rc.circle(cx+4, hy-42, 4, { stroke: 'none', fill: color, fillStyle:'solid', roughness: 0.5 }));
+    // Nasal cavity
+    svg.appendChild(rc.polygon([[cx-1,hy-37],[cx+1,hy-37],[cx,hy-35]], { stroke:'#999', fill:'#888', fillStyle:'solid', roughness:0.8 }));
+    // Grinning jaw teeth
+    svg.appendChild(rc.line(cx-4, hy-34, cx+4, hy-34, { stroke: '#e8dcc8', strokeWidth: 1, roughness: 1.5 }));
+    // Bone arms
+    svg.appendChild(rc.line(cx-7, hy-28, cx-16, hy-18, { stroke: '#e8dcc8', strokeWidth: 3, roughness: 2 }));
+    svg.appendChild(rc.line(cx+7, hy-28, cx+18, hy-16, { stroke: '#e8dcc8', strokeWidth: 3, roughness: 2 }));
+    // Weapon — bone club or sword
+    svg.appendChild(rc.line(cx+18, hy-16, cx+24, hy-40, { stroke: color, strokeWidth: 2, roughness: 1.5 }));
+    // Tattered cloak (player color) — suggests personality
+    svg.appendChild(rc.polygon([
+      [cx-7,hy-28],[cx+7,hy-28],[cx+10,hy-4],[cx+6,hy],[cx,hy-6],[cx-6,hy],[cx-10,hy-4]
+    ], { stroke: color, fill: `${color}55`, fillStyle:'solid', roughness: 2.5 }));
+  } else if (cls === 'ghost_pc') {
+    // Ghost player character — translucent, floating, retains personality
+    const ghostBody = `M ${cx-12} ${hy} Q ${cx-16} ${hy-18} ${cx-10} ${hy-28} Q ${cx-12} ${hy-44} ${cx} ${hy-46} Q ${cx+12} ${hy-44} ${cx+10} ${hy-28} Q ${cx+16} ${hy-18} ${cx+12} ${hy} Q ${cx+8} ${hy+6} ${cx+4} ${hy+2} Q ${cx} ${hy+8} ${cx-4} ${hy+2} Q ${cx-8} ${hy+6} ${cx-12} ${hy}`;
+    // Ghost body in player color (translucent)
+    svg.appendChild(rc.path(ghostBody, { stroke: color, fill: `${color}55`, fillStyle:'solid', roughness: 3.0, strokeWidth: 2 }));
+    // Inner glow
+    svg.appendChild(rc.ellipse(cx, hy-28, 14, 20, { stroke:'none', fill: `${color}33`, fillStyle:'solid', roughness: 1.5 }));
+    // Eyes — player color glowing
+    svg.appendChild(rc.circle(cx-5, hy-36, 5, { stroke: 'none', fill: color, fillStyle:'solid', roughness: 0.5 }));
+    svg.appendChild(rc.circle(cx+5, hy-36, 5, { stroke: 'none', fill: color, fillStyle:'solid', roughness: 0.5 }));
+    svg.appendChild(rc.circle(cx-5, hy-36, 2, { stroke: 'none', fill: '#fff', fillStyle:'solid', roughness: 0.3 }));
+    svg.appendChild(rc.circle(cx+5, hy-36, 2, { stroke: 'none', fill: '#fff', fillStyle:'solid', roughness: 0.3 }));
+    // Wispy arms
+    svg.appendChild(rc.path(`M ${cx-10} ${hy-24} Q ${cx-22} ${hy-20} ${cx-24} ${hy-12}`,
+      { stroke: color, strokeWidth: 4, fill: 'none', roughness: 2.5 }));
+    svg.appendChild(rc.path(`M ${cx+10} ${hy-24} Q ${cx+22} ${hy-18} ${cx+22} ${hy-10}`,
+      { stroke: color, strokeWidth: 4, fill: 'none', roughness: 2.5 }));
+    // Floating (no ground shadow overriding — ghost floats above)
+    svg.appendChild(rc.ellipse(cx, hy+4, 20, 4, { stroke:'none', fill:'rgba(0,0,0,0.1)', fillStyle:'solid', roughness:1 }));
   } else {
     // Default — generic adventurer
     svg.appendChild(rc.polygon([
@@ -660,6 +822,16 @@ function resolveCharacterClass(classId, className, role) {
     'space ranger': 'spaceranger', 'pilot': 'spaceranger',
     'android': 'spaceranger', 'cyborg': 'spaceranger',
     'xenobiologist': 'mage', 'engineer': 'spaceranger', 'drone operator': 'spaceranger',
+    // Ocean — unique visuals
+    'mermaid': 'mermaid', 'merfolk': 'mermaid', 'siren': 'mermaid',
+    // Nature / Druid
+    'druid': 'druid', 'shaman': 'druid', 'nature priest': 'druid', 'herbalist': 'druid',
+    // Creature PCs — remap to real branches
+    'skeleton': 'skeleton_pc', 'undead': 'skeleton_pc', 'lich pc': 'skeleton_pc',
+    'ghost pc': 'ghost_pc', 'spirit': 'ghost_pc', 'phantom': 'ghost_pc',
+    // Horror investigator
+    'investigator': 'rogue', 'detective': 'rogue', 'monster hunter': 'warrior',
+    'occultist': 'mage', 'empath': 'healer',
   };
 
   // Check display name first (className like "Netrunner")
