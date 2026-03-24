@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import rough from 'roughjs/bundled/rough.esm.js';
+import rough from '../../lib/rough.js';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { useSaveSlots } from '../../hooks/useSaveSlots.js';
 import { SFX, initAudio } from '../game/SoundEngine.js';
