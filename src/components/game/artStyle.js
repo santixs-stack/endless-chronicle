@@ -209,6 +209,34 @@ export const SCENE_CREATURES = {
   fairy_castle: ['knight','enchanted_knight','dark_fairy','evil_queen','guard','princess_npc'],
   magic_village:['elder','merchant','witch','fairy','wood_elf','bard'],
   dark_woods:   ['witch','werewolf','troll','wolf','dark_fairy','cursed_beast'],
+  // ── SPACE / SCI-FI ───────────────────────────────────────────────────
+  spaceship:    ['android','robot_drone','alien_grey','space_marine','corrupted_ai','scientist_npc'],
+  space_station:['guard','android','robot_drone','alien_grey','netrunner','scientist_npc'],
+  alien_planet: ['alien_grey','alien_beast','alien_bug','robot_drone','space_marine','corrupted_ai'],
+  // ── WESTERN ───────────────────────────────────────────────────────────
+  prairie:      ['wolf','native_warrior','outlaw','drifter','gunslinger','dire_wolf'],
+  saloon:       ['gunslinger','bandit','merchant','elder','outlaw','gambler_npc','bartender'],
+  frontier_town:['sheriff','deputy','gunslinger','merchant','outlaw','elder','preacher'],
+  canyon:       ['outlaw','native_warrior','bandit','wolf','cattle_rustler','gunslinger'],
+  mine:         ['bandit','zombie','rat','goblin','elder','guard'],
+  // ── HORROR ────────────────────────────────────────────────────────────
+  graveyard:    ['zombie','skeleton','ghost','wraith','vampire','revenant','ghoul'],
+  crypt:        ['skeleton','zombie','ghost','vampire','lich','wraith','revenant'],
+  asylum:       ['ghost','zombie','poltergeist','cultist','banshee','doppelganger'],
+  // ── CYBERPUNK ─────────────────────────────────────────────────────────
+  neon_city:    ['netrunner','gang_member','android','corpo_agent','street_thug','assassin'],
+  back_alley:   ['gang_member','bandit','street_thug','assassin','yakuza_cyber','ripperdoc'],
+  corp_building:['corpo_agent','guard','android','maxtac_officer','netrunner','security_guard'],
+  // ── MYTHOLOGY ─────────────────────────────────────────────────────────
+  olympus:      ['olympian','demigod','elder','griffin','satyr','pegasus'],
+  underworld:   ['cerberus','shade','lich','wraith','fury','skeleton','demon'],
+  // ── NINJA / SAMURAI ───────────────────────────────────────────────────
+  dojo:         ['samurai','ronin','elder','monk','war_monk','clan_warrior'],
+  bamboo_forest:['ninja','tengu','kitsune','wolf','oni','river_spirit'],
+  fortress_jp:  ['samurai','shogun','knight','guard','assassin','daimyo'],
+  // ── POST-APOCALYPTIC ──────────────────────────────────────────────────
+  bunker:       ['vault_dweller','guard','elder','android','tech_priest','scientist_npc'],
+  ruined_city:  ['raider','ghoul_npc','super_mutant','scavenger','zombie','feral_dog'],
   // ── HISTORICAL ────────────────────────────────────────────────────────
   arena:        ['gladiator','guard','knight','elder','orc','bandit'],
   battlefield:  ['knight','guard','bandit','roman_soldier','barbarian','archer_npc'],

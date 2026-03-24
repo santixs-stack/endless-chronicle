@@ -79,7 +79,7 @@ ${turnInfo}
 
 TAGS — append after EVERY narrative response:
 [IMAGE:{"setting":"TYPE","time":"TIME","mood":"MOOD","weather":"WEATHER","fg":"foreground description","mg":"midground description","bg":"background description","details":["detail1","detail2"],"partySize":N,"inCombat":false,"enemy":"enemy name or null","label":"short scene label"}]
-  setting: forest|plains|village|dungeon|cave|desert|city|ruins|castle|mountain|ocean|space|snow|ship|tavern|road|swamp
+  setting: forest|plains|village|dungeon|cave|desert|city|ruins|castle|mountain|ocean|space|snow|ship|tavern|road|swamp|tower|temple|shrine|manor|market|arena|jail|wasteland|jungle|interior|spaceship|space_station|alien_planet|prairie|saloon|frontier_town|canyon|mine|graveyard|crypt|asylum|neon_city|back_alley|corp_building|olympus|underworld|dojo|bamboo_forest|fortress_jp|bunker|ruined_city
   time: day|night|dawn|dusk|cave|storm|space
   mood: tense|peaceful|mysterious|exciting|dark|wondrous|funny|scary
   weather: clear|rain|snow|fog|storm
@@ -87,9 +87,22 @@ TAGS — append after EVERY narrative response:
   fg/mg/bg: brief descriptions of what's in each visual layer
   Fill this accurately based on what's actually happening in the scene — every response gets a unique scene image.
 [SCENE:{"type":"TYPE","time":"TIME","weather":"WEATHER","mood":"MOOD"}]
-  type: forest|plains|village|dungeon|cave|desert|city|ruins|castle|mountain|ocean|swamp|space|snow
+  type — pick the CLOSEST match. Common types by genre:
+    Fantasy:     forest | plains | village | dungeon | cave | castle | ruins | mountain | swamp | snow | tower | temple | shrine | tavern | manor | market | arena | jail | jungle | interior
+    Space:       space | spaceship | space_station | alien_planet
+    Ocean:       ocean | ship | island | port | beach | underwater
+    Horror:      manor | graveyard | crypt | asylum | dungeon | ruins
+    Western:     frontier_town | saloon | prairie | canyon | mine | city
+    Post-Apoc:   wasteland | bunker | ruined_city | refugee_camp
+    Cyberpunk:   neon_city | back_alley | corp_building | city
+    Mythology:   olympus | underworld | ruins | mountain | ocean | temple
+    Fairy Tale:  forest | enchanted_forest | dark_woods | castle | tower | village
+    Ninja:       dojo | bamboo_forest | fortress_jp | shrine | forest | village
+    Historical:  arena | battlefield | city | ruins | castle | desert | ocean
+    Fallback:    plains (outdoor generic), interior (indoor generic)
   time: day|night|dawn|dusk|storm|cave   weather: clear|rain|snow|fog|storm
   mood: tense|peaceful|mysterious|exciting|triumphant|sad|joyful|dark|battle — REQUIRED, drives music selection
+  ⚠ SCENE MUST UPDATE every time the player moves to a new location. Walking to a tower? type="tower". Entering a saloon? type="saloon". Arriving on an alien planet? type="alien_planet". Never keep the previous scene type if the location changed.
 
 [ACTIONS:["action 1","action 2","action 3","action 4"]]
   Specific to the moment and current player's class. Max 8 words each.

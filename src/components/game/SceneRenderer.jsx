@@ -21,6 +21,7 @@ function mkRand(seed) {
 // ── Children's book color palettes ───────
 // Warm, saturated, illustrator-quality
 const PALETTE = {
+  // ── existing palettes ──────────────────────────────────────────────────
   forest: {
     sky:    ['#7EC8E3','#ADE3F5','#E8F7F0'],
     ground: '#4A7C3F',
@@ -152,7 +153,6 @@ const PALETTE = {
     glow:   '#9B59FF',
   },
   city: {
-    // Day palette: bright mercantile city
     sky:    ['#4A90C8','#6AAEE0','#A8D4F0'],
     ground: '#8B7355',
     mid:    '#6B5540',
@@ -166,6 +166,274 @@ const PALETTE = {
     flag:   '#CC2222',
     sun:    '#FFE066',
   },
+  // ── new scene types ────────────────────────────────────────────────────
+  tower: {
+    sky:    ['#1C1030','#2E1C4A','#4A2A6A'],
+    ground: '#3A2840',
+    mid:    '#2A1E32',
+    far:    '#1A1228',
+    accent: '#9B6FFF',
+    stone:  ['#5A4870','#4A3860','#6A5880'],
+    torch:  '#FF8C42',
+    glow:   '#7B4FFF',
+    window: '#AAFFCC',
+  },
+  temple: {
+    sky:    ['#D4A843','#C4882A','#8A5A18'],
+    ground: '#A07838',
+    mid:    '#806028',
+    far:    '#5A4018',
+    accent: '#FFD700',
+    stone:  ['#C8A870','#B89058','#A07840'],
+    pillar: '#D4B880',
+    glow:   '#FFD700',
+    torch:  '#FF6030',
+  },
+  shrine: {
+    sky:    ['#2A1A3A','#3A2A50','#4A3A68'],
+    ground: '#2A2038',
+    mid:    '#1E1830',
+    far:    '#141028',
+    accent: '#FF8CA0',
+    stone:  ['#5A4870','#4A3862','#6A5882'],
+    lantern:'#FFD080',
+    glow:   '#FF70A0',
+    petal:  '#FF90B0',
+  },
+  tavern: {
+    sky:    ['#2A1A0A','#3A2810','#4A3818'],
+    ground: '#5A3818',
+    mid:    '#4A2E12',
+    far:    '#38220A',
+    accent: '#FFB830',
+    wood:   ['#6B4423','#8B5A2A','#5A3818'],
+    fire:   '#FF6B35',
+    mug:    '#D4A840',
+    candle: '#FFD080',
+  },
+  ship: {
+    sky:    ['#1E4080','#2850A0','#3A6ABE'],
+    ground: '#1565C0',
+    mid:    '#0D47A1',
+    far:    '#0A3080',
+    accent: '#F5DEB3',
+    wood:   ['#8B4513','#A0522D','#6B3410'],
+    sail:   '#F5F5DC',
+    wave:   '#1E90FF',
+    rope:   '#C4A040',
+  },
+  manor: {
+    sky:    ['#1A0A18','#280E24','#380E30'],
+    ground: '#2A1828',
+    mid:    '#1E1020',
+    far:    '#120A18',
+    accent: '#8866AA',
+    stone:  ['#3A2840','#2E2038','#4A3850'],
+    window: '#FF4488',
+    vine:   '#2A4A20',
+    fog:    'rgba(80,40,80,0.3)',
+  },
+  interior: {
+    sky:    ['#1A1008','#241810','#301E14'],
+    ground: '#5A3A18',
+    mid:    '#4A2E12',
+    far:    '#38220A',
+    accent: '#FFD080',
+    wood:   ['#6B4423','#8B5A2A','#5A3818'],
+    fire:   '#FF8C42',
+    candle: '#FFD080',
+    stone:  ['#7A6858','#6A5848','#8A7868'],
+  },
+  market: {
+    sky:    ['#FF9A3C','#FFAD50','#FFC870'],
+    ground: '#8B7355',
+    mid:    '#7A6248',
+    far:    '#6A5238',
+    accent: '#FF6B35',
+    awning: ['#CC2222','#2244CC','#22AA44'],
+    stone:  ['#9E8E7A','#8A7A68'],
+    sun:    '#FFE066',
+    crowd:  '#C4A880',
+  },
+  arena: {
+    sky:    ['#1A237E','#283593','#3949AB'],
+    ground: '#C4A040',
+    mid:    '#A08030',
+    far:    '#806020',
+    accent: '#FFD700',
+    sand:   ['#D4B058','#C09040','#B07830'],
+    stone:  ['#607D8B','#546E7A','#455A64'],
+    crowd:  '#8B6A50',
+    blood:  '#CC2222',
+  },
+  jail: {
+    sky:    ['#0A0A14','#101018','#0A0A14'],
+    ground: '#2A2430',
+    mid:    '#1E1A28',
+    far:    '#141020',
+    accent: '#6B6B7A',
+    stone:  ['#3A3448','#2E2838','#4A4458'],
+    rust:   '#8B4513',
+    torch:  '#FF6B35',
+    bar:    '#5A5A6A',
+  },
+  wasteland: {
+    sky:    ['#3A2810','#4A3418','#5A4020'],
+    ground: '#6A4820',
+    mid:    '#5A3A18',
+    far:    '#402A10',
+    accent: '#D4A840',
+    dust:   ['#8B6030','#A07040','#7A5028'],
+    ruin:   ['#5A4030','#4A3020'],
+    smog:   'rgba(100,80,40,0.3)',
+    rust:   '#8B3A20',
+  },
+  jungle: {
+    sky:    ['#1B5E20','#2E7D32','#43A047'],
+    ground: '#2E4A1E',
+    mid:    '#1E3A12',
+    far:    '#122808',
+    accent: '#F9A825',
+    leaf:   ['#2E7D32','#388E3C','#1B5E20'],
+    vine:   '#558B2F',
+    flower: '#FF6F00',
+    fog:    'rgba(80,140,60,0.2)',
+  },
+  // ── SPACE / SCI-FI ──────────────────────────────────────────────────
+  spaceship: {
+    sky:    ['#050510','#0A0A20','#050510'],
+    ground: '#1A1A2E', mid: '#10102A', far: '#080818',
+    accent: '#00FFCC', metal: ['#2A3A4A','#1E2E3E','#3A4A5A'],
+    panel: '#1A3A5A', alert: '#FF4444', glow: '#00CCFF', window: '#004466',
+  },
+  space_station: {
+    sky:    ['#020212','#060620','#020212'],
+    ground: '#1E1E30', mid: '#141428', far: '#0A0A1A',
+    accent: '#44FFCC', metal: ['#303848','#242E3C','#3C4858'],
+    strut: '#2A3A4A', glow: '#00FFAA', alert: '#FF6600', window: '#003355',
+  },
+  alien_planet: {
+    sky:    ['#1A0A30','#2E1050','#4A1A70'],
+    ground: '#3A1A50', mid: '#2A1240', far: '#1A0A30',
+    accent: '#AAFFAA', crystal: ['#8844FF','#AA66FF','#6622DD'],
+    glow: '#88FF44', fog: 'rgba(100,40,180,0.25)', spore: '#44FFAA',
+  },
+  // ── WESTERN ─────────────────────────────────────────────────────────
+  prairie: {
+    sky:    ['#4A8ABE','#6AA8D8','#A0CCE8'],
+    ground: '#8A7040', mid: '#7A6030', far: '#6A5020',
+    accent: '#D4A840', grass: ['#A09040','#B0A050','#907830'],
+    dust: '#C4A870', horizon: '#D4B880', sun: '#FFE566',
+  },
+  saloon: {
+    sky:    ['#1A0E08','#281810','#381E14'],
+    ground: '#5A3818', mid: '#4A2E12', far: '#38220A',
+    accent: '#D4A840', wood: ['#7B4A23','#9B6A33','#6B3A18'],
+    lamp: '#FFD060', baize: '#2A6A2A', piano: '#4A3020',
+  },
+  frontier_town: {
+    sky:    ['#CC7A30','#E89050','#F0A860'],
+    ground: '#A07840', mid: '#886030', far: '#6A4820',
+    accent: '#FFD060', wood: ['#8B5A2A','#7A4A1A','#9B6A3A'],
+    dust: '#C4A060', sign: '#D4B870', sun: '#FFE566',
+  },
+  canyon: {
+    sky:    ['#CC5A20','#E07030','#F08848'],
+    ground: '#C06030', mid: '#A04A20', far: '#803818',
+    accent: '#FFD060', rock: ['#C07040','#A85A30','#D08050'],
+    shadow: '#602010', dust: '#D4A060', sun: '#FFE080',
+  },
+  mine: {
+    sky:    ['#080808','#101010','#080808'],
+    ground: '#2A2020', mid: '#1E1818', far: '#141010',
+    accent: '#D4A840', wood: ['#5A3A18','#4A2E12','#6A4A28'],
+    ore: '#8A7040', torch: '#FF8030', cart: '#4A3828',
+  },
+  // ── HORROR ──────────────────────────────────────────────────────────
+  graveyard: {
+    sky:    ['#0A0A14','#14141E','#0A0A14'],
+    ground: '#1E2018', mid: '#181A14', far: '#101210',
+    accent: '#8899AA', stone: ['#4A4A50','#3A3A40','#5A5A60'],
+    fog: 'rgba(80,90,100,0.35)', moon: '#AABBCC', dead: '#2A2E28',
+  },
+  crypt: {
+    sky:    ['#050510','#0A0A18','#050510'],
+    ground: '#1A1820', mid: '#12101A', far: '#0A0812',
+    accent: '#6644AA', stone: ['#2A283A','#1E1C30','#3A3848'],
+    bone: '#C8C0A8', glow: '#4422AA', damp: '#141830',
+  },
+  asylum: {
+    sky:    ['#0A0A10','#101018','#0A0A10'],
+    ground: '#1E1E28', mid: '#16161E', far: '#0E0E18',
+    accent: '#AAAACC', wall: ['#2A2A38','#222230','#323240'],
+    flicker: '#FFDD88', crack: '#1A1A28', blood: '#4A1010',
+  },
+  // ── CYBERPUNK ───────────────────────────────────────────────────────
+  neon_city: {
+    sky:    ['#050510','#0A0820','#050510'],
+    ground: '#1A1428', mid: '#120E20', far: '#0A0818',
+    accent: '#FF00FF', neon: ['#FF00FF','#00FFFF','#FF4400','#00FF88'],
+    build: ['#1A1830','#141228','#221E38'], puddle: '#0A0818',
+    smog: 'rgba(20,10,40,0.4)', window: '#001133',
+  },
+  back_alley: {
+    sky:    ['#030308','#06060E','#030308'],
+    ground: '#1A1418', mid: '#120E10', far: '#0A080C',
+    accent: '#FF3366', brick: ['#2A1E22','#1E1618','#32262A'],
+    neon: ['#FF2266','#0088FF','#00FFAA'], trash: '#2A2018', puddle: '#0A0A18',
+  },
+  corp_building: {
+    sky:    ['#080818','#101028','#080818'],
+    ground: '#1E1E30', mid: '#161626', far: '#0E0E1E',
+    accent: '#0088FF', glass: ['#102030','#0A1828','#182838'],
+    light: '#0066CC', logo: '#FF4400', floor: '#1A1A2E',
+  },
+  // ── MYTHOLOGY ───────────────────────────────────────────────────────
+  olympus: {
+    sky:    ['#87CEEB','#AADDF5','#E8F7FF'],
+    ground: '#F5F0E8', mid: '#E8E0D0', far: '#D8D0C0',
+    accent: '#FFD700', cloud: '#FFFFFF', marble: ['#F8F4EC','#EEE8DC','#E4DCC8'],
+    gold: '#FFD700', glow: '#FFFAAA', pillar: '#F0E8D8',
+  },
+  underworld: {
+    sky:    ['#1A0000','#300808','#1A0000'],
+    ground: '#2A0808', mid: '#200606', far: '#140404',
+    accent: '#FF4400', lava: ['#FF4400','#FF6600','#DD2200'],
+    bone: '#C8B898', smoke: 'rgba(60,10,10,0.4)', glow: '#FF2200', river: '#440000',
+  },
+  // ── NINJA / SAMURAI ─────────────────────────────────────────────────
+  dojo: {
+    sky:    ['#1A1008','#241810','#301E14'],
+    ground: '#5A3818', mid: '#4A2E12', far: '#38220A',
+    accent: '#D4A840', wood: ['#6B4423','#8B5A2A','#5A3818'],
+    mat: '#8A7040', paper: '#F0E8D0', lacquer: '#AA2222',
+  },
+  bamboo_forest: {
+    sky:    ['#2E5A1E','#3A7028','#4A8A38'],
+    ground: '#2A4818', mid: '#1E3A12', far: '#142A0A',
+    accent: '#C8E840', bamboo: ['#6A9A30','#8AB840','#5A8A28'],
+    leaf: '#A8D840', mist: 'rgba(80,140,50,0.3)', light: '#E8FF88',
+  },
+  fortress_jp: {
+    sky:    ['#0A0A18','#141428','#0A0A18'],
+    ground: '#2A2838', mid: '#1E1C2E', far: '#141228',
+    accent: '#CC2222', stone: ['#3A3848','#2E2C40','#464458'],
+    wood: ['#4A3018','#3A2210','#5A4020'], banner: '#CC2222', torch: '#FF8030',
+  },
+  // ── POST-APOCALYPTIC ────────────────────────────────────────────────
+  bunker: {
+    sky:    ['#080808','#101010','#080808'],
+    ground: '#282828', mid: '#202020', far: '#181818',
+    accent: '#88AA44', metal: ['#3A3A3A','#2E2E2E','#464646'],
+    light: '#88AA44', rust: '#6A3018', pipe: '#4A4A4A',
+  },
+  ruined_city: {
+    sky:    ['#2A2010','#382818','#4A3420'],
+    ground: '#5A4428', mid: '#4A3420', far: '#382818',
+    accent: '#C4A840', rubble: ['#5A4A38','#4A3A28','#6A5A48'],
+    rebar: '#5A5050', smoke: 'rgba(80,60,40,0.35)', fire: '#FF6030', glass: '#5A7A6A',
+  },
+
 };
 
 function getPal(type, time) {
@@ -945,8 +1213,24 @@ function drawScene(svgEl2, scene, players, turnCount) {
     if (type === 'mountain')     ty = H*0.55 + Math.sin(i*0.9)*30 + tr()*10;
     else if (type === 'ocean')   ty = H*0.62 + Math.sin(i*0.5)*8 + tr()*5;
     else if (type === 'desert')  ty = H*0.63 + Math.sin(i*0.4)*12 + tr()*8;
-    else if (type === 'dungeon' || type === 'cave') ty = H*0.75 + tr()*3;
+    else if (type === 'dungeon' || type === 'cave' || type === 'crypt') ty = H*0.75 + tr()*3;
     else if (type === 'castle' || type === 'ruins') ty = H*0.66 + Math.sin(i*0.3)*6 + tr()*5;
+    else if (type === 'tower' || type === 'temple' || type === 'shrine') ty = H*0.70 + tr()*3;
+    else if (type === 'interior' || type === 'tavern' || type === 'jail' || type === 'dojo' || type === 'bunker') ty = H*0.78 + tr()*2;
+    else if (type === 'saloon' || type === 'mine' || type === 'asylum') ty = H*0.76 + tr()*3;
+    else if (type === 'manor' || type === 'fortress_jp') ty = H*0.68 + Math.sin(i*0.2)*4 + tr()*4;
+    else if (type === 'arena' || type === 'colosseum') ty = H*0.72 + Math.sin(i*0.3)*5 + tr()*4;
+    else if (type === 'jungle' || type === 'bamboo_forest') ty = H*0.64 + Math.sin(i*0.8)*10 + tr()*8;
+    else if (type === 'wasteland' || type === 'ruined_city') ty = H*0.65 + Math.sin(i*0.5)*8 + tr()*10;
+    else if (type === 'market' || type === 'ship') ty = H*0.67 + Math.sin(i*0.4)*6 + tr()*5;
+    else if (type === 'graveyard') ty = H*0.67 + Math.sin(i*0.3)*8 + tr()*5;
+    else if (type === 'prairie' || type === 'canyon') ty = H*0.63 + Math.sin(i*0.4)*14 + tr()*8;
+    else if (type === 'frontier_town') ty = H*0.66 + Math.sin(i*0.3)*6 + tr()*5;
+    else if (type === 'spaceship' || type === 'space_station' || type === 'corp_building') ty = H*0.80 + tr()*2;
+    else if (type === 'alien_planet') ty = H*0.62 + Math.sin(i*0.7)*15 + tr()*12;
+    else if (type === 'neon_city' || type === 'back_alley') ty = H*0.70 + tr()*4;
+    else if (type === 'olympus') ty = H*0.58 + Math.sin(i*0.4)*18 + tr()*8;
+    else if (type === 'underworld') ty = H*0.68 + Math.sin(i*0.5)*10 + tr()*6;
     else                         ty = H*0.65 + Math.sin(i*0.6)*12 + Math.sin(i*1.3)*6 + tr()*8;
     terrainPts.push({ x: tx, y: ty });
   }
