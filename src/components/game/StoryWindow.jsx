@@ -333,9 +333,16 @@ export default function StoryWindow() {
   const { state } = useGame();
   const lastPlayerEntryRef = useRef(null);
   const windowRef = useRef(null);
-  // Mobile: scene collapsed by default on small screens
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 640;
-  const [sceneCollapsed, setSceneCollapsed] = useState(isMobile);
+
+  // Tablet/mobile detection — covers iPad (768-1024px) and phones (≤640px)
+  // Uses touch capability + screen width to catch all touch devices
+  const isTouchDevice = () => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 1024 ||
+      ('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0);
+  };
+  const [sceneCollapsed, setSceneCollapsed] = useState(isTouchDevice);
 
   useEffect(() => {
     if (lastPlayerEntryRef.current) {

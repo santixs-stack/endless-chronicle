@@ -110,7 +110,7 @@
 }
 
 /* ── Mobile: chips single row, hide keyboard hint ── */
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .chips {
     flex-wrap: nowrap;
     overflow-x: auto;

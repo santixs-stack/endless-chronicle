@@ -447,9 +447,9 @@
   border-bottom: none;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .sceneCollapseBtn {
-    display: flex; /* mobile: show toggle */
+    display: flex; /* tablet + mobile: show toggle */
   }
 }
 

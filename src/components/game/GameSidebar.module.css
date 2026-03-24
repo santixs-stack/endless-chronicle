@@ -36,7 +36,7 @@
 .iconBtn:hover { border-color: var(--accent); color: var(--accent); }
 .backdrop { display: none; }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .sidebar {
     position: absolute;
     left: 0; top: 0; bottom: 0;
@@ -103,7 +103,7 @@
 }
 
 /* ── Mobile sidebar improvements ─────────── */
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .sidebar { width: 80vw; max-width: 280px; }
   .body { padding: 0.5rem 0.75rem; }
   .sectionTitle { font-size: 0.6rem; margin-top: 0.5rem; }
