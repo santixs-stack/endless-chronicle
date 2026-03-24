@@ -20,7 +20,18 @@ export const RL_SHORT = {
 };
 
 export const RL_PROMPTS = {
-  '4th': 'Write at a 2nd-3rd grade reading level (ages 6-9). Use ONLY simple everyday words a young child knows. NEVER use words like: ancient, mysterious, treacherous, catastrophic, formidable, sinister, ominous, looming, descended, emerged, shimmered, revealed, concealed, lurking, peculiar, extraordinary, tremendous, magnificent. Instead use: old, scary, dangerous, big, bad, glowing, hiding, near, strange, huge, great. Short sentences, 8 words or less. No big words. Clear exciting action. 4-6 punchy sentences. CONTENT: Keep everything fun and safe for young children. No death, no dark themes, no scary violence. Heroes always succeed or learn something. Villains are silly or misguided, not evil. Quests involve helping, finding, befriending, or fixing things.',
+  '4th': `Write at a 2nd-3rd grade reading level (ages 6-9). Think Dragon Masters by Tracey West and Octonauts — stories kids this age love because they have REAL stakes, genuine worry, and earned victories.
+
+LANGUAGE: Short sentences. Simple words. Action-forward. Vivid sounds and colors. Use: old, scary, dark, glowing, fast, loud, worried, brave, sneak, grab, run, hide, cry, cheer. Avoid: ancient, mysterious, treacherous, formidable, sinister, ominous. 4-6 sentences max per response.
+
+STORY RULES — This is what makes it GOOD:
+- REAL STAKES: Something the hero actually cares about is in danger. A friend is lost. A creature is hurt. The village needs help. Make the player FEEL it.
+- GENUINE WORRY: Things go wrong. The plan fails. The door is locked. The creature is bigger than expected. The friend is in more danger than they thought. Let the hero struggle before they succeed.
+- ACTIVE VILLAIN: Even silly villains have a PLAN already happening. They are not waiting — they are doing something bad RIGHT NOW that must be stopped.
+- WONDER AND DISCOVERY: Every quest has one amazing thing — a dragon that can talk, a glowing cave, a creature nobody has seen before. Describe it so the child can picture it perfectly.
+- EARNED VICTORY: The hero wins by being CLEVER or KIND, not just lucky. Bonus points if they use something they learned earlier.
+
+CONTENT: No death or serious injury. Mild scary moments are fine — Dragon Masters has real danger. Villains can be mean and threatening. Heroes can feel afraid and doubt themselves. Happy endings required but they must be EARNED.`,
 
   '8th': 'Write at a middle-grade reading level (ages 10-13). Clear sentences, interesting vocabulary. Think Percy Jackson or Harry Potter — exciting and engaging for kids and families. 3-5 sentences per response. CONTENT: Adventure and excitement are fine. Mild peril and conflict are ok. Characters can be in danger but should generally be safe. Keep themes appropriate for family audiences — no gore, no adult romance, no extremely dark content. Heroes can struggle and lose battles but the overall tone stays hopeful.',
 
@@ -31,7 +42,20 @@ export const RL_PROMPTS = {
 
 // Age-appropriate quest generation instruction per level
 export const RL_QUEST_GUIDANCE = {
-  '4th': 'IMPORTANT: This is for young children (ages 6-9). Quests must be fun, safe, and age-appropriate. Focus on: helping others, finding lost things, making new friends, fixing problems, going on treasure hunts, defeating silly villains. NO: death, serious injury, horror, dark magic, adult themes, scary villains. Keep everything lighthearted and optimistic.',
+  '4th': `IMPORTANT: This is for young children (ages 6-9) in the Dragon Masters / Octonauts style.
+
+The 5 story beats EVERY quest must hit:
+1. HOOK (turn 1): Something is ALREADY going wrong. A creature is in danger. A friend is missing. A dark cloud is spreading. The player walks into trouble, not toward it.
+2. COMPLICATION (turn 2-3): The first plan fails or makes it worse. The villain has a second trick. The creature is harder to help than expected. The player must think differently.
+3. DARK MOMENT (turn 3-4): Things look really bad. The player might fail. Give them one moment of doubt, fear, or loss. This is what makes the victory matter.
+4. TWIST or DISCOVERY (turn 4-5): The player learns something that changes everything — about the villain's real reason, the creature's special ability, a hidden door, a new friend.
+5. EARNED VICTORY: The player uses what they DISCOVERED or who they BEFRIENDED to win. Not luck — cleverness or kindness.
+
+WHAT MAKES IT GOOD:
+- Give the villain a motivation the player can understand (even if wrong) — not just "evil"
+- Include at least one creature or character with personality and feelings
+- Create one "wow" moment of wonder per quest — something magical and vivid
+- The emotional journey: worry → determination → doubt → discovery → triumph`,
 
   '8th': 'This is for family/middle-grade audiences (ages 10-13). Quests can involve real adventure, mystery, and mild danger. Heroes can struggle. Think Percy Jackson or early Harry Potter energy. Avoid: graphic violence, adult romance, extreme horror, or very dark themes.',
 
