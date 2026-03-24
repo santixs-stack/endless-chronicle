@@ -1207,14 +1207,31 @@ export const CREATURE_REGISTRY = {
   elder:          drawElder,
 };
 
+// ── Fallback creature by faction/relationship ──────────────────────────
+// When the AI invents a creature type not in the registry, pick the
+// closest visual based on faction so nothing ever goes invisible.
+function fallbackCreature(faction) {
+  switch (faction) {
+    case 'enemy':
+    case 'hostile':   return (x,y,sc,fac,st,uid) => drawGoblin(x,y,sc,fac,st,uid,'dagger');
+    case 'boss':      return (x,y,sc,fac,st,uid) => drawDemon(x,y,sc,fac,st,uid);
+    case 'friendly':
+    case 'ally':      return (x,y,sc,fac,st,uid) => drawElder(x,y,sc,fac,st,uid);
+    case 'neutral':   return (x,y,sc,fac,st,uid) => drawMerchant(x,y,sc,fac,st,uid);
+    case 'beast':     return (x,y,sc,fac,st,uid) => drawWolf(x,y,sc,fac,st,uid);
+    case 'undead':    return (x,y,sc,fac,st,uid) => drawZombie(x,y,sc,fac,st,uid);
+    default:          return (x,y,sc,fac,st,uid) => drawBandit(x,y,sc,'neutral',st,uid,'bandit');
+  }
+}
+
 export function drawCreature(type, x, y, scale, faction, status, uid) {
-  const fn = CREATURE_REGISTRY[type];
-  if (!fn) return { defs:'', svg:'' };
+  const fn = CREATURE_REGISTRY[type] || fallbackCreature(faction);
   try {
     return fn(x, y, scale, faction, status, uid);
   } catch(e) {
     console.warn('Creature draw error:', type, e);
-    return { defs:'', svg:'' };
+    // Last-resort: plain merchant silhouette, never blank
+    try { return drawMerchant(x, y, scale, 'neutral', status, uid); } catch { return { defs:'', svg:'' }; }
   }
 }
 
