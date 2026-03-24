@@ -1015,6 +1015,13 @@ function svgEl(tag, attrs) {
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   return el;
 }
+// ── Animated group wrapper ──────────────────
+function animG(cls, children) {
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  if (cls) g.setAttribute('class', cls);
+  if (Array.isArray(children)) children.forEach(c => c && g.appendChild(c));
+  return g;
+}
 
 // ── Map creature type to a drawable character class ──────────────────────
 function creatureTypeToClass(creatureType) {
@@ -1263,28 +1270,31 @@ function drawScene(svgEl2, scene, players, turnCount) {
     svgEl2.appendChild(auraG);
   }
 
-  // Far depth plane creatures (behind terrain midground)
+  // Far depth plane creatures (deep background — behind terrain midground)
   if (popResult.far) {
     const farG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     farG.innerHTML = popResult.far;
     svgEl2.appendChild(farG);
   }
 
-  // Mid depth plane creatures
+  // Mid depth plane creatures (midground — same level as players)
   if (popResult.mid) {
     const midG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     midG.innerHTML = popResult.mid;
     svgEl2.appendChild(midG);
   }
 
-  // Near depth plane creatures (in front — after players)
+  // ── Foreground grass/rocks (drawn before near-plane so NPCs stand in front) ──
+  drawForeground(rc, svgEl2, type, pal, tr, W, H);
+
+  // Near depth plane creatures (foreground — closest to viewer, on top of everything)
   if (popResult.near) {
     const nearG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     nearG.innerHTML = popResult.near;
     svgEl2.appendChild(nearG);
   }
 
-  // Particles
+  // Particles (on top of all creatures)
   if (particles) {
     const partG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     partG.innerHTML = particles;
@@ -1310,9 +1320,6 @@ function drawScene(svgEl2, scene, players, turnCount) {
     vs.textContent = 'VS';
     svgEl2.appendChild(vs);
   }
-
-  // ── Foreground grass/rocks ──
-  drawForeground(rc, svgEl2, type, pal, tr, W, H);
 
   // ── Paper texture overlay ──
   const paper = svgEl('rect', {
@@ -1393,11 +1400,13 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
         fillStyle: 'hachure', roughness: 1.8, strokeWidth: 1.5
       }));
     }
-    // Torches
+    // Torches with flicker animation
     [W*0.2, W*0.5, W*0.8].forEach(tx => {
       svg.appendChild(rc.rectangle(tx-3, H*0.45, 6, 16, { stroke:'#5C3A1E', fill:'#6B4423', fillStyle:'solid', roughness:1 }));
-      svg.appendChild(rc.ellipse(tx, H*0.43, 12, 16, { stroke:pal.torch, fill:pal.torch, fillStyle:'solid', roughness:2.5 }));
-      svg.appendChild(rc.ellipse(tx, H*0.42, 7, 10, { stroke:'#ffe080', fill:'#ffe080', fillStyle:'solid', roughness:2 }));
+      svg.appendChild(animG('flicker', [
+        rc.ellipse(tx, H*0.43, 12, 16, { stroke:pal.torch, fill:pal.torch, fillStyle:'solid', roughness:2.5 }),
+        rc.ellipse(tx, H*0.42, 7, 10, { stroke:'#ffe080', fill:'#ffe080', fillStyle:'solid', roughness:2 }),
+      ]));
     });
   }
 
@@ -1465,6 +1474,9 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
         cx: nx, cy: ny, rx: 60+sr()*80, ry: 30+sr()*40,
         fill: colors[i%colors.length]
       });
+      nebulaEl.setAttribute('class', 'driftCloud');
+      nebulaEl.style.animationDuration = `${40+sr()*30}s`;
+      nebulaEl.style.animationDelay = `${sr()*-20}s`;
       svg.appendChild(nebulaEl);
     }
     // Planets — sketchy and colorful
@@ -1512,14 +1524,15 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
     svg.appendChild(rc.polygon([[shipX,shipY-32],[shipX+20,shipY-20],[shipX,shipY-18]], {
       stroke:'#8a7060', fill:'rgba(200,180,150,0.5)', fillStyle:'solid', roughness:1.5
     }));
-    // Waves
+    // Waves (animated)
     for (let i = 0; i < 8; i++) {
       const wy = H*0.52 + sr()*30, wx = sr()*W;
       const wl = 30 + sr()*60;
       const wavePath = `M ${wx} ${wy} Q ${wx+wl/2} ${wy-8} ${wx+wl} ${wy}`;
-      svg.appendChild(rc.path(wavePath, {
-        stroke: pal.wave || '#42A5F5', fill:'none', strokeWidth:2, roughness:2.0
-      }));
+      const waveEl = rc.path(wavePath, { stroke: pal.wave || '#42A5F5', fill:'none', strokeWidth:2, roughness:2.0 });
+      waveEl.setAttribute('class', 'waveAnim');
+      waveEl.style.animationDelay = `${sr()*2}s`;
+      svg.appendChild(waveEl);
     }
   }
 
@@ -1540,16 +1553,23 @@ function drawBackground(rc, svg, type, time, pal, sr, tr, turnCount) {
         stroke: shadeColor(pal.roof||'#C62828', -20), fill: pal.roof||'#C62828',
         fillStyle:'hachure', roughness:2.0
       }));
-      // Window
+      // Window (candle flicker)
       if (lit) {
-        svg.appendChild(rc.rectangle(hx-6, hy2-20, 10, 8, {
+        const winEl = rc.rectangle(hx-6, hy2-20, 10, 8, {
           stroke:'#aaa', fill:'rgba(255,200,80,0.85)', fillStyle:'solid', roughness:0.8
-        }));
+        });
+        winEl.setAttribute('class', 'flicker2');
+        winEl.style.animationDelay = `${sr()*1.5}s`;
+        svg.appendChild(winEl);
       }
-      // Chimney
+      // Chimney with smoke
       svg.appendChild(rc.rectangle(hx+10, hy2-52, 7, 18, {
         stroke:'#5C3A1E', fill: pal.chimney||'#6D4C41', fillStyle:'solid', roughness:1.5
       }));
+      const smokeEl = svgEl('ellipse', { cx:String(hx+14), cy:String(hy2-58), rx:'5', ry:'7', fill:'rgba(100,80,60,0.35)' });
+      smokeEl.setAttribute('class', 'smokeRise');
+      smokeEl.style.animationDelay = `${sr()*2}s`;
+      svg.appendChild(smokeEl);
     }
   }
 
@@ -2255,8 +2275,11 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
     for (let i = 0; i < 3; i++) {
       const torchX = W*0.2 + i*(W*0.3);
       svg.appendChild(rc.line(torchX, H*0.3, torchX, H*0.42, { stroke:'#5A3010', strokeWidth:3, roughness:1.5 }));
-      svg.appendChild(rc.circle(torchX, H*0.28, 7, { stroke:'#FF8030', fill:'#FF6020', fillStyle:'solid', roughness:1.2 }));
+      svg.appendChild(animG('flicker', [
+        rc.circle(torchX, H*0.28, 7, { stroke:'#FF8030', fill:'#FF6020', fillStyle:'solid', roughness:1.2 }),
+      ]));
       const glowEl2 = svgEl('ellipse', { cx:String(torchX), cy:String(H*0.28), rx:'18', ry:'14', fill:'#FF6020', opacity:'0.12' });
+      glowEl2.setAttribute('class', 'eyeGlow');
       svg.appendChild(glowEl2);
     }
   }
@@ -2292,6 +2315,8 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
     if (type === 'space_station') {
       for (let i = 0; i < 4; i++) {
         const alertEl = svgEl('circle', { cx:String(W*0.05+i*(W*0.3)), cy:String(H*0.08), r:'5', fill:pal.alert||'#FF4444', opacity:'0.8' });
+        alertEl.setAttribute('class', 'eyeGlow');
+        alertEl.style.animationDelay = `${i*0.5}s`;
         svg.appendChild(alertEl);
       }
     }
@@ -2319,9 +2344,12 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
         stroke:shadeColor(cc,-20), fill:cc+'88', fillStyle:'solid', roughness:1.5, strokeWidth:1.5
       }));
     }
-    // Spore particles
+    // Spore particles (floating)
     for (let i = 0; i < 12; i++) {
       const spEl = svgEl('circle', { cx:String(sr()*W), cy:String(H*0.3+sr()*0.3*H), r:String(2+sr()*3), fill:pal.spore||'#44FFAA', opacity:String(0.3+sr()*0.4) });
+      spEl.setAttribute('class', 'emberFloat');
+      spEl.style.animationDelay = `${sr()*4}s`;
+      spEl.style.animationDuration = `${3+sr()*3}s`;
       svg.appendChild(spEl);
     }
     // Alien vegetation
@@ -2362,10 +2390,12 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
         }
       }
     }
-    // Ground neon reflections — puddles
+    // Ground neon reflections — puddles (shimmer)
     for (let i = 0; i < 5; i++) {
       const nc2 = (pal.neon||['#FF00FF','#00FFFF'])[i%2];
       const puddleEl = svgEl('ellipse', { cx:String(sr()*W), cy:String(H*0.70+sr()*6), rx:String(20+sr()*30), ry:'4', fill:nc2, opacity:'0.12' });
+      puddleEl.setAttribute('class', 'waveAnim');
+      puddleEl.style.animationDelay = `${sr()*2}s`;
       svg.appendChild(puddleEl);
     }
     // Rain effect for cyberpunk
@@ -2397,8 +2427,12 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
       svg.appendChild(beamEl);
     }
     // Security lights — sweeping
-    svg.appendChild(rc.circle(W*0.1, H*0.5, 5, { stroke:pal.light||'#0066CC', fill:pal.light||'#0066CC', fillStyle:'solid', roughness:0.5 }));
-    svg.appendChild(rc.circle(W*0.9, H*0.5, 5, { stroke:pal.light||'#0066CC', fill:pal.light||'#0066CC', fillStyle:'solid', roughness:0.5 }));
+    const sec1 = rc.circle(W*0.1, H*0.5, 5, { stroke:pal.light||'#0066CC', fill:pal.light||'#0066CC', fillStyle:'solid', roughness:0.5 });
+    sec1.setAttribute('class', 'eyeGlow'); sec1.style.animationDelay = '0s';
+    svg.appendChild(sec1);
+    const sec2 = rc.circle(W*0.9, H*0.5, 5, { stroke:pal.light||'#0066CC', fill:pal.light||'#0066CC', fillStyle:'solid', roughness:0.5 });
+    sec2.setAttribute('class', 'eyeGlow'); sec2.style.animationDelay = '1s';
+    svg.appendChild(sec2);
   }
 
   // ── Olympus (bright clouds, marble) ──────────────────────────────────────
@@ -2410,11 +2444,15 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
       const a2 = (i/12)*Math.PI*2;
       svg.appendChild(rc.line(W*0.75+Math.cos(a2)*24, H*0.1+Math.sin(a2)*24, W*0.75+Math.cos(a2)*38, H*0.1+Math.sin(a2)*38, { stroke:'#FFE040', strokeWidth:2, roughness:1.5 }));
     }
-    // Cloud layers
+    // Cloud layers (drifting)
     for (let c = 0; c < 8; c++) {
       const cx3 = sr()*W, cy3 = H*(0.1+sr()*0.45);
       const cw3 = 50+sr()*80;
-      svg.appendChild(rc.ellipse(cx3, cy3, cw3, 18+sr()*12, { stroke:'#e8e8e8', fill:'white', fillStyle:'solid', roughness:2.5 }));
+      const cloudEl = rc.ellipse(cx3, cy3, cw3, 18+sr()*12, { stroke:'#e8e8e8', fill:'white', fillStyle:'solid', roughness:2.5 });
+      cloudEl.setAttribute('class', 'driftCloud');
+      cloudEl.style.animationDuration = `${20+sr()*20}s`;
+      cloudEl.style.animationDelay = `${sr()*-15}s`;
+      svg.appendChild(cloudEl);
     }
     // Marble pillars
     for (let i = 0; i < 5; i++) {
@@ -2441,6 +2479,7 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
     }));
     // Lava glow
     const lavaEl = svgEl('ellipse', { cx:String(W*0.5), cy:String(H*0.67), rx:String(W*0.45), ry:'18', fill:'#FF4400', opacity:'0.2' });
+    lavaEl.setAttribute('class', 'eyeGlow');
     svg.appendChild(lavaEl);
     // Bone columns
     for (let i = 0; i < 4; i++) {
@@ -2454,9 +2493,11 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
       svg.appendChild(rc.circle(skx-3, sky2-1, 2, { stroke:'none', fill:'#FF4400', fillStyle:'solid', roughness:0.5 }));
       svg.appendChild(rc.circle(skx+3, sky2-1, 2, { stroke:'none', fill:'#FF4400', fillStyle:'solid', roughness:0.5 }));
     }
-    // Smoke columns
+    // Smoke columns (rising)
     for (let i = 0; i < 4; i++) {
       const smokeEl = svgEl('ellipse', { cx:String(W*0.15+i*(W*0.25)), cy:String(H*0.4), rx:'12', ry:'30', fill:pal.smoke||'rgba(60,10,10,0.4)', opacity:'0.6' });
+      smokeEl.setAttribute('class', 'smokeRise');
+      smokeEl.style.animationDelay = `${i*0.8}s`;
       svg.appendChild(smokeEl);
     }
   }
@@ -2466,8 +2507,11 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
     // Warm lantern light
     for (let i = 0; i < 4; i++) {
       const lx = W*0.12 + i*(W*0.26);
-      svg.appendChild(rc.ellipse(lx, H*0.18, 14, 20, { stroke:pal.lacquer||'#AA2222', fill:pal.lamp||'#FFD060', fillStyle:'solid', roughness:1.2 }));
+      svg.appendChild(animG('flicker2', [
+        rc.ellipse(lx, H*0.18, 14, 20, { stroke:pal.lacquer||'#AA2222', fill:pal.lamp||'#FFD060', fillStyle:'solid', roughness:1.2 }),
+      ]));
       const lanternGlow = svgEl('ellipse', { cx:String(lx), cy:String(H*0.18), rx:'28', ry:'22', fill:pal.lamp||'#FFD060', opacity:'0.1' });
+      lanternGlow.setAttribute('class', 'eyeGlow');
       svg.appendChild(lanternGlow);
       svg.appendChild(rc.line(lx, H*0.08, lx, H*0.18-10, { stroke:'#4A2810', strokeWidth:2, roughness:1.5 }));
     }
@@ -2503,7 +2547,12 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
       const bstX = sr()*W;
       const bstColor = bambooColors[i%bambooColors.length];
       const bstH = H*0.6 + sr()*0.2*H;
-      svg.appendChild(rc.line(bstX, H*0.75, bstX, H*0.75-bstH, { stroke:bstColor, strokeWidth:5+sr()*4, roughness:0.6 }));
+      const bambooEl = rc.line(bstX, H*0.75, bstX, H*0.75-bstH, { stroke:bstColor, strokeWidth:5+sr()*4, roughness:0.6 });
+      bambooEl.setAttribute('class', 'idleSway');
+      bambooEl.style.transformOrigin = `${bstX}px ${H*0.75}px`;
+      bambooEl.style.animationDelay = `${sr()*2}s`;
+      bambooEl.style.animationDuration = `${2+sr()*2}s`;
+      svg.appendChild(bambooEl);
       // Node segments
       for (let n = 0; n < 5; n++) {
         const ny = H*0.75 - (n+1)*(bstH/6);
@@ -2552,8 +2601,11 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
     // Torches on walls
     for (let t = 0; t < 3; t++) {
       const tx3 = W*0.2 + t*(W*0.3);
-      svg.appendChild(rc.circle(tx3, H*0.40, 6, { stroke:pal.torch||'#FF8030', fill:pal.torch||'#FF6020', fillStyle:'solid', roughness:1 }));
+      svg.appendChild(animG('flicker', [
+        rc.circle(tx3, H*0.40, 6, { stroke:pal.torch||'#FF8030', fill:pal.torch||'#FF6020', fillStyle:'solid', roughness:1 }),
+      ]));
       const torchGlow = svgEl('ellipse', { cx:String(tx3), cy:String(H*0.40), rx:'16', ry:'12', fill:pal.torch||'#FF8030', opacity:'0.15' });
+      torchGlow.setAttribute('class', 'eyeGlow');
       svg.appendChild(torchGlow);
     }
   }
@@ -2569,8 +2621,10 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
     // Emergency lighting — green strips
     for (let i = 0; i < 5; i++) {
       const lightEl = svgEl('rect', { x:String(i*(W/5)), y:String(H*0.68), width:String(W/5.5), height:'4', fill:pal.light||'#88AA44', opacity:'0.7' });
+      lightEl.setAttribute('class', 'eyeGlow'); lightEl.style.animationDelay = `${i*0.4}s`;
       svg.appendChild(lightEl);
       const glowEl3 = svgEl('rect', { x:String(i*(W/5)-4), y:String(H*0.65), width:String(W/5.5+8), height:'10', fill:pal.light||'#88AA44', opacity:'0.1' });
+      glowEl3.setAttribute('class', 'eyeGlow'); glowEl3.style.animationDelay = `${i*0.4}s`;
       svg.appendChild(glowEl3);
     }
     // Pipes on ceiling
@@ -2617,9 +2671,10 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
         }
       }
     }
-    // Fire glow on horizon
+    // Fire glow on horizon (animated)
     for (let f = 0; f < 3; f++) {
       const fireEl = svgEl('ellipse', { cx:String(W*(0.2+f*0.3)), cy:String(H*0.65), rx:String(25+sr()*20), ry:'12', fill:pal.fire||'#FF6030', opacity:String(0.15+sr()*0.1) });
+      fireEl.setAttribute('class', 'eyeGlow');
       svg.appendChild(fireEl);
     }
     // Rubble mounds on ground

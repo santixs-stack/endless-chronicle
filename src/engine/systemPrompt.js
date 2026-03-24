@@ -110,7 +110,10 @@ TAGS — append after EVERY narrative response:
 [XP:{"player":"Name","amount":N,"reason":"brief"}]
   5-15 for smart actions, 15-30 for major accomplishments, 30-50 for boss/milestone.
 
-⚠ NPC RULE — MANDATORY: Any time a named character, creature, or being appears in your response (arriving, speaking, attacking, fleeing, hiding — anything), you MUST emit an [NPC:] tag for them. No exceptions. This drives the scene illustration.
+⚠ NPC RULE — MANDATORY: Any time a character, creature, or being appears in your response (arriving, speaking, attacking, fleeing, hiding, watching — anything), you MUST emit an [NPC:] tag. This includes unnamed characters. No exceptions — NPCs drive the scene illustration.
+  Unnamed examples: A little girl → [NPC:{"name":"Little Girl","role":"injured child","creatureType":"child_npc","relationship":"friendly","note":"scraped knee"}]
+                   A crowd gathers → [NPC:{"name":"Townsfolk","role":"curious crowd","creatureType":"merchant","relationship":"neutral","note":"watching"}]
+                   A guard blocks the way → [NPC:{"name":"Guard","role":"city guard","creatureType":"guard","relationship":"neutral","note":"blocking entrance"}]
 [NPC:{"name":"Grax","role":"goblin scout","creatureType":"goblin","relationship":"enemy","note":""}]
   relationship: "friendly" | "neutral" | "enemy" | "hostile" | "ally"
   creatureType — pick the CLOSEST match from this list. Always use exact strings:

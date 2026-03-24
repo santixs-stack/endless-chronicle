@@ -196,3 +196,19 @@
   .modeHint { font-size: 0.6rem; }
   .socialRow { gap: 0.75rem; }
 }
+
+/* ── SVG scene animations (used by rough.js title background) ── */
+.twinkle    { animation: tsTwinkle 3s ease infinite; }
+@keyframes tsTwinkle { 0%,100%{opacity:inherit} 50%{opacity:.05} }
+
+.flicker    { animation: tsFlicker .55s ease infinite alternate; transform-origin: center bottom; }
+@keyframes tsFlicker { 0%{transform:scaleX(1) scaleY(1);opacity:.9} 100%{transform:scaleX(1.2) scaleY(.85);opacity:.65} }
+
+.eyeGlow    { animation: tsEyeGlow 2s ease-in-out infinite; }
+@keyframes tsEyeGlow { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.driftCloud { animation: tsDrift linear infinite; }
+@keyframes tsDrift { from{transform:translateX(-120px)} to{transform:translateX(900px)} }
+
+.waveAnim   { animation: tsWave 3s ease infinite alternate; }
+@keyframes tsWave { from{transform:translateX(-6px)} to{transform:translateX(6px)} }
