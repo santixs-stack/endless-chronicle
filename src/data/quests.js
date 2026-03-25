@@ -51,7 +51,7 @@ DARK MOMENT: The party reaches the treasure first, but learns what it actually I
 TWIST: The person who hid the treasure left one final message explaining why. It completely reframes who the real villain is.
 RESOLUTION: The decision of what to DO with the treasure is the real quest. There's no perfect answer.
 Track clues 0/4. Give each rival team a NAME, a LEADER with personality, and a REASON for wanting the treasure. One rival should become an unexpected ally.`,
-    start: 'The map is in your hands. Three teams saw you find it. They're already running. But the old sailor who gave you the map whispered one thing before she walked away: "Don't open the chest. Not until you know WHY it was hidden."',
+    start: `The map is in your hands. Three teams saw you find it. They're already running. But the old sailor who gave you the map whispered one thing before she walked away: "Don't open the chest. Not until you know WHY it was hidden."`,
   },
   {
     id: 'crash', icon: '🚀', name: 'Lost in Space', genre: 'space',
@@ -83,7 +83,7 @@ DARK MOMENT: The party finds the hoard — and the dragon mother arrives. She's 
 TWIST: The egg can still hatch — but only with warmth from someone who genuinely wants to protect it. Greed won't work.
 RESOLUTION: Return the egg with good intentions. The dragon mother becomes an ally. The "treasure" was the living egg all along.
 Track crew happiness 0-100%. Each crew member has a name and specialty. The rival child pirate should join the crew by act 2. The dragon mother appears first as a shadow under the water.`,
-    start: 'The wind fills your sails and the crew is singing. Then the lookout goes quiet. There's a shadow under the water, longer than your ship, moving the same direction you're heading. The old map marks this exact spot with two words: "SHE WATCHES."',
+    start: `The wind fills your sails and the crew is singing. Then the lookout goes quiet. There's a shadow under the water, longer than your ship, moving the same direction you're heading. The old map marks this exact spot with two words: "SHE WATCHES."`,
   },
   {
     id: 'wildwest', icon: '🤠', name: 'Wild West', genre: 'western',
@@ -99,7 +99,7 @@ DARK MOMENT: The party has 24 hours. They've earned the town's trust — but som
 TWIST: The bandit leader sends a private message: "I just want to talk. One hour. No guns." Is it a trap or is there a real way to resolve this without a showdown?
 RESOLUTION: True heroism is the choice — fight, negotiate, or find a third option that nobody expected.
 Track town trust 0-100%. Each townsperson has a name, a job, and an opinion. The bandit leader has a reason. The protected person has been keeping a secret.`,
-    start: 'You ride into Dusty Creek at sunset. The streets are empty. A note on your saddle says: GET OUT WHILE YOU STILL CAN. Every window has a face in it, watching. Then an old woman opens her door and waves you inside quickly. "You're the help," she says. "Good. Sit down. There's something you need to know about this town before you go getting anybody shot."',
+    start: `You ride into Dusty Creek at sunset. The streets are empty. A note on your saddle says: GET OUT WHILE YOU STILL CAN. Every window has a face in it, watching. Then an old woman opens her door and waves you inside quickly. "You're the help," she says. "Good. Sit down. There's something you need to know about this town before you go getting anybody shot."`,
   },
   {
     id: 'dreamworld', icon: '🌙', name: 'Dream World', genre: 'fantasy',
@@ -115,7 +115,7 @@ DARK MOMENT: The players find the child — but the child doesn't want to wake u
 TWIST: The dream world is ALIVE and it loves the child. It won't let them go easily. But it can be reasoned with — if the players understand what it's giving the child that reality isn't.
 RESOLUTION: The real fix isn't forcing the child to wake up — it's promising that the real world can have what they found here, too. Someone has to make that promise and mean it.
 Track dream keys 0/3. Each key is found by facing something real about one of the players' characters. The lost child has a name, a backstory, and a reason the dream felt better than home.`,
-    start: 'Three nights. Same dream. A door. A light. A voice saying your name. Tonight you all fell asleep holding hands. The door is in front of you now — real enough to touch. On the other side, a child is crying. They sound like they've been crying for a long time.',
+    start: `Three nights. Same dream. A door. A light. A voice saying your name. Tonight you all fell asleep holding hands. The door is in front of you now — real enough to touch. On the other side, a child is crying. They sound like they've been crying for a long time.`,
   },
   {
     id: 'spacemystery', icon: '🌌', name: 'Space Station Mystery', genre: 'space',
@@ -147,7 +147,7 @@ DARK MOMENT: The party learns the entity has been protecting the manor from some
 TWIST: The dangerous presence is grief — the entity's own grief, given form. The person couldn't leave because they couldn't let go of something. The party must find what it was.
 RESOLUTION: Help the entity complete their unfinished business and they can finally pass on. The dangerous presence dissolves with the grief.
 Track secrets 0/5. Each secret reveals one layer of who this person was. Include an object that holds an emotional memory. The entity should feel like a PERSON, not a monster.`,
-    start: 'The letter arrived this morning. Twenty-year-old handwriting. Your aunt's handwriting. She has been dead for twenty years. The letter says three words: "I'm still here." The gates of Blackthorn Manor stand open. The candle in the top window is lit.',
+    start: `The letter arrived this morning. Twenty-year-old handwriting. Your aunt's handwriting. She has been dead for twenty years. The letter says three words: "I'm still here." The gates of Blackthorn Manor stand open. The candle in the top window is lit.`,
   },
   {
     id: 'gladiator', icon: '🏛', name: 'Arena of Glory', genre: 'historical',
@@ -173,7 +173,7 @@ DARK MOMENT: The party arrives to find rival factions already there. One will de
 TWIST: The list is a record of "genetic donors" — the child is the result of a pre-war project to preserve humanity's best traits. They are, in a literal sense, made from hundreds of people including the party's ancestors.
 RESOLUTION: Protect the child and decide what happens to the project — destroy it, expand it, or let the child simply be a child and choose their own future.
 Track supplies and days. The rival faction leaders have names and past trauma. The child has been alone for two years and has opinions about everything.`,
-    start: 'The signal is a child's voice. It reads names — one every ten seconds, all day, all night. Yesterday it said YOUR name. Today, looking out from your settlement, you can see three other groups also packing up, also heading toward Old City. Whoever gets there first gets to decide what happens to whoever's broadcasting.',
+    start: `The signal is a child's voice. It reads names — one every ten seconds, all day, all night. Yesterday it said YOUR name. Today, looking out from your settlement, you can see three other groups also packing up, also heading toward Old City. Whoever gets there first gets to decide what happens to whoever's broadcasting.`,
   },
   {
     id: 'cybercity', icon: '🤖', name: 'Neon City Heist', genre: 'cyberpunk',
@@ -199,7 +199,7 @@ DARK MOMENT: Trial 3 — the party must choose between saving someone they love 
 TWIST: The ancestor's choice wasn't wrong — it was just incomplete. The party's task isn't to apologize but to FINISH what was started.
 RESOLUTION: The answer that ends the divine argument isn't power or sacrifice — it's wisdom. The party demonstrates that mortals can understand something the gods, in their eternal conflict, cannot.
 Track divine favor 0-100%. Each god the party meets has a personality and an argument. The ancestor's ghost appears in trial 2. The choice in trial 3 has real consequences.`,
-    start: 'The earth shook at dawn. The oracle spoke three words: GO. TO. OLYMPUS. Then she handed you a clay tablet and said, "Your great-great-grandmother left this unfinished. The gods have been arguing about it for two hundred years. They want YOU to settle it." The tablet has your family's name on it. And something that looks like a debt.',
+    start: `The earth shook at dawn. The oracle spoke three words: GO. TO. OLYMPUS. Then she handed you a clay tablet and said, "Your great-great-grandmother left this unfinished. The gods have been arguing about it for two hundred years. They want YOU to settle it." The tablet has your family's name on it. And something that looks like a debt.`,
   },
   {
     id: 'fairytale', icon: '🧚', name: 'The Enchanted Quest', genre: 'fairytale',
@@ -231,7 +231,7 @@ DARK MOMENT: The party must face the friend in combat. To refuse destroys their 
 TWIST: The legendary warrior protecting the warlord is the party's own sensei — in disguise, monitoring the situation for the emperor, waiting to see if the warlord truly has good intentions.
 RESOLUTION: Honor is not following the rule — it's knowing WHEN the rule is right. The party must make a judgment call that the code of bushido cannot make for them.
 Track honor 0-100%. Honor gained by choosing mercy when violence is easier. Honor lost by cruelty or cowardice. The friend must get a conversation before any combat.`,
-    start: 'The morning mist hides everything. Your contact's sandals are here. Their blade is here. A fresh bowl of tea, still warm. They are not here. Below in the valley, the warlord's banners have just been raised over the old lord's gate. A child comes running up the path — not afraid, just fast — and hands you a folded note. It is in your friend's handwriting: "Wait. Watch. Then decide."',
+    start: `The morning mist hides everything. Your contact's sandals are here. Their blade is here. A fresh bowl of tea, still warm. They are not here. Below in the valley, the warlord's banners have just been raised over the old lord's gate. A child comes running up the path — not afraid, just fast — and hands you a folded note. It is in your friend's handwriting: "Wait. Watch. Then decide."`,
   },
 ];
 
