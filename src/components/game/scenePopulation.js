@@ -108,7 +108,16 @@ export function buildScenePopulation(npcs, inCombat, combatants, sceneType, turn
     // Near-plane: same ground as player (H-65) — they share the scene floor.
     // Mid/far: terrain-relative — perspective makes them appear higher and smaller.
     const terrainY = getTerrainY(xPos, terrainPts);
-    const PLAYER_GROUND_Y = H - 65;
+    // Match the scene-specific groundY from SceneRenderer so NPCs stand on same surface
+    const PLAYER_GROUND_Y = (() => {
+      if (sceneType === 'ocean' || sceneType === 'ship')                   return Math.round(H * 0.56);
+      if (sceneType === 'underwater')                                       return Math.round(H * 0.70);
+      if (sceneType === 'spaceship' || sceneType === 'space_station')      return Math.round(H * 0.72);
+      if (sceneType === 'corp_building' || sceneType === 'bunker')         return Math.round(H * 0.72);
+      if (sceneType === 'dojo' || sceneType === 'tavern' || sceneType === 'saloon' || sceneType === 'interior') return Math.round(H * 0.72);
+      if (sceneType === 'arena' || sceneType === 'colosseum')              return Math.round(H * 0.68);
+      return H - 65;
+    })();
     const yPos = plane === 'near'
       ? PLAYER_GROUND_Y                    // on the same floor as the hero
       : terrainY + dep.yOffset * H;        // receding into background

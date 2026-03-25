@@ -123,6 +123,23 @@ export function parseAllTags(raw) {
   });
   text = text.replace(/\[NPC:\s*\{(?:[^{}"']|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')*\}\]/g, '').trim();
 
+  // ── Bare NPC tags: [NPC:Name] without JSON — parse name only, strip from text ──
+  // The AI sometimes emits [NPC:Captain Blackwater] instead of [NPC:{...}]
+  const bareNpcMatches = [...text.matchAll(/\[NPC:([^\]{}\n]{1,60})\]/g)];
+  bareNpcMatches.forEach(m => {
+    const name = m[1].trim();
+    if (name && !name.startsWith('{')) {
+      // Create minimal NPC from bare name — role/creatureType will be inferred by fallback
+      result.npcs.push({ name, role: name, creatureType: 'guard', relationship: 'neutral', note: 'bare-tag' });
+    }
+  });
+  text = text.replace(/\[NPC:[^\]{}\n]{1,60}\]/g, '').trim();
+
+  // ── Catch-all: strip any remaining [TAG:...] or [TAG] from narrative ──
+  // Prevents raw tags leaking into the displayed story text
+  text = text.replace(/\[[A-Z_]{2,20}:[^\]]{0,200}\]/g, '').trim();
+  text = text.replace(/\[[A-Z_]{2,20}\]/g, '').trim();
+
   // ── Fallback NPC extractor ──────────────────────────────────────────────
   // If the AI described a character in narrative but forgot to emit [NPC:{...}],
   // scan the text for known character patterns and auto-generate NPC entries.

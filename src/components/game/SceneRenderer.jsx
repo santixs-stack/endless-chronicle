@@ -1209,7 +1209,18 @@ function drawScene(svgEl2, scene, players, turnCount) {
   if (weather === 'fog') drawFog(svgEl2, pal);
 
   // ── Characters ──
-  const groundY = H - 65;
+  // groundY = where character feet touch — scene-specific so they stand on terrain
+  // Ocean/ship: character stands on deck/wave crest, not below water line
+  // Interior scenes: stand on floor which is higher up
+  const groundY = (() => {
+    if (type === 'ocean' || type === 'ship')                   return Math.round(H * 0.56); // on wave top / ship deck
+    if (type === 'underwater')                                 return Math.round(H * 0.70); // sea floor
+    if (type === 'spaceship' || type === 'space_station')      return Math.round(H * 0.72); // metal floor
+    if (type === 'corp_building' || type === 'bunker')         return Math.round(H * 0.72);
+    if (type === 'dojo' || type === 'tavern' || type === 'saloon' || type === 'interior') return Math.round(H * 0.72);
+    if (type === 'arena' || type === 'colosseum')              return Math.round(H * 0.68);
+    return H - 65; // default for all other scenes
+  })();
   if (players?.length > 0) {
     const PLAYER_COLORS = ['#c4a84f','#5595e0','#6dbb7c','#e05555','#a87ed4','#e09030'];
     const spacing = Math.min(80, W / (players.length + 2));
