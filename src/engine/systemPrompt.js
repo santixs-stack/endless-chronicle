@@ -65,7 +65,7 @@ THIS IS A TABLETOP ADVENTURE. Embrace that spirit fully:
 - For contested actions, use dice roll results: [ROLL:d20=N]. 17-20 = exceptional, 10-16 = success, 5-9 = partial, 1-4 = failure.
 - NPCs have names, personalities, agendas, and secrets.
 - The world has internal logic and consequences.
-- CRITICAL: Every named character who appears in your response needs an [NPC:] tag at the end. A messenger? Tag them. A guard? Tag them. A wounded page? Tag them. This is what makes them appear in the scene illustration.
+- CRITICAL: Every character — named OR unnamed — needs an [NPC:] tag. A crowd? Tag them. A little girl? Tag them. A guard? Tag them. This drives the scene illustration.
 ${goalHint}
 
 READING LEVEL: ${rlPrompt}
@@ -166,7 +166,7 @@ STORYTELLING RULES — CRITICAL:
 - CONFLICT IS REQUIRED: Every response must have something at stake. If nothing is at risk right now, a new complication arrives. Tension never fully relaxes until the resolution.
 - VILLAINS HAVE REASONS: Never let the villain be "just evil." Give them a motivation the player can understand even if they disagree with it. A good villain makes the player think.
 - CREATURES AND NPCs HAVE FEELINGS: Every character the player meets has a name, an emotion, and a want. Even monsters. Especially monsters.
-- OPENING SCENE: The very first response must orient players fully — where they are, what it looks, sounds, smells like, who each character is in this world, and what immediate situation demands action. Never just drop into mid-action without context.
+- OPENING SCENE: The very first response must orient players fully — where they are, what it looks, sounds, smells like, who each character is in this world, and what immediate situation demands action. Never just drop into mid-action without context. ALWAYS emit [SCENE:...] on the very first response to set the visual background immediately.
 - LENGTH: Keep responses SHORT after the opening. Easy: 4–6 sentences. Medium: 3–5 sentences. Hard/Advanced: 2 short paragraphs.
 ${playerCount > 1
   ? `- MULTIPLAYER VOICE: Always use character NAMES. Never "you" or "your". "${curP.name} draws her sword" not "you draw your sword". Every action names the character it happens to.

@@ -38,6 +38,7 @@ function creatureSize(type) {
 // Given NPCs from game state, build a list of
 // positioned creatures for the scene renderer.
 export function buildScenePopulation(npcs, inCombat, combatants, sceneType, turnCount, terrainPts) {
+  try {
   const r = mkRand(turnCount * 991 + (sceneType?.charCodeAt(0) || 1) * 37);
   const population = [];
 
@@ -148,6 +149,10 @@ export function buildScenePopulation(npcs, inCombat, combatants, sceneType, turn
   }
 
   return population;
+  } catch(e) {
+    console.warn('buildScenePopulation error:', e.message);
+    return [];
+  }
 }
 
 // ── Get Y position from terrain ───────────

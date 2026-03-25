@@ -1157,8 +1157,9 @@ function drawScene(svgEl2, scene, players, turnCount) {
   const inCombat = scene?.inCombat || false;
   const enemyName = scene?.enemy;
   const pal = getPal(type, time);
-  const sr = mkRand(type.charCodeAt(0) * 1337);
-  const tr = mkRand(turnCount * 997 + type.charCodeAt(0) * 31);
+  const typeCode = (type || 'plains').charCodeAt(0) || 112; // 112='p' fallback
+  const sr = mkRand(typeCode * 1337);
+  const tr = mkRand(turnCount * 997 + typeCode * 31);
 
   // ── Defs (gradients, filters, paper texture) ──
   const defs = svgEl('defs', {});
