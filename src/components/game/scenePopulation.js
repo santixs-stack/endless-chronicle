@@ -53,52 +53,65 @@ export function buildScenePopulation(npcs, inCombat, combatants, sceneType, turn
     const faction = relToFaction(npc.relationship);
     const sz = creatureSize(creatureType);
 
-    // Determine depth plane based on relationship and scene context
-    // Rule: if only 1-2 total NPCs and no active combat, bring them close (near/mid)
-    // This handles one-on-one encounters like "a child on the roof" or "a stranger approaches"
+    // ── Depth plane by NPC count, not relationship ──────────────────────────
+    // Depth = narrative distance from the hero, not friend/foe status.
+    // An enemy attacking you is RIGHT THERE. A friendly crowd is in the background.
+    //
+    // Rule: assign planes by position in the NPC list.
+    //   1-2 total NPCs   → all near (they're the focus of the scene)
+    //   3 total NPCs     → first two near, third mid
+    //   4+ total NPCs    → first two near, next two mid, rest far
+    //   Combat active    → primary combatant always near, others mid/far
     const totalNpcs = activeNpcs.length;
-    const isIntimate = totalNpcs <= 2 && !combatActive;
     let plane;
-    if (faction === 'enemy' || faction === 'boss') {
-      // Enemies: mid for the main threat, far for additional
-      plane = i < 2 ? 'mid' : 'far';
-    } else if (faction === 'friendly') {
-      // Friendly NPCs: first one always near, rest mid
-      plane = i === 0 ? 'near' : 'mid';
+    if (combatActive) {
+      // In combat: first enemy near (the active combatant), rest mid
+      if (faction === 'enemy' || faction === 'boss') {
+        plane = i === 0 ? 'near' : 'mid';
+      } else {
+        plane = 'mid'; // allies/bystanders stay mid during combat
+      }
+    } else if (totalNpcs <= 2) {
+      plane = 'near'; // 1-2 NPCs = they're right here, talking/interacting
+    } else if (totalNpcs === 3) {
+      plane = i < 2 ? 'near' : 'mid';
     } else {
-      // Neutral: near for intimate scenes (1-2 NPCs), mid otherwise
-      plane = isIntimate && i === 0 ? 'near' : 'mid';
+      // 4+ NPCs: spread across planes for depth
+      if (i < 2)      plane = 'near';
+      else if (i < 4) plane = 'mid';
+      else            plane = 'far';
     }
 
     const dep = DEPTH[plane];
 
-    // X position — enemies spread across back, friendlies to sides
+    // ── X position ───────────────────────────────────────────────────────
+    // Near-plane NPCs cluster to the right of the player (who is centered).
+    // Mid/far NPCs spread across the width for a populated scene feel.
     let xPos;
-    if (faction === 'enemy' || faction === 'boss') {
-      // Spread enemies across back half of scene
-      const totalEnemies = activeNpcs.filter(n => relToFaction(n.relationship) === 'enemy' || relToFaction(n.relationship) === 'boss').length;
-      const enemyIdx = activeNpcs.filter((n,j) => j < i && (relToFaction(n.relationship) === 'enemy' || relToFaction(n.relationship) === 'boss')).length;
-      const spread = Math.min(totalEnemies - 1, 3);
-      xPos = W * 0.35 + (spread > 0 ? (enemyIdx / spread) * W * 0.35 : W * 0.175);
-      // Slight randomness
-      xPos += (r() - 0.5) * 30;
-    } else if (faction === 'friendly') {
-      // Friendly NPCs close to party — intimate scenes bring them in tighter
-      const friendlyBase = isIntimate ? W * 0.62 : W * 0.68;
-      xPos = friendlyBase + i * 28 + (r() - 0.5) * 12;
+    if (plane === 'near') {
+      // Right of player, spaced out naturally — first NPC closest to player
+      xPos = W * 0.60 + i * 32 + (r() - 0.5) * 14;
+    } else if (plane === 'mid') {
+      // Mid-ground: spread across the scene
+      const midNpcs = activeNpcs.filter((_, j) => {
+        if (combatActive) return relToFaction(activeNpcs[j].relationship) !== 'enemy';
+        return j >= 2 && j < 4;
+      }).length || 1;
+      const midIdx = Math.max(0, i - 2);
+      xPos = W * 0.15 + (midIdx / Math.max(midNpcs - 1, 1)) * W * 0.7 + (r() - 0.5) * 20;
     } else {
-      // Neutrals scattered
-      xPos = W * 0.2 + r() * W * 0.6;
+      // Far background: scattered
+      xPos = W * 0.1 + r() * W * 0.8;
     }
 
-    // Y position — near-plane NPCs stand at same ground level as player characters
-    // Player is drawn at H-65 (hardcoded). Terrain-based Y diverges from this.
-    // Using player ground Y for near, terrain for mid/far ensures visual alignment.
+    // ── Y position ───────────────────────────────────────────────────────
+    // Near-plane: same ground as player (H-65) — they share the scene floor.
+    // Mid/far: terrain-relative — perspective makes them appear higher and smaller.
     const terrainY = getTerrainY(xPos, terrainPts);
     const PLAYER_GROUND_Y = H - 65;
     const yPos = plane === 'near'
-      ? PLAYER_GROUND_Y          // same ground as player
-      : terrainY + dep.yOffset * H; // terrain-relative for background NPCs
+      ? PLAYER_GROUND_Y                    // on the same floor as the hero
+      : terrainY + dep.yOffset * H;        // receding into background
 
     // Scale from depth plane + size class.
     // Creatures are designed at sc=1.0 to be ~62px tall on a 300px canvas.
