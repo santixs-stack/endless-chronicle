@@ -33,7 +33,7 @@ export const STARTING_GEAR = {
     pirate:     ['Boarding axe', 'Grappling hook launcher', 'Space compass', 'Stolen ID'],
   },
   // ── Ocean ───────────────────────────────────────────────────────────────
-  ocean: {
+  pirate: {
     warrior:    ['Boarding cutlass', 'Buckler', 'Sailor\'s knife', 'Rope (50ft)'],
     mage:       ['Tide-caller staff', 'Sea charts', 'Bottled storm', 'Compass'],
     rogue:      ['Daggers (×2)', 'Grappling hook', 'Waterproof satchel', 'Fake papers'],
@@ -189,14 +189,14 @@ export const ARCHETYPE_SPECIALS = {
   'space/pirate':         'Pirate Broadcast — commandeer any ship\'s systems; fly anything, anywhere, any time',
 
   // ── Ocean ─────────────────────────────────────────────────────────────
-  'ocean/warrior':        'Boarding Action — lead a charge onto any vessel; enemies rout before you land',
-  'ocean/mage':           'Call the Storm — summon or dismiss weather at will; the sea obeys your command',
-  'ocean/rogue':          'Phantom Ship — your vessel is invisible at night; no one sees you coming or going',
-  'ocean/ranger':         'True North — always know your exact position; never lost at sea, ever',
-  'ocean/healer':         'Sea Remedy — the ocean provides; cure any illness with tidal water and ship\'s stores',
-  'ocean/bard':           'Captain\'s Charisma — any crew follows you into any storm; morale never breaks',
-  'ocean/spaceranger':    'Navigator\'s Gift — plot any course through any danger; arrive exactly on time',
-  'ocean/pirate':         'Fearless — challenge anyone to any contest and they always accept',
+  'pirate/warrior':        'Boarding Action — lead a charge onto any vessel; enemies rout before you land',
+  'pirate/mage':           'Call the Storm — summon or dismiss weather at will; the sea obeys your command',
+  'pirate/rogue':          'Phantom Ship — your vessel is invisible at night; no one sees you coming or going',
+  'pirate/ranger':         'True North — always know your exact position; never lost at sea, ever',
+  'pirate/healer':         'Sea Remedy — the ocean provides; cure any illness with tidal water and ship\'s stores',
+  'pirate/bard':           'Captain\'s Charisma — any crew follows you into any storm; morale never breaks',
+  'pirate/spaceranger':    'Navigator\'s Gift — plot any course through any danger; arrive exactly on time',
+  'pirate/pirate':         'Fearless — challenge anyone to any contest and they always accept',
 
   // ── Horror ────────────────────────────────────────────────────────────
   'horror/warrior':       'Monster Hunter — you know the weakness of every creature; one guaranteed vulnerable strike',

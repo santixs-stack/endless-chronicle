@@ -16,7 +16,7 @@ import styles from './CharacterCreateScreen.module.css';
 const GENRE_DEFAULT_WORLDS = {
   fantasy:    { world: 'A medieval kingdom of ancient magic, hidden dungeons, and legendary swords', location: 'The cobblestone streets of a bustling castle town', tone: 'Epic & Exciting' },
   space:      { world: 'A distant star system with alien civilizations and uncharted worlds', location: 'The observation deck of a battered starship', tone: 'Mysterious & Wondrous' },
-  ocean:      { world: 'The Golden Age of Sail — treacherous seas, hidden islands, legendary treasures', location: 'The deck of a weathered ship, open ocean in every direction', tone: 'Epic & Exciting' },
+  pirate:      { world: 'The Golden Age of Sail — treacherous seas, hidden islands, legendary treasures', location: 'The deck of a weathered ship, open ocean in every direction', tone: 'Epic & Exciting' },
   horror:     { world: 'A shadowed Victorian city where monsters lurk just beyond the gaslight', location: 'A fog-drenched street at the edge of a haunted district', tone: 'Dark & Mysterious' },
   western:    { world: 'The untamed frontier — dusty towns, railroad money, and frontier justice', location: 'A crossroads saloon where outlaws and lawmen share the same whiskey', tone: 'Epic & Exciting' },
   postapoc:   { world: 'A shattered civilization slowly rebuilding from the ashes of the old world', location: 'A fortified settlement on the edge of the wastes', tone: 'Dark & Mysterious' },
@@ -33,7 +33,7 @@ const GENRE_DEFAULT_WORLDS = {
 const GENRE_ICONS = {
   fantasy:    'lorc/broadsword',
   space:      'lorc/rocket',
-  ocean:      'lorc/anchor',
+  pirate:      'lorc/anchor',
   horror:     'lorc/ghost',
   western:    'lorc/law-star',
   postapoc:   'lorc/radioactive',
@@ -49,7 +49,7 @@ const GENRE_ICONS = {
 const RANDOM_NAMES = {
   fantasy:    ['Eryn','Cael','Thora','Brin','Oskar','Lyra','Dex','Mira','Flynn','Zara'],
   space:      ['Nova','Hex','Dax','Lyra','Zephyr','Orion','Vega','Axel','Cass','Juno'],
-  ocean:      ['Reef','Coral','Drake','Maren','Salty','Wren','Cove','Finn','Pearl','Tide'],
+  pirate:      ['Reef','Coral','Drake','Maren','Salty','Wren','Cove','Finn','Pearl','Tide'],
   horror:     ['Mira','Cain','Vesper','Ash','Raven','Cole','Nyx','Victor','Dusk','Wren'],
   western:    ['Buck','Mae','Colt','Dusty','June','Hank','Willa','Jesse','Ada','Clint'],
   postapoc:   ['Rust','Gravel','Nova','Grit','Wren','Ash','Cinder','Raze','Sable','Zinc'],
@@ -484,7 +484,7 @@ export default function CharacterCreateScreen() {
       sneaky_thief:  { world: 'A sprawling city of merchants, guilds, and shadowy back alleys',  location: 'The rooftops of the merchant quarter at dusk',            tone: 'Epic & Exciting',    genre: 'fantasy'  },
       forest_ranger: { world: 'An ancient wilderness where nature holds secrets and danger',      location: 'The edge of the Whispering Forest at dawn',              tone: 'Mysterious & Wondrous', genre: 'fantasy' },
       space_cadet:   { world: 'A distant star system with alien worlds and uncharted space',      location: 'The observation deck of a battered starship',            tone: 'Mysterious & Wondrous', genre: 'space'   },
-      sea_captain:   { world: 'The Golden Age of Piracy — treacherous seas, hidden islands',      location: 'The deck of a weathered ship, open ocean in every direction', tone: 'Epic & Exciting', genre: 'ocean'  },
+      sea_captain:   { world: 'The Golden Age of Piracy — treacherous seas, hidden islands',      location: 'The deck of a weathered ship, open ocean in every direction', tone: 'Epic & Exciting', genre: 'pirate'  },
       ageless_slime: { world: 'A strange world where the impossible is merely improbable',        location: 'A dungeon that seems oddly familiar to a slime',         tone: 'Funny & Silly',      genre: 'fantasy'  },
       gruff_veteran: { world: 'A war-scarred land rebuilding itself after a great conflict',       location: 'A crossroads tavern where old soldiers gather',          tone: 'Dark & Mysterious',  genre: 'historical' },
     };

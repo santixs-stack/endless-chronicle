@@ -38,7 +38,7 @@ Track obstacles cleared 0/3. Guards have names and personalities. The villain sp
     start: 'The letter arrived at dawn: "I have them. Come alone. Tell no one. You have until midnight to choose — come to the fortress, or I start asking them questions." You came anyway. You brought friends. That was already the first defiance.',
   },
   {
-    id: 'treasure', icon: '🗺', name: 'Treasure Hunt', genre: 'ocean',
+    id: 'treasure', icon: '🗺', name: 'Treasure Hunt', genre: 'pirate',
     tagline: 'A map to the greatest treasure ever hidden — and three other teams want it too!',
     tags: ['adventure', 'exploration', 'pirate'],
     tone: 'Funny & Silly', sceneType: 'ocean', sceneTime: 'day',
@@ -70,7 +70,7 @@ Track repairs 0-5 parts. The missing crew member has been BEFRIENDING the creatu
     start: 'CRASH. Green sky. Ship in pieces. Your crewmate Zara is not here — her seat is empty, harness unclipped from the inside. Outside, something small and glowing watches you from behind a rock. It looks scared. Everything on this planet looks scared.',
   },
   {
-    id: 'pirates', icon: '🏴‍☠️', name: 'Pirate Adventure', genre: 'ocean',
+    id: 'pirates', icon: '🏴‍☠️', name: 'Pirate Adventure', genre: 'pirate',
     tagline: 'Sail the seven seas, find legendary treasure, and become the greatest pirates ever!',
     tags: ['pirate', 'adventure'],
     tone: 'Epic & Exciting', sceneType: 'ocean', sceneTime: 'dawn',

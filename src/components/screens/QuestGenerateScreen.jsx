@@ -126,7 +126,7 @@ export default function QuestGenerateScreen() {
     const genreKeywords = {
       ninja: ['japan','samurai','ninja','feudal','shogun','katana','shinobi','clan'],
       space: ['space','galaxy','planet','starship','alien','sci-fi','robot'],
-      ocean: ['ocean','sea','pirate','ship','island','sailor','harbor'],
+      ocean: ['pirate','sea','pirate','ship','island','sailor','harbor'],
       horror: ['horror','haunted','ghost','vampire','zombie','curse','demon'],
       western: ['western','cowboy','frontier','saloon','gunslinger','outlaw','sheriff'],
       postapoc: ['apocalypse','wasteland','survival','radiation','ruins','nuclear'],
@@ -361,7 +361,7 @@ Respond ONLY with a JSON array of 4 objects, each with:
           <div className={styles.presetTitle}>Preset Quests</div>
           {/* Genre filter pills */}
           <div className={styles.presetGenreRow}>
-            {['fantasy','space','ocean','horror','western','postapoc','cyberpunk','mythology','fairytale','ninja','historical'].map(g => (
+            {['fantasy','space','pirate','horror','western','postapoc','cyberpunk','mythology','fairytale','ninja','historical'].map(g => (
               <button
                 key={g}
                 className={`${styles.presetGenreBtn} ${presetGenreFilter === g ? styles.presetGenreBtnActive : ''}`}

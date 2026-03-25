@@ -32,10 +32,10 @@ export const GENRES = [
     keywords: ['space', 'galaxy', 'planet', 'starship', 'alien', 'sci-fi', 'science fiction', 'orbit', 'nasa', 'spaceship', 'future', 'robot'],
   },
   {
-    id: 'ocean',
-    label: 'Ocean',
-    icon: '⚓',
-    keywords: ['ocean', 'sea', 'ship', 'island', 'pirate', 'sailor', 'harbor', 'naval', 'underwater', 'mermaid', 'voyage'],
+    id: 'pirate',
+    label: 'Pirate',
+    icon: '🏴‍☠️',
+    keywords: ['pirate', 'ocean', 'sea', 'ship', 'island', 'sailor', 'harbor', 'naval', 'underwater', 'mermaid', 'voyage', 'treasure', 'buccaneer', 'swashbuckler'],
   },
   {
     id: 'horror',
@@ -51,7 +51,7 @@ export const GENRES = [
   },
   {
     id: 'postapoc',
-    label: 'Post-Apocalyptic',
+    label: 'Wasteland',
     icon: '☢',
     keywords: ['apocalypse', 'post-apocalyptic', 'wasteland', 'survival', 'radiation', 'ruins', 'collapse', 'end of world', 'nuclear', 'dystopia', 'fallout'],
   },
@@ -69,9 +69,9 @@ export const GENRES = [
   },
   {
     id: 'fairytale',
-    label: 'Fairy Tale',
-    icon: '🧚',
-    keywords: ['fairy tale', 'fairytale', 'enchanted', 'princess', 'witch', 'spell', 'magical forest', 'fairy', 'ogre', 'once upon', 'kingdom'],
+    label: 'Storybook',
+    icon: '📖',
+    keywords: ['fairy tale', 'fairytale', 'storybook', 'enchanted', 'princess', 'prince', 'witch', 'curse', 'spell', 'magical forest', 'fairy', 'ogre', 'once upon', 'talking animal', 'true love'],
   },
   {
     id: 'ninja',
@@ -89,7 +89,7 @@ export const GENRES = [
 
 // Priority order for genre detection (most specific first)
 export const GENRE_PRIORITY = [
-  'horror', 'cyberpunk', 'postapoc', 'ninja', 'space', 'ocean',
+  'horror', 'cyberpunk', 'postapoc', 'ninja', 'space', 'pirate',
   'western', 'mythology', 'fairytale', 'historical', 'fantasy',
 ];
 
@@ -129,7 +129,7 @@ export const ARCHETYPES = {
     trickster: { name: 'Con Artist',    icon: '🎭',  desc: 'Smooth operator who deals in information',   classId: 'bard'        },
     wildcard:  { name: 'Alien',         icon: '👽',  desc: 'Extraterrestrial with abilities no one expects', classId: 'mage'   },
   },
-  ocean: {
+  pirate: {
     warrior:   { name: 'Buccaneer',     icon: '⚔',  desc: 'Fearless pirate fighter, boarding cutlass ready', classId: 'warrior' },
     mage:      { name: 'Sea Witch',     icon: '🌊',  desc: 'Commands storms, tides, and sea creatures',  classId: 'mage'        },
     rogue:     { name: 'Smuggler',      icon: '🗡',  desc: 'Moves cargo no one else dares to carry',     classId: 'rogue'       },
@@ -190,14 +190,14 @@ export const ARCHETYPES = {
     wildcard:  { name: 'Titan',         icon: '🌋',  desc: 'Ancient power not fully understood by anyone', classId: 'mage'      },
   },
   fairytale: {
-    warrior:   { name: 'Knight',        icon: '⚔',  desc: 'Sworn to protect the innocent at any cost',  classId: 'warrior'     },
-    mage:      { name: 'Enchanter',     icon: '✨',  desc: 'Weaves spells from starlight and wishes',    classId: 'mage'        },
-    rogue:     { name: 'Thief',         icon: '🗡',  desc: 'Steals from the wicked, gives to the good — mostly', classId: 'rogue' },
-    ranger:    { name: 'Woodsman',      icon: '🌲',  desc: 'The forest speaks to them, and they listen', classId: 'ranger'      },
-    healer:    { name: 'Wise Woman',    icon: '💚',  desc: 'Knows remedies for curses, heartbreak, and worse', classId: 'healer' },
-    leader:    { name: 'Royalty',       icon: '👑',  desc: 'Born to lead, though destiny had other plans',classId: 'warrior'     },
-    trickster: { name: 'Jester',        icon: '🃏',  desc: 'Only fool at court wise enough to speak truth', classId: 'bard'     },
-    wildcard:  { name: 'Faerie',        icon: '🧚',  desc: 'Ancient, capricious, and dangerously beautiful', classId: 'mage'   },
+    warrior:   { name: 'Cursed Hero',   icon: '🌹',  desc: 'Under a spell — only true deeds can break it', classId: 'warrior'   },
+    mage:      { name: 'Fairy Godmother',icon: '✨',  desc: 'Grants wishes, but the magic always has a catch', classId: 'mage'   },
+    rogue:     { name: 'Trickster',     icon: '🦊',  desc: 'Cleverness beats power every time — watch and see', classId: 'rogue'  },
+    ranger:    { name: 'Woodcutter's Child', icon: '🪓', desc: 'Youngest of three — the one the prophecy forgot', classId: 'ranger' },
+    healer:    { name: 'Wise Witch',    icon: '🍄',  desc: 'Lives alone for good reason — power requires distance', classId: 'healer' },
+    leader:    { name: 'Lost Royalty',  icon: '👑',  desc: 'The true heir in disguise, waiting for the right moment', classId: 'warrior' },
+    trickster: { name: 'Talking Animal',icon: '🐾',  desc: 'Not what they appear — far more dangerous than they look', classId: 'bard' },
+    wildcard:  { name: 'Enchanted Beast',icon: '🐻', desc: 'Something terrible happened — beauty may yet return', classId: 'mage'  },
   },
   ninja: {
     warrior:   { name: 'Samurai',       icon: '⚔',  desc: 'Bushido incarnate — honor is not optional',  classId: 'warrior'     },
@@ -269,7 +269,7 @@ export const ARCHETYPE_ICONS = {
     trickster: 'lorc/domino-mask',
     wildcard:  'lorc/alien-skull',
   },
-  ocean: {
+  pirate: {
     warrior:   'lorc/plain-dagger',
     mage:      'lorc/alien-skull',
     rogue:     'lorc/swap-bag',
@@ -330,14 +330,14 @@ export const ARCHETYPE_ICONS = {
     wildcard:  'lorc/battle-axe',
   },
   fairytale: {
-    warrior:   'lorc/broadsword',
+    warrior:   'lorc/thorny-vine',
     mage:      'lorc/fairy-wand',
-    rogue:     'lorc/plain-dagger',
+    rogue:     'lorc/fox-head',
     ranger:    'lorc/wood-axe',
     healer:    'lorc/cauldron',
     leader:    'lorc/crown',
-    trickster: 'lorc/domino-mask',
-    wildcard:  'lorc/fairy',
+    trickster: 'lorc/paw',
+    wildcard:  'lorc/bear-head',
   },
   ninja: {
     warrior:   'lorc/broadsword',
