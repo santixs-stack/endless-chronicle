@@ -62,9 +62,9 @@ Track clues 0/4. Give each rival team a NAME, a LEADER with personality, and a R
     worldLocation: 'A crash landing site — ship in two pieces, alien sky above',
     hint: `Sci-fi survival with an emotional core:
 HOOK: Ship crashed. One crew member is MISSING. The ship can be repaired — but only if the party splits up, and splitting up is dangerous.
-COMPLICATION: The planet's creatures aren't hostile — they're AFRAID of something else. Something big drove them all to the same hiding spots. The party walks right into the creatures' panicked migration.
+COMPLICATION: The planet's creatures aren\'t hostile — they're AFRAID of something else. Something big drove them all to the same hiding spots. The party walks right into the creatures' panicked migration.
 DARK MOMENT: The missing crew member is found — inside the creature's nest, unharmed but unable to leave safely. The big threat is getting closer.
-TWIST: The "big threat" is actually the crashed ship's leaking engine — it's poisoning the creatures' water. The party caused the crisis.
+TWIST: The "big threat" is actually the crashed ship's leaking engine — it\'s poisoning the creatures' water. The party caused the crisis.
 RESOLUTION: Fix the ship AND fix the leak to save the creatures. The creatures help in return.
 Track repairs 0-5 parts. The missing crew member has been BEFRIENDING the creatures. Name them. The big creature that "hunts" is actually just trying to warn everyone.`,
     start: 'CRASH. Green sky. Ship in pieces. Your crewmate Zara is not here — her seat is empty, harness unclipped from the inside. Outside, something small and glowing watches you from behind a rock. It looks scared. Everything on this planet looks scared.',
@@ -77,7 +77,7 @@ Track repairs 0-5 parts. The missing crew member has been BEFRIENDING the creatu
     worldName: 'The Golden Age of Piracy — a world of ships, treasure, and adventure',
     worldLocation: 'The deck of your pirate ship, open ocean ahead',
     hint: `Pirate adventure with real heart:
-HOOK: The Golden Dragon's Hoard isn't just treasure — it's a dragon EGG that a pirate captain stole fifty years ago. The dragon mother is still searching for it. Ships that get too close disappear.
+HOOK: The Golden Dragon's Hoard isn\'t just treasure — it's a dragon EGG that a pirate captain stole fifty years ago. The dragon mother is still searching for it. Ships that get too close disappear.
 COMPLICATION: The rival pirate hunting the same treasure turns out to be a CHILD whose parent disappeared on the last expedition to find it.
 DARK MOMENT: The party finds the hoard — and the dragon mother arrives. She's not attacking. She's GRIEVING. The egg is cold.
 TWIST: The egg can still hatch — but only with warmth from someone who genuinely wants to protect it. Greed won't work.
@@ -95,7 +95,7 @@ Track crew happiness 0-100%. Each crew member has a name and specialty. The riva
     hint: `Western with a moral backbone:
 HOOK: The bandits aren't coming for the bank — they're coming for ONE SPECIFIC PERSON in town. Someone who did something. The town is divided on whether to protect them.
 COMPLICATION: That person turns out to be the bandit leader's FAMILY MEMBER. The "crime" was refusing to help with the gang's last job. This is personal, not just criminal.
-DARK MOMENT: The party has 24 hours. They've earned the town's trust — but some townspeople want to hand over the person to save themselves. The party must decide if they'll defend someone the town has abandoned.
+DARK MOMENT: The party has 24 hours. They've earned the town\'s trust — but some townspeople want to hand over the person to save themselves. The party must decide if they'll defend someone the town has abandoned.
 TWIST: The bandit leader sends a private message: "I just want to talk. One hour. No guns." Is it a trap or is there a real way to resolve this without a showdown?
 RESOLUTION: True heroism is the choice — fight, negotiate, or find a third option that nobody expected.
 Track town trust 0-100%. Each townsperson has a name, a job, and an opinion. The bandit leader has a reason. The protected person has been keeping a secret.`,
@@ -110,9 +110,9 @@ Track town trust 0-100%. Each townsperson has a name, a job, and an opinion. The
     worldLocation: 'The mysterious place you all keep dreaming about',
     hint: `Dream world with emotional truth:
 HOOK: Everyone had the same dream — but each person dreamed a DIFFERENT piece of it. Together they form a map to a child who got lost in the dream and can't wake up.
-COMPLICATION: The dream world reshapes around the players' fears. Every door tests something real about who they are. The lost child has been there so long they've forgotten they're dreaming.
+COMPLICATION: The dream world reshapes around the players' fears. Every door tests something real about who they are. The lost child has been there so long they\'ve forgotten they're dreaming.
 DARK MOMENT: The players find the child — but the child doesn't want to wake up. The dream world gave them everything the real world didn't.
-TWIST: The dream world is ALIVE and it loves the child. It won't let them go easily. But it can be reasoned with — if the players understand what it's giving the child that reality isn't.
+TWIST: The dream world is ALIVE and it loves the child. It won't let them go easily. But it can be reasoned with — if the players understand what it\'s giving the child that reality isn't.
 RESOLUTION: The real fix isn't forcing the child to wake up — it's promising that the real world can have what they found here, too. Someone has to make that promise and mean it.
 Track dream keys 0/3. Each key is found by facing something real about one of the players' characters. The lost child has a name, a backstory, and a reason the dream felt better than home.`,
     start: `Three nights. Same dream. A door. A light. A voice saying your name. Tonight you all fell asleep holding hands. The door is in front of you now — real enough to touch. On the other side, a child is crying. They sound like they've been crying for a long time.`,
@@ -126,7 +126,7 @@ Track dream keys 0/3. Each key is found by facing something real about one of th
     worldLocation: 'The docking bay of Space Station Horizon',
     hint: `Space mystery with a twist ending:
 HOOK: Everyone on the station fell asleep at the same moment. Only the party, who arrived late via shuttle, is awake. The station's AI says everything is "normal."
-COMPLICATION: Clue 2 reveals the AI is hiding something — not maliciously, but because it made a PROMISE to a crew member. Clue 3 shows the sleeping isn't dangerous — it's the crew's way of keeping SOMETHING ELSE asleep too.
+COMPLICATION: Clue 2 reveals the AI is hiding something — not maliciously, but because it made a PROMISE to a crew member. Clue 3 shows the sleeping isn't dangerous — it\'s the crew's way of keeping SOMETHING ELSE asleep too.
 DARK MOMENT: The party wakes one crew member to get answers — and something else stirs. Now the clock is ticking before it fully wakes.
 TWIST: The "something else" isn't an enemy — it's an alien that came aboard sick and frightened, and the crew has been singing it to sleep in shifts for six months. The crew just forgot to warn anyone.
 RESOLUTION: The party must find a way to help the alien so it doesn't need the lullaby anymore — and decide what to do about a first contact situation nobody planned for.
@@ -144,7 +144,7 @@ Track clues 0/4. The AI has a name and a personality. The alien communicates thr
 HOOK: The manor was abandoned after one person disappeared inside it twenty years ago. The party arrives because someone received a LETTER in that person's handwriting — postmarked today.
 COMPLICATION: The entity in the manor IS the missing person — or what remains of them. They're not haunting the place; they're TRAPPED in it. Each "haunting" is a cry for help.
 DARK MOMENT: The party learns the entity has been protecting the manor from something worse — a second presence that actually IS dangerous. The good entity is weakening.
-TWIST: The dangerous presence is grief — the entity's own grief, given form. The person couldn't leave because they couldn't let go of something. The party must find what it was.
+TWIST: The dangerous presence is grief — the entity's own grief, given form. The person couldn\'t leave because they couldn't let go of something. The party must find what it was.
 RESOLUTION: Help the entity complete their unfinished business and they can finally pass on. The dangerous presence dissolves with the grief.
 Track secrets 0/5. Each secret reveals one layer of who this person was. Include an object that holds an emotional memory. The entity should feel like a PERSON, not a monster.`,
     start: `The letter arrived this morning. Twenty-year-old handwriting. Your aunt's handwriting. She has been dead for twenty years. The letter says three words: "I'm still here." The gates of Blackthorn Manor stand open. The candle in the top window is lit.`,
@@ -196,7 +196,7 @@ Track supplies and days. The rival faction leaders have names and past trauma. T
 HOOK: The gods are arguing over a mortal decision — one choice a hero's ancestor made that set events in motion. The party is descended from that ancestor. They have to answer for it.
 COMPLICATION: Trial 2 reveals the argument between gods has divided Olympus into two sides. Mortals who help one side face punishment from the other. There's no safe path.
 DARK MOMENT: Trial 3 — the party must choose between saving someone they love and maintaining divine favor. The gods watch to see what mortals value most.
-TWIST: The ancestor's choice wasn't wrong — it was just incomplete. The party's task isn't to apologize but to FINISH what was started.
+TWIST: The ancestor's choice wasn\'t wrong — it was just incomplete. The party's task isn't to apologize but to FINISH what was started.
 RESOLUTION: The answer that ends the divine argument isn't power or sacrifice — it's wisdom. The party demonstrates that mortals can understand something the gods, in their eternal conflict, cannot.
 Track divine favor 0-100%. Each god the party meets has a personality and an argument. The ancestor's ghost appears in trial 2. The choice in trial 3 has real consequences.`,
     start: `The earth shook at dawn. The oracle spoke three words: GO. TO. OLYMPUS. Then she handed you a clay tablet and said, "Your great-great-grandmother left this unfinished. The gods have been arguing about it for two hundred years. They want YOU to settle it." The tablet has your family's name on it. And something that looks like a debt.`,
@@ -225,13 +225,13 @@ Track enchantment broken 0/3. The talking animals know the real history of the k
     worldName: 'Feudal Japan — cherry blossoms, honor codes, and shadows that move with purpose',
     worldLocation: 'The mountain pass above the Valley of Morning Mist',
     hint: `Samurai story about what honor truly means:
-HOOK: The contact who didn't show was the party's most trusted friend. The warlord's forces didn't take them — they CHOSE to join the warlord. The party must discover why.
+HOOK: The contact who didn't show was the party\'s most trusted friend. The warlord's forces didn't take them — they CHOSE to join the warlord. The party must discover why.
 COMPLICATION: Mission 3 reveals the warlord is doing something genuinely good alongside the conquest — feeding the villages the old lord starved. The friend saw this and made a choice. Was it wrong?
 DARK MOMENT: The party must face the friend in combat. To refuse destroys their honor. To fight means hurting someone they love. There may be a third option — but finding it risks everything.
 TWIST: The legendary warrior protecting the warlord is the party's own sensei — in disguise, monitoring the situation for the emperor, waiting to see if the warlord truly has good intentions.
 RESOLUTION: Honor is not following the rule — it's knowing WHEN the rule is right. The party must make a judgment call that the code of bushido cannot make for them.
 Track honor 0-100%. Honor gained by choosing mercy when violence is easier. Honor lost by cruelty or cowardice. The friend must get a conversation before any combat.`,
-    start: `The morning mist hides everything. Your contact's sandals are here. Their blade is here. A fresh bowl of tea, still warm. They are not here. Below in the valley, the warlord's banners have just been raised over the old lord's gate. A child comes running up the path — not afraid, just fast — and hands you a folded note. It is in your friend's handwriting: "Wait. Watch. Then decide."`,
+    start: `The morning mist hides everything. Your contact's sandals are here. Their blade is here. A fresh bowl of tea, still warm. They are not here. Below in the valley, the warlord\'s banners have just been raised over the old lord's gate. A child comes running up the path — not afraid, just fast — and hands you a folded note. It is in your friend's handwriting: "Wait. Watch. Then decide."`,
   },
 ];
 

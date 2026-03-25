@@ -193,7 +193,7 @@ export const ARCHETYPES = {
     warrior:   { name: 'Cursed Hero',   icon: '🌹',  desc: 'Under a spell — only true deeds can break it', classId: 'warrior'   },
     mage:      { name: 'Fairy Godmother',icon: '✨',  desc: 'Grants wishes, but the magic always has a catch', classId: 'mage'   },
     rogue:     { name: 'Trickster',     icon: '🦊',  desc: 'Cleverness beats power every time — watch and see', classId: 'rogue'  },
-    ranger:    { name: 'Woodcutter's Child', icon: '🪓', desc: 'Youngest of three — the one the prophecy forgot', classId: 'ranger' },
+    ranger:    { name: 'Woodcutter\'s Child', icon: '🪓', desc: 'Youngest of three — the one the prophecy forgot', classId: 'ranger' },
     healer:    { name: 'Wise Witch',    icon: '🍄',  desc: 'Lives alone for good reason — power requires distance', classId: 'healer' },
     leader:    { name: 'Lost Royalty',  icon: '👑',  desc: 'The true heir in disguise, waiting for the right moment', classId: 'warrior' },
     trickster: { name: 'Talking Animal',icon: '🐾',  desc: 'Not what they appear — far more dangerous than they look', classId: 'bard' },
