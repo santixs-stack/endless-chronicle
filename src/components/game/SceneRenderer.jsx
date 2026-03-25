@@ -1002,7 +1002,10 @@ function drawEnemy(rc, svg, cx, groundY, creatureType) {
 
 // ── Color helper ───────────────────────────
 function shadeColor(hex, pct) {
-  const n = parseInt(hex.replace('#',''), 16);
+  if (!hex || typeof hex !== 'string') return '#888888';
+  const clean = hex.startsWith('#') ? hex : '#' + hex;
+  const n = parseInt(clean.replace('#',''), 16);
+  if (isNaN(n)) return '#888888';
   const r = Math.min(255, Math.max(0, (n>>16) + pct));
   const g = Math.min(255, Math.max(0, ((n>>8)&0xff) + pct));
   const b = Math.min(255, Math.max(0, (n&0xff) + pct));
@@ -1182,7 +1185,11 @@ function drawScene(svgEl2, scene, players, turnCount) {
   svgEl2.appendChild(sky);
 
   // ── Scene-specific background elements ──
-  drawBackground(rc, svgEl2, type, time, pal, sr, tr, turnCount);
+  try {
+    drawBackground(rc, svgEl2, type, time, pal, sr, tr, turnCount);
+  } catch(e) {
+    console.warn('drawBackground error for type:', type, e.message);
+  }
 
   // ── Ground ──
   drawGround(rc, svgEl2, type, pal, sr, tr, W, H);
@@ -1201,13 +1208,18 @@ function drawScene(svgEl2, scene, players, turnCount) {
     const offsetX = inCombat ? -60 : 0;
     players.forEach((p, i) => {
       const cx = startX + i * spacing + offsetX;
-      // Resolve archetype name to visual class
-      // p.class is the DnD class id (mage/warrior/rogue etc)
-      // but we want genre-flavored visuals
-      const pClass = resolveCharacterClass(p.class, p.className, p.role);
-      drawCharacter(rc, svgEl2, cx, groundY, pClass,
-        p.color || PLAYER_COLORS[i % PLAYER_COLORS.length],
-        p.name || '', sr);
+      try {
+        const pClass = resolveCharacterClass(p.class, p.className, p.role);
+        drawCharacter(rc, svgEl2, cx, groundY, pClass,
+          p.color || PLAYER_COLORS[i % PLAYER_COLORS.length],
+          p.name || '', sr);
+      } catch(e) {
+        console.warn('drawCharacter error for player:', p.name, p.class, e.message);
+        // Fallback: draw a simple silhouette so the player is always visible
+        const fc = p.color || PLAYER_COLORS[i % PLAYER_COLORS.length];
+        svgEl2.appendChild(rc.ellipse(cx, groundY - 40, 14, 14, { stroke: fc, fill: fc, fillStyle:'solid', roughness:1 }));
+        svgEl2.appendChild(rc.rectangle(cx - 7, groundY - 30, 14, 22, { stroke: fc, fill: fc, fillStyle:'solid', roughness:1 }));
+      }
     });
   }
 
@@ -1251,10 +1263,16 @@ function drawScene(svgEl2, scene, players, turnCount) {
     allNpcs, inCombat, combatants, type, turnCount, terrainPts
   );
 
-  const popResult = renderPopulation(population);
-  const particles  = renderParticles(population, turnCount);
-  const auras      = renderStatusAuras(population, `sc${turnCount}${type}`);
-  const npcLabels  = renderNpcLabels(population);
+  let popResult = { defs:'', far:'', mid:'', near:'' };
+  let particles = '', auras = '', npcLabels = '';
+  try {
+    popResult = renderPopulation(population);
+    particles = renderParticles(population, turnCount);
+    auras     = renderStatusAuras(population, `sc${turnCount}${type}`);
+    npcLabels = renderNpcLabels(population);
+  } catch(e) {
+    console.warn('NPC population render error:', e.message);
+  }
 
   // Inject creature defs into SVG defs
   if (popResult.defs) {
