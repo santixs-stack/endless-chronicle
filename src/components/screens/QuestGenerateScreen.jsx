@@ -107,7 +107,7 @@ const QUEST_ICONS = {
   wasteland:    'lorc/radioactive',
   cybercity:    'lorc/hacking',
   olympus:      'lorc/zeus-sword',
-  fairytale:    'lorc/fairy-wand',
+  fairytale:    'lorc/book',
   shogun:       'lorc/torii-gate',
   custom:       'lorc/scroll-quill',
 };
@@ -124,16 +124,16 @@ export default function QuestGenerateScreen() {
   const detectedGenre = state.world?.genre || (() => {
     const worldText = (state.world?.world || '').toLowerCase();
     const genreKeywords = {
-      ninja: ['japan','samurai','ninja','feudal','shogun','katana','shinobi','clan'],
-      space: ['space','galaxy','planet','starship','alien','sci-fi','robot'],
-      ocean: ['pirate','sea','pirate','ship','island','sailor','harbor'],
-      horror: ['horror','haunted','ghost','vampire','zombie','curse','demon'],
-      western: ['western','cowboy','frontier','saloon','gunslinger','outlaw','sheriff'],
-      postapoc: ['apocalypse','wasteland','survival','radiation','ruins','nuclear'],
-      cyberpunk: ['cyberpunk','neon','hacker','corporation','android','megacity'],
-      mythology: ['myth','greek','roman','norse','god','titan','olympus','legend'],
-      fairytale: ['fairy tale','enchanted','princess','witch','spell','fairy'],
-      historical: ['rome','egypt','medieval','viking','ancient','revolution'],
+      ninja: ['japan','samurai','ninja','feudal','shogun','katana','shinobi','clan','ronin','edo'],
+      space: ['space','galaxy','planet','starship','alien','sci-fi','robot','orbit','future'],
+      pirate: ['pirate','sea','ship','island','sailor','harbor','treasure','buccaneer','ocean','swashbuckler'],
+      horror: ['horror','haunted','ghost','vampire','zombie','curse','demon','manor','asylum'],
+      western: ['western','cowboy','frontier','saloon','gunslinger','outlaw','sheriff','wild west','ranch'],
+      postapoc: ['apocalypse','wasteland','survival','radiation','ruins','nuclear','fallout','collapse'],
+      cyberpunk: ['cyberpunk','neon','hacker','corporation','android','megacity','cyber','dystopia'],
+      mythology: ['myth','greek','roman','norse','god','titan','olympus','legend','demigod','ancient gods'],
+      fairytale: ['fairy tale','fairytale','enchanted','princess','witch','curse','talking animal','once upon'],
+      historical: ['rome','egypt','medieval','viking','ancient','revolution','war','empire','aztec'],
     };
     for (const [genre, words] of Object.entries(genreKeywords)) {
       if (words.some(w => worldText.includes(w))) return genre;
@@ -361,13 +361,18 @@ Respond ONLY with a JSON array of 4 objects, each with:
           <div className={styles.presetTitle}>Preset Quests</div>
           {/* Genre filter pills */}
           <div className={styles.presetGenreRow}>
-            {['fantasy','space','pirate','horror','western','postapoc','cyberpunk','mythology','fairytale','ninja','historical'].map(g => (
+            {[
+              ['fantasy','Fantasy'],['space','Space'],['pirate','Pirate'],
+              ['horror','Horror'],['western','Western'],['postapoc','Wasteland'],
+              ['cyberpunk','Cyberpunk'],['mythology','Mythology'],['fairytale','Storybook'],
+              ['ninja','Ninja'],['historical','Historical'],
+            ].map(([id, label]) => (
               <button
-                key={g}
-                className={`${styles.presetGenreBtn} ${presetGenreFilter === g ? styles.presetGenreBtnActive : ''}`}
-                onClick={() => setPresetGenreFilter(g)}
+                key={id}
+                className={`${styles.presetGenreBtn} ${presetGenreFilter === id ? styles.presetGenreBtnActive : ''}`}
+                onClick={() => setPresetGenreFilter(id)}
               >
-                {g.charAt(0).toUpperCase() + g.slice(1)}
+                {label}
               </button>
             ))}
           </div>

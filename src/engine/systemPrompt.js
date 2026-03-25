@@ -90,13 +90,13 @@ TAGS — append after EVERY narrative response:
   type — pick the CLOSEST match. Common types by genre:
     Fantasy:     forest | plains | village | dungeon | cave | castle | ruins | mountain | swamp | snow | tower | temple | shrine | tavern | manor | market | arena | jail | jungle | interior
     Space:       space | spaceship | space_station | alien_planet
-    Ocean:       ocean | ship | island | port | beach | underwater
+    Pirate:      ocean | ship | island | port | beach | underwater
     Horror:      manor | graveyard | crypt | asylum | dungeon | ruins
     Western:     frontier_town | saloon | prairie | canyon | mine | city
-    Post-Apoc:   wasteland | bunker | ruined_city | refugee_camp
+    Wasteland:   wasteland | bunker | ruined_city
     Cyberpunk:   neon_city | back_alley | corp_building | city
     Mythology:   olympus | underworld | ruins | mountain | ocean | temple
-    Fairy Tale:  forest | enchanted_forest | dark_woods | castle | tower | village
+    Storybook:   forest | enchanted_forest | dark_woods | castle | tower | village | ruins
     Ninja:       dojo | bamboo_forest | fortress_jp | shrine | forest | village
     Historical:  arena | battlefield | city | ruins | castle | desert | ocean
     Fallback:    plains (outdoor generic), interior (indoor generic)
