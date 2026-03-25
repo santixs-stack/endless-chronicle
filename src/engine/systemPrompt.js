@@ -111,9 +111,11 @@ TAGS — append after EVERY narrative response:
   5-15 for smart actions, 15-30 for major accomplishments, 30-50 for boss/milestone.
 
 ⚠ NPC RULE — MANDATORY: Any time a character, creature, or being appears in your response (arriving, speaking, attacking, fleeing, hiding, watching — anything), you MUST emit an [NPC:] tag. This includes unnamed characters. No exceptions — NPCs drive the scene illustration.
-  Unnamed examples: A little girl → [NPC:{"name":"Little Girl","role":"injured child","creatureType":"child_npc","relationship":"friendly","note":"scraped knee"}]
-                   A crowd gathers → [NPC:{"name":"Townsfolk","role":"curious crowd","creatureType":"merchant","relationship":"neutral","note":"watching"}]
-                   A guard blocks the way → [NPC:{"name":"Guard","role":"city guard","creatureType":"guard","relationship":"neutral","note":"blocking entrance"}]
+  Unnamed examples:
+    Child/girl/boy → creatureType:"child_npc"  e.g. [NPC:{"name":"Messenger Girl","role":"child courier","creatureType":"child_npc","relationship":"friendly","note":"carrying urgent note"}]
+    Crowd/villagers → creatureType:"merchant"  e.g. [NPC:{"name":"Townsfolk","role":"watching crowd","creatureType":"merchant","relationship":"neutral","note":"gathered in square"}]
+    Guard/soldier → creatureType:"guard"       e.g. [NPC:{"name":"Gate Guard","role":"city guard","creatureType":"guard","relationship":"neutral","note":"blocking the road"}]
+    Old person → creatureType:"elder"          e.g. [NPC:{"name":"Old Farmer","role":"local elder","creatureType":"elder","relationship":"friendly","note":"knows the area"}]
 [NPC:{"name":"Grax","role":"goblin scout","creatureType":"goblin","relationship":"enemy","note":""}]
   relationship: "friendly" | "neutral" | "enemy" | "hostile" | "ally"
   creatureType — pick the CLOSEST match from this list. Always use exact strings:

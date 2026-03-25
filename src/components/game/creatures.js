@@ -1122,6 +1122,69 @@ export function drawSpider(x, y, sc, fac, status, uid) {
 }
 
 // ── ELDER NPC (FRIENDLY) ──────────────────
+// ── CHILD NPC ──────────────────────────────
+// Small, round-headed, energetic — running with note or just curious
+export function drawChild(x, y, sc, fac, status, uid, variant='neutral') {
+  const f = fac === 'enemy' ? FACTION.enemy : FACTION.friendly;
+  const id = `ch_${uid}`;
+  const skinTone = '#d4a874';
+  const hairCol  = '#2a1808';
+  // Kimono / simple robe color based on relationship
+  const robeCol  = fac === 'enemy' ? '#8a2020' : fac === 'neutral' ? '#6a7a8a' : '#5a7a9a';
+  const robeShad = fac === 'enemy' ? '#601010' : fac === 'neutral' ? '#4a5a6a' : '#3a5a7a';
+
+  const defs = `
+    ${g(`${id}_robe`, [[0,robeCol],[50,robeShad],[100,robeShad]])}
+    ${g(`${id}_skin`, [[0,skinTone],[50,'#b8885a'],[100,'#907050']])}
+    ${rg(`${id}_eye`, x, y-28*sc, 3*sc, [[0,f.eye,0.7],[100,f.eye,0]])}
+    ${rg(`${id}_glow`, x, y, 10*sc, [[0,f.underGlow,0.1],[100,f.underGlow,0]])}
+  `;
+
+  const svg = `
+    <g style="transform-origin:${x}px ${y}px;filter:${statusFilter(status)}">
+      <ellipse cx="${x}" cy="${y}" rx="${8*sc}" ry="${2*sc}" fill="url(#${id}_glow)"/>
+      <!-- Sandals / bare feet -->
+      <ellipse cx="${x-3.5*sc}" cy="${y}"   rx="${3.5*sc}" ry="${1.5*sc}" fill="#5a3818"/>
+      <ellipse cx="${x+3.5*sc}" cy="${y}"   rx="${3.5*sc}" ry="${1.5*sc}" fill="#5a3818"/>
+      <!-- Short legs — slightly mid-stride -->
+      <path d="M${x-4*sc},${y-12*sc} Q${x-5*sc},${y-6*sc} ${x-4*sc},${y}" fill="none" stroke="url(#${id}_robe)" stroke-width="${4.5*sc}" stroke-linecap="round"/>
+      <path d="M${x+4*sc},${y-12*sc} Q${x+4*sc},${y-6*sc} ${x+3.5*sc},${y}" fill="none" stroke="url(#${id}_robe)" stroke-width="${4.5*sc}" stroke-linecap="round"/>
+      <!-- Small round body — kimono/tunic -->
+      <path d="M${x-7*sc},${y-22*sc} Q${x-8*sc},${y-16*sc} ${x-5*sc},${y-12*sc} L${x+5*sc},${y-12*sc} Q${x+8*sc},${y-16*sc} ${x+7*sc},${y-22*sc} Q${x+4*sc},${y-28*sc} ${x},${y-28*sc} Q${x-4*sc},${y-28*sc} ${x-7*sc},${y-22*sc}Z"
+        fill="url(#${id}_robe)"/>
+      <!-- Obi / belt -->
+      <path d="M${x-6*sc},${y-15*sc} Q${x},${y-14*sc} ${x+6*sc},${y-15*sc}" fill="none" stroke="#c8a040" stroke-width="${2*sc}" opacity="0.7"/>
+      <!-- Arms — one reaching forward with folded note -->
+      <path d="M${x-7*sc},${y-22*sc} Q${x-14*sc},${y-20*sc} ${x-14*sc},${y-13*sc}" fill="none" stroke="url(#${id}_skin)" stroke-width="${3.5*sc}" stroke-linecap="round"/>
+      <path d="M${x+7*sc},${y-22*sc} Q${x+15*sc},${y-18*sc} ${x+18*sc},${y-12*sc}" fill="none" stroke="url(#${id}_skin)" stroke-width="${3.5*sc}" stroke-linecap="round"/>
+      <!-- Folded paper/note in outstretched hand -->
+      <rect x="${x+16*sc}" y="${y-15*sc}" width="${5*sc}" height="${4*sc}" rx="${0.5*sc}" fill="#f0e8c8" transform="rotate(-20,${x+18*sc},${y-13*sc})"/>
+      <line x1="${x+16.5*sc}" y1="${y-13.5*sc}" x2="${x+20.5*sc}" y2="${y-13.5*sc}" stroke="#8a8060" stroke-width="${0.5*sc}" opacity="0.5"/>
+      <line x1="${x+16.5*sc}" y1="${y-12.5*sc}" x2="${x+19*sc}" y2="${y-12.5*sc}" stroke="#8a8060" stroke-width="${0.5*sc}" opacity="0.5"/>
+      <!-- Big round child head -->
+      <circle cx="${x}" cy="${y-34*sc}" r="${8.5*sc}" fill="url(#${id}_skin)"/>
+      <!-- Hair — simple bowl cut / tied back -->
+      <path d="M${x-8.5*sc},${y-34*sc} Q${x-9*sc},${y-40*sc} ${x},${y-43*sc} Q${x+9*sc},${y-40*sc} ${x+8.5*sc},${y-34*sc} Q${x+5*sc},${y-30*sc} ${x},${y-30*sc} Q${x-5*sc},${y-30*sc} ${x-8.5*sc},${y-34*sc}Z"
+        fill="${hairCol}"/>
+      <!-- Big round child eyes — expressive -->
+      <circle cx="${x-3.5*sc}" cy="${y-34*sc}" r="${2.2*sc}" fill="white"/>
+      <circle cx="${x-3.5*sc}" cy="${y-34*sc}" r="${1.4*sc}" fill="#2a1808"/>
+      <circle cx="${x-3*sc}"   cy="${y-34.5*sc}" r="${0.5*sc}" fill="white" opacity="0.8"/>
+      <circle cx="${x+3.5*sc}" cy="${y-34*sc}" r="${2.2*sc}" fill="white"/>
+      <circle cx="${x+3.5*sc}" cy="${y-34*sc}" r="${1.4*sc}" fill="#2a1808"/>
+      <circle cx="${x+4*sc}"   cy="${y-34.5*sc}" r="${0.5*sc}" fill="white" opacity="0.8"/>
+      <!-- Small nose -->
+      <circle cx="${x}" cy="${y-32*sc}" r="${0.8*sc}" fill="#b8885a" opacity="0.6"/>
+      <!-- Open mouth — urgent, out of breath -->
+      <path d="M${x-2.5*sc},${y-30*sc} Q${x},${y-28.5*sc} ${x+2.5*sc},${y-30*sc}" fill="none" stroke="#8a5030" stroke-width="${1.2*sc}"/>
+      <!-- Rosy cheeks — exertion from running -->
+      <circle cx="${x-5.5*sc}" cy="${y-32*sc}" r="${2*sc}" fill="#d06050" opacity="0.25"/>
+      <circle cx="${x+5.5*sc}" cy="${y-32*sc}" r="${2*sc}" fill="#d06050" opacity="0.25"/>
+    </g>
+  `;
+  return { defs, svg };
+}
+
 export function drawElder(x, y, sc, fac, status, uid) {
   const f = FACTION.friendly;
   const id = `el_${uid}`;
@@ -2117,7 +2180,11 @@ Object.assign(CREATURE_REGISTRY, {
   frog_beast:      (x,y,sc,fac,st,uid) => drawGoblin(x,y,sc,'enemy',st,uid),
   will_o_wisp:     (x,y,sc,fac,st,uid) => drawGhost(x,y,sc,fac,st,uid),
   traveling_bard:  (x,y,sc,fac,st,uid) => drawMerchant(x,y,sc,'friendly',st,uid),
-  child_npc:       (x,y,sc,fac,st,uid) => drawElder(x,y,sc,'friendly',st,uid),
+  child_npc:       (x,y,sc,fac,st,uid) => drawChild(x,y,sc,fac,st,uid),
+  child:           (x,y,sc,fac,st,uid) => drawChild(x,y,sc,fac,st,uid),
+  kid:             (x,y,sc,fac,st,uid) => drawChild(x,y,sc,fac,st,uid),
+  girl:            (x,y,sc,fac,st,uid) => drawChild(x,y,sc,fac,st,uid,'friendly'),
+  boy:             (x,y,sc,fac,st,uid) => drawChild(x,y,sc,fac,st,uid,'friendly'),
   ranger_npc:      (x,y,sc,fac,st,uid) => drawBandit(x,y,sc,'neutral',st,uid),
   // ── FANTASY — classic types ───────────────────────────────────────────────
   kobold:          (x,y,sc,fac,st,uid) => drawGoblin(x,y,sc,fac,st,uid,'dagger'),
