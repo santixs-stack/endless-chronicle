@@ -3,6 +3,7 @@ import { RL_QUEST_GUIDANCE } from '../../data/readingLevels.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { callAPI } from '../../engine/api.js';
+import { withRetry } from '../../lib/recovery.jsx';
 import { STORY_GOALS } from '../../data/quests.js';
 import { GAME_ICONS } from '../../data/gameIcons.js';
 import GameIcon from '../ui/GameIcon.jsx';
@@ -172,18 +173,18 @@ Respond ONLY with a JSON array of 4 objects, each with:
   "icon": "single emoji",
   "name": "quest title (4-6 words)",
   "tagline": "one punchy sentence that hooks the player",
-  "hint": "2-3 sentences for the GM: the core conflict, what's at stake, and a tracking mechanic",
+  "hint": "GM story spine with 5 beats — HOOK: what\'s already going wrong when players arrive | COMPLICATION: how the first approach fails or gets more complex | DARK MOMENT: the low point where failure feels real | TWIST: the discovery that reframes everything | RESOLUTION: what the earned victory looks like. Also include a tracking mechanic (e.g. Track: Clues found 0/4).",
   "start": "The opening line the GM reads aloud — vivid, immediate, drops players into action",
   "tone": "one of: Epic & Exciting | Mysterious & Wondrous | Dark & Mysterious | Funny & Silly",
-  "sceneType": "one of: dungeon|cave|forest|plains|castle|ruins|ocean|space|village|city|desert|mountain|swamp|snow",
+  "sceneType": "one of: dungeon|cave|forest|plains|castle|ruins|ocean|space|village|city|desert|mountain|swamp|snow|tower|temple|shrine|graveyard|crypt|neon_city|back_alley|corp_building|spaceship|space_station|alien_planet|prairie|frontier_town|canyon|saloon|wasteland|bunker|ruined_city|dojo|bamboo_forest|fortress_jp|olympus|underworld|jungle|manor|market|arena",
   "sceneTime": "one of: day|night|dawn|dusk|cave|storm"
 }`;
 
     try {
-      const response = await callAPI(
+      const response = await withRetry(() => callAPI(
         [{ role: 'user', content: prompt }],
         'You are a creative game master. Generate personalized quest hooks. Respond only with valid JSON arrays.'
-      );
+      ), 3, 1500);
       const clean = response.replace(/```json|```/g, '').trim();
       const quests = JSON.parse(clean);
       if (Array.isArray(quests) && quests.length > 0) {
