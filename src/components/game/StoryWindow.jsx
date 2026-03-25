@@ -552,12 +552,7 @@ export default function StoryWindow() {
                 />
               )}
 
-              {/* ── NPC introduction cards ── */}
-              {item.type === 'npcs' && (
-                <div className={styles.npcGroup}>
-                  {item.npcs.map((npc, j) => <NpcCard key={j} npc={npc} />)}
-                </div>
-              )}
+              {/* ── NPC introduction cards removed — NPCs appear in scene graphic only ── */}
 
               {/* ── Combat events ── */}
               {item.type === 'combat' && (
