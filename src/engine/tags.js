@@ -36,6 +36,7 @@ export function parseAllTags(raw) {
   };
 
   let text = raw;
+  const originalText = raw; // preserved for fallback NPC extraction
 
   // Image scene data
   const imageM = text.match(/\[IMAGE:(\{[\s\S]*?\})\]/);
@@ -121,6 +122,64 @@ export function parseAllTags(raw) {
     else logTagParseError("NPC", raw, new Error("unrecoverable parse failure"));
   });
   text = text.replace(/\[NPC:\s*\{(?:[^{}"']|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')*\}\]/g, '').trim();
+
+  // ── Fallback NPC extractor ──────────────────────────────────────────────
+  // If the AI described a character in narrative but forgot to emit [NPC:{...}],
+  // scan the text for known character patterns and auto-generate NPC entries.
+  // Only runs if the pattern isn't already covered by a tagged NPC.
+  if (originalText) {
+    const taggedNames = new Set(result.npcs.map(n => n.name.toLowerCase()));
+
+    // Pattern: [ regex, name, role, creatureType, relationship ]
+    const CHARACTER_PATTERNS = [
+      // Children
+      [/\b(a\s+)?(small\s+)?(little\s+)?(girl|boy|child|kid|youth|youngster)\b(?!\s+npc)/gi,
+        'Child', 'young child', 'child_npc', 'neutral'],
+      [/\bmessenger\s+(girl|boy|child|kid)\b/gi,
+        'Messenger Child', 'child messenger', 'child_npc', 'friendly'],
+      [/\b(the\s+)?(young\s+)?messenger\b(?!\s+from)/gi,
+        'Messenger', 'messenger', 'guard', 'neutral'],
+
+      // Crowds / groups
+      [/\b(a\s+)?(small\s+)?(crowd|mob|gathering|throng|group of people|villagers?|townsfolk|bystanders?)\b/gi,
+        'Townsfolk', 'watching crowd', 'merchant', 'neutral'],
+      [/\b(the\s+)?guards?\s+(arrive|appear|emerge|block|step|rush|surround)/gi,
+        'Guard', 'city guard', 'guard', 'neutral'],
+      [/\b(a\s+)?(cloaked|hooded|mysterious|shadowy)\s+(figure|stranger|person)\b/gi,
+        'Mysterious Figure', 'unknown stranger', 'bandit', 'neutral'],
+
+      // Named-ish characters that appear without tags
+      [/\bKenji\b/g, 'Kenji', 'missing ally', 'elder', 'friendly'],
+      [/\ban?\s+(old|elderly|ancient)\s+(man|woman|crone|sage|hermit|monk|priest|priestess)\b/gi,
+        'Elder', 'wise elder', 'elder', 'neutral'],
+      [/\b(an?|the)\s+(innkeeper|barkeep|bartender|tavern\s+keeper)\b/gi,
+        'Innkeeper', 'innkeeper', 'merchant', 'neutral'],
+      [/\b(an?|the)\s+(blacksmith|weaponsmith|armorer)\b/gi,
+        'Blacksmith', 'blacksmith', 'merchant', 'neutral'],
+      [/\b(an?|the)\s+(healer|herbalist|midwife|apothecary)\b/gi,
+        'Healer', 'local healer', 'merchant', 'friendly'],
+      [/\b(an?|the)\s+(scout|lookout|watchman|sentry)\b/gi,
+        'Scout', 'scout', 'guard', 'neutral'],
+      [/\b(an?|the)\s+(beggar|street\s+urchin|homeless\s+person)\b/gi,
+        'Beggar', 'street beggar', 'merchant', 'neutral'],
+      [/\b(an?|the)\s+(bandit|thug|ruffian|brigand|cutthroat)\s+(steps?|emerges?|attacks?|draws?|levels?|raises?)/gi,
+        'Bandit', 'bandit', 'bandit', 'enemy'],
+      [/\b(an?|the)\s+(cultist|robed\s+figure|dark\s+priest)\b/gi,
+        'Cultist', 'cult member', 'mage_npc', 'enemy'],
+    ];
+
+    const rawNarrative = originalText.replace(/\[[A-Z_]+[^\]]*\]/g, ''); // strip tags
+    CHARACTER_PATTERNS.forEach(([pattern, name, role, creatureType, relationship]) => {
+      const regex = new RegExp(pattern.source, pattern.flags);
+      if (!regex.test(rawNarrative)) return;
+      // Don't add if we already have this type tagged
+      if (taggedNames.has(name.toLowerCase())) return;
+      // Don't add if any existing NPC has same creatureType (avoid duplicates)
+      if (result.npcs.some(n => n.creatureType === creatureType && n.relationship === relationship)) return;
+      result.npcs.push({ name, role, creatureType, relationship, note: 'auto-detected from narrative' });
+      taggedNames.add(name.toLowerCase());
+    });
+  }
 
   // Journal
   const journalM = text.match(/\[JOURNAL:"([^"]+)"\]/);
