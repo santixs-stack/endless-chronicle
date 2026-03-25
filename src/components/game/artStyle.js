@@ -406,6 +406,10 @@ export const ROLE_TO_CREATURE = {
   mechanic:        'mechanic_npc',  engineer:        'mechanic_npc',
   // ── OCEAN / PIRATE ────────────────────────────────────────────────────────
   sailor:          'pirate_npc',    corsair:         'pirate_npc',
+  navigator:       'pirate_npc',    helmsman:        'pirate_npc',
+  ship_doctor:     'merchant',      ship_cook:       'merchant',
+  mermaid:         'mermaid',       merfolk:         'mermaid',
+  sea_serpent:     'sea_serpent',   kraken_spawn:    'kraken',
   ghost_sailor:    'ghost_sailor',  undead_sailor:   'skeleton',
   shark:           'shark',         deep_one:        'deep_one',
   naval_officer:   'knight',        admiral:         'knight',
@@ -487,7 +491,7 @@ export const ROLE_TO_CREATURE = {
   pegasus:         'dire_wolf',     griffin:         'griffin',
   titan_npc:       'troll',         titan:           'troll',
   demigod:         'knight',        hero:            'knight',
-  // ── FAIRY TALE ───────────────────────────────────────────────────────────
+  // ── STORYBOOK / FAIRY TALE ──────────────────────────────────────────────
   enchanted_knight:'knight',        cursed_knight:   'knight',
   dark_fairy:      'witch',         forest_spirit:   'elder',
   evil_queen:      'witch',         wicked:          'witch',
@@ -497,6 +501,12 @@ export const ROLE_TO_CREATURE = {
   beanstalk_giant: 'troll',         cursed_beast:    'troll',
   helpful_mouse:   'rat',           enchanted:       'elder',
   wood_elf:        'ranger_npc',    forest_elf:      'ranger_npc',
+  // New Storybook archetypes
+  cursed_hero:     'knight',        lost_royalty:    'elder',
+  wise_witch:      'witch',         trickster_fox:   'wolf',
+  fairy_godmother: 'fairy',         enchanted_beast: 'troll',
+  royalty:         'elder',         lost_prince:     'knight',
+  woodcutters_child:'merchant',     talking_creature:'wolf',
   // ── HISTORICAL ───────────────────────────────────────────────────────────
   gladiator:       'knight',        legionary:       'guard',
   centurion:       'knight',        spartan:         'knight',

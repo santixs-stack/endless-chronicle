@@ -14,7 +14,7 @@ import styles from './TitleScreen.module.css';
 // ═══════════════════════════════════════════
 
 // Scene types to cycle through in background
-const BG_SCENES = ['dungeon','space','ocean','forest','castle','neon_city','ruins','prairie','olympus'];
+const BG_SCENES = ['dungeon','space','ocean','forest','castle','neon_city','graveyard','prairie','olympus'];
 
 // ── Seeded random (same as SceneRenderer) ──────────────────────────────
 function mkRand(seed) {
@@ -51,6 +51,7 @@ function drawTitleBg(svgEl2, type, seed) {
     castle:   { sky:['#0a0a1e','#141432','#1a1a3e'], ground:'#3a2858', accent:'#FFD700', torch:'#FF6B35' },
     neon_city:{ sky:['#020208','#060418','#020208'], ground:'#1a1428', accent:'#FF00FF', neon:['#FF00FF','#00FFFF','#FF4400'] },
     ruins:    { sky:['#1a0a28','#2a1448','#1a0a28'], ground:'#2a1e38', accent:'#C06EFF', vine:'#2D5A18' },
+    graveyard:{ sky:['#0a0c14','#141828','#0c1020'], ground:'#1e1e1e', accent:'#AABBCC', moon:'#CCD8E8' },
     prairie:  { sky:['#1a3a60','#2a5a88','#3a7aaa'], ground:'#6a5020', accent:'#D4A840', dust:'#C4A870' },
     olympus:  { sky:['#3a6ab0','#5a8ad0','#8aaae8'], ground:'#e8e0d0', accent:'#FFD700', cloud:'#ffffff' },
   };

@@ -255,6 +255,32 @@ export function parseAllTags(raw) {
       [/\b(an?|the)\s+(ghost|poltergeist|specter|wraith|shade)\s+(of|appears?|emerges?|wails?|drifts?)/gi,
         'Ghost', 'restless ghost', 'ghost', 'neutral'],
 
+      // ── Storybook / Fairy Tale ───────────────────────────────────────────
+      [/\b(an?|the)\s+(witch|sorceress|wise\s+woman|crone)\b/gi,
+        'Witch', 'mysterious witch', 'witch', 'neutral'],
+      [/\b(an?|the)\s+(fairy|faerie|pixie)\s+(godmother|appears?|arrives?|grants?|speaks?)/gi,
+        'Fairy Godmother', 'fairy godmother', 'fairy', 'friendly'],
+      [/\b(an?|the)\s+(enchanted|cursed|transformed)\s+(beast|creature|animal|prince|princess)/gi,
+        'Enchanted Being', 'cursed creature', 'troll', 'neutral'],
+      [/\b(an?|the)\s+(talking|speaking|wise)\s+(animal|wolf|raven|crow|cat|fox|bird)\b/gi,
+        'Talking Animal', 'talking animal companion', 'wolf', 'friendly'],
+      [/\b(an?|the)\s+(evil|wicked)\s+(queen|king|stepmother|witch|sorcerer)\b/gi,
+        'Villain', 'wicked villain', 'witch', 'enemy'],
+      [/\b(an?|the)\s+(prince|princess|royal)\s+(emerges?|appears?|steps?|runs?|cries?|pleads?)/gi,
+        'Royalty', 'royal figure', 'elder', 'neutral'],
+
+      // ── Pirate / Ocean ────────────────────────────────────────────────────
+      [/\b(an?|the)\s+(first\s+mate|bosun|boatswain|quartermaster)\b/gi,
+        'First Mate', 'ship officer', 'pirate_npc', 'neutral'],
+      [/\b(an?|the)\s+(sea\s+creature|leviathan|sea\s+serpent)\s+(emerges?|rises?|attacks?|surfaces?)/gi,
+        'Sea Creature', 'sea monster', 'kraken', 'enemy'],
+      [/\b(the\s+)?crew\s+(cheers?|grumbles?|mutters?|follows?|panics?|draws?)/gi,
+        'Crew', 'ship crew', 'pirate_npc', 'neutral'],
+      [/\b(an?|the)\s+(mermaid|merfolk|siren)\s+(appears?|surfaces?|speaks?|sings?|warns?)/gi,
+        'Mermaid', 'sea being', 'mermaid', 'neutral'],
+      [/\b(an?|the)\s+(naval|royal\s+navy|navy)\s+(officer|captain|patrol|ship)/gi,
+        'Naval Officer', 'navy officer', 'guard', 'enemy'],
+
       // ── Mythology / Historical ────────────────────────────────────────────
       [/\b(an?|the)\s+(god|goddess|deity|divine\s+being)\s+(of|speaks?|appears?|descends?|smiles?|frowns?)/gi,
         'God', 'divine being', 'god_npc', 'neutral'],
