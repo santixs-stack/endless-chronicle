@@ -135,7 +135,7 @@ export function parseAllTags(raw) {
 
       // ── Universal / Fantasy ──────────────────────────────────────────────
       [/\b(a\s+)?(small\s+)?(little\s+)?(girl|boy|child|kid|youth|youngster)\b(?!\s*_npc)/gi,
-        'Child', 'young child', 'child_npc', 'neutral'],
+        'Child', 'young child', 'child_npc', 'friendly'],
       [/\bmessenger\s+(girl|boy|child|kid)\b/gi,
         'Messenger Child', 'child messenger', 'child_npc', 'friendly'],
       [/\b(the\s+)?(young\s+)?messenger\b(?!\s+from)/gi,

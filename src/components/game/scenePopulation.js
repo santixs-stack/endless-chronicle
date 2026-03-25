@@ -53,15 +53,21 @@ export function buildScenePopulation(npcs, inCombat, combatants, sceneType, turn
     const faction = relToFaction(npc.relationship);
     const sz = creatureSize(creatureType);
 
-    // Determine depth plane based on relationship
-    // Enemies go further back, friendlies come closer
+    // Determine depth plane based on relationship and scene context
+    // Rule: if only 1-2 total NPCs and no active combat, bring them close (near/mid)
+    // This handles one-on-one encounters like "a child on the roof" or "a stranger approaches"
+    const totalNpcs = activeNpcs.length;
+    const isIntimate = totalNpcs <= 2 && !combatActive;
     let plane;
     if (faction === 'enemy' || faction === 'boss') {
+      // Enemies: mid for the main threat, far for additional
       plane = i < 2 ? 'mid' : 'far';
     } else if (faction === 'friendly') {
+      // Friendly NPCs: first one always near, rest mid
       plane = i === 0 ? 'near' : 'mid';
     } else {
-      plane = 'mid';
+      // Neutral: near for intimate scenes (1-2 NPCs), mid otherwise
+      plane = isIntimate && i === 0 ? 'near' : 'mid';
     }
 
     const dep = DEPTH[plane];
@@ -77,16 +83,22 @@ export function buildScenePopulation(npcs, inCombat, combatants, sceneType, turn
       // Slight randomness
       xPos += (r() - 0.5) * 30;
     } else if (faction === 'friendly') {
-      // Friendly NPCs to the right of party
-      xPos = W * 0.68 + i * 28 + (r() - 0.5) * 15;
+      // Friendly NPCs close to party — intimate scenes bring them in tighter
+      const friendlyBase = isIntimate ? W * 0.62 : W * 0.68;
+      xPos = friendlyBase + i * 28 + (r() - 0.5) * 12;
     } else {
       // Neutrals scattered
       xPos = W * 0.2 + r() * W * 0.6;
     }
 
-    // Y position from terrain
+    // Y position — near-plane NPCs stand at same ground level as player characters
+    // Player is drawn at H-65 (hardcoded). Terrain-based Y diverges from this.
+    // Using player ground Y for near, terrain for mid/far ensures visual alignment.
     const terrainY = getTerrainY(xPos, terrainPts);
-    const yPos = terrainY + dep.yOffset * H;
+    const PLAYER_GROUND_Y = H - 65;
+    const yPos = plane === 'near'
+      ? PLAYER_GROUND_Y          // same ground as player
+      : terrainY + dep.yOffset * H; // terrain-relative for background NPCs
 
     // Scale from depth plane + size class.
     // Creatures are designed at sc=1.0 to be ~62px tall on a 300px canvas.
