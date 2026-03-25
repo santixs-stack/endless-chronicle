@@ -1083,6 +1083,17 @@ function resolveCharacterClass(classId, className, role) {
     'skeleton': 'skeleton_pc', 'undead': 'skeleton_pc', 'bones': 'skeleton_pc',
     'ghost': 'ghost_pc', 'spirit': 'ghost_pc', 'wraith_pc': 'ghost_pc',
     'shapeshifter': 'slime',
+    // Common archetype display names that come as p.class or p.className
+    'knight': 'warrior', 'fighter': 'warrior', 'paladin': 'warrior',
+    'cleric': 'healer', 'priest': 'healer', 'monk': 'healer',
+    'wizard': 'mage', 'sorcerer': 'mage', 'warlock': 'mage',
+    'archer': 'ranger', 'scout': 'ranger', 'hunter': 'ranger',
+    'thief': 'rogue', 'assassin': 'rogue',
+    'captain': 'pirate', 'sea witch': 'mage',
+    'marine': 'warrior', 'commander': 'warrior',
+    'engineer': 'spaceranger', 'medic': 'healer', 'hacker': 'netrunner',
+    'warlord': 'warrior', 'raider': 'warrior', 'mutant': 'warrior',
+    'monster hunter': 'warrior', 'occultist': 'mage',
     // Fairy tale
     'faerie': 'bard', 'creature': 'rogue', 'enchanter': 'bard',
     'knight errant': 'warrior', 'prince': 'warrior', 'princess': 'healer',
@@ -1154,12 +1165,9 @@ function drawScene(svgEl2, scene, players, turnCount) {
 
   // Sky gradient
   const skyGrad = svgEl('linearGradient', { id:'skyG', x1:'0', y1:'0', x2:'0', y2:'1' });
-  const [s1, s2, s3] = pal.sky;
-  skyGrad.appendChild(Object.assign(svgEl('stop', {}), {}).setAttribute ? (() => {
-    const s = svgEl('stop', { offset:'0%', 'stop-color': s1 }); return s;
-  })() : null);
+  const [s1, s2, s3] = pal.sky || ['#1a1a2e','#16213e','#0f3460'];
   [s1, s2, s3 || s2].forEach((c, i) => {
-    const stop = svgEl('stop', { offset:`${i*50}%`, 'stop-color': c });
+    const stop = svgEl('stop', { offset:`${i*50}%`, 'stop-color': c || '#1a1a2e' });
     skyGrad.appendChild(stop);
   });
   defs.appendChild(skyGrad);
@@ -1197,6 +1205,7 @@ function drawScene(svgEl2, scene, players, turnCount) {
   // ── Weather ──
   if (weather === 'rain' || weather === 'storm') drawRain(svgEl2, tr);
   if (weather === 'snow' || type === 'snow') drawSnowfall(svgEl2, tr);
+  if (weather === 'fog') drawFog(svgEl2, pal);
 
   // ── Characters ──
   const groundY = H - 65;
@@ -2265,7 +2274,7 @@ function drawGround(rc, svg, type, pal, sr, tr, W, H) {
       svg.appendChild(rc.ellipse(gsx, gsy-gsh, gsw, 7, { stroke:shadeColor(stone2,-20), fill:stone2, fillStyle:'solid', roughness:1.5 }));
     }
     // Ground fog
-    const fogEl = svgEl('rect', { x:'0', y:String(H*0.60), width:String(W), height:String(H*0.1), fill:'url(#fogGrad)', opacity:'0.5' });
+    const fogEl = svgEl('rect', { x:'0', y:String(H*0.60), width:String(W), height:String(H*0.1), fill:'rgba(80,90,100,0.3)', opacity:'0.8' });
     svg.appendChild(fogEl);
   }
 
@@ -2726,6 +2735,30 @@ function drawForeground(rc, svg, type, pal, tr, W, H) {
 }
 
 // ── Weather ────────────────────────────────
+function drawFog(svg, pal) {
+  // Layered fog — 3 translucent horizontal bands at different heights
+  const fogColor = pal.fog || 'rgba(200,210,220,0.18)';
+  [[H*0.45, H*0.25], [H*0.58, H*0.18], [H*0.68, H*0.12]].forEach(([cy, ry], i) => {
+    const fogEl = svgEl('ellipse', {
+      cx: String(W*0.5), cy: String(cy),
+      rx: String(W*0.8), ry: String(ry),
+      fill: fogColor, opacity: String(0.5 + i*0.1),
+    });
+    fogEl.setAttribute('class', 'waveAnim');
+    fogEl.style.animationDelay = `${i * 1.2}s`;
+    fogEl.style.animationDuration = `${6 + i*2}s`;
+    svg.appendChild(fogEl);
+  });
+  // Ground-level fog bank
+  const groundFog = svgEl('rect', {
+    x: '0', y: String(H*0.60), width: String(W), height: String(H*0.25),
+    fill: fogColor, opacity: '0.6',
+  });
+  groundFog.setAttribute('class', 'waveAnim');
+  groundFog.style.animationDuration = '8s';
+  svg.appendChild(groundFog);
+}
+
 function drawRain(svg, tr) {
   for (let i = 0; i < 60; i++) {
     const rx = tr()*W, ry = tr()*H;

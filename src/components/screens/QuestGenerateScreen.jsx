@@ -142,6 +142,13 @@ export default function QuestGenerateScreen() {
     generateQuests();
   }, []);
 
+  // Auto-show presets if generation fails
+  useEffect(() => {
+    if (!loading && (error || !generatedQuests)) {
+      setShowPresets(true);
+    }
+  }, [loading, error, generatedQuests]);
+
   async function generateQuests() {
     setLoading(true);
     setError(false);
@@ -271,11 +278,8 @@ Respond ONLY with a JSON array of 4 objects, each with:
 
       {!loading && (error || !generatedQuests) && (
         <div className={styles.errorSection}>
-          <p className={styles.errorMsg}>Quest generation stumbled. Choose a preset instead, or try again.</p>
-          <div className={styles.errorActions}>
-            <button className="btn-primary" onClick={generateQuests}>↻ Try Again</button>
-            <button className="btn-ghost" onClick={() => setShowPresets(true)}>Browse Presets →</button>
-          </div>
+          <p className={styles.errorMsg}>Quest generation stumbled — showing presets instead.</p>
+          <button className="btn-ghost" style={{marginTop:'8px'}} onClick={generateQuests}>↻ Try again</button>
         </div>
       )}
 
