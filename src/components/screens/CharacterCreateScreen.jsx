@@ -39,7 +39,7 @@ const GENRE_ICONS = {
   postapoc:   'lorc/radioactive',
   cyberpunk:  'lorc/android-mask',
   mythology:  'lorc/zeus-sword',
-  fairytale:  'lorc/fairy',
+  fairytale:  'lorc/fairy-wand',
   ninja:      'lorc/plain-dagger',
   historical: 'lorc/crossed-axes',
 };

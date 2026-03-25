@@ -94,22 +94,22 @@ const LOADING_LINES = [
 
 // Quest id → game icon path
 const QUEST_ICONS = {
-  dungeon:      'lorc/dungeon-gate',
+  dungeon:      'lorc/portculis',
   rescue:       'lorc/imprisoned',
-  treasure:     'lorc/open-treasure-chest',
+  treasure:     'lorc/locked-chest',
   crash:        'lorc/rocket',
-  pirates:      'lorc/pirate-skull',
+  pirates:      'lorc/skull-bolt',
   wildwest:     'delapouite/revolver',
   dreamworld:   'lorc/moon',
-  spacemystery: 'lorc/ufo',
+  spacemystery: 'lorc/alien-skull',
   haunted:      'lorc/ghost',
-  gladiator:    'lorc/roman-shield',
+  gladiator:    'lorc/spartan',
   wasteland:    'lorc/radioactive',
-  cybercity:    'lorc/hacking',
+  cybercity:    'lorc/circuitry',
   olympus:      'lorc/zeus-sword',
-  fairytale:    'lorc/book',
-  shogun:       'lorc/torii-gate',
-  custom:       'lorc/scroll-quill',
+  fairytale:    'lorc/open-book',
+  shogun:       'lorc/magic-gate',
+  custom:       'lorc/quill',
 };
 
 export default function QuestGenerateScreen() {
