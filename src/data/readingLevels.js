@@ -42,20 +42,7 @@ CONTENT: No death or serious injury. Mild scary moments are fine — Dragon Mast
 
 // Age-appropriate quest generation instruction per level
 export const RL_QUEST_GUIDANCE = {
-  '4th': `IMPORTANT: This is for young children (ages 6-9) in the Dragon Masters / Octonauts style.
-
-The 5 story beats EVERY quest must hit:
-1. HOOK (turn 1): Something is ALREADY going wrong. A creature is in danger. A friend is missing. A dark cloud is spreading. The player walks into trouble, not toward it.
-2. COMPLICATION (turn 2-3): The first plan fails or makes it worse. The villain has a second trick. The creature is harder to help than expected. The player must think differently.
-3. DARK MOMENT (turn 3-4): Things look really bad. The player might fail. Give them one moment of doubt, fear, or loss. This is what makes the victory matter.
-4. TWIST or DISCOVERY (turn 4-5): The player learns something that changes everything — about the villain's real reason, the creature's special ability, a hidden door, a new friend.
-5. EARNED VICTORY: The player uses what they DISCOVERED or who they BEFRIENDED to win. Not luck — cleverness or kindness.
-
-WHAT MAKES IT GOOD:
-- Give the villain a motivation the player can understand (even if wrong) — not just "evil"
-- Include at least one creature or character with personality and feelings
-- Create one "wow" moment of wonder per quest — something magical and vivid
-- The emotional journey: worry → determination → doubt → discovery → triumph`,
+  '4th': 'Ages 6-9 (Dragon Masters / Octonauts style). Quests need: real stakes (something the hero cares about is in danger), genuine obstacles (first plan fails), one wow/wonder moment, a villain with a reason not just "evil", and an EARNED victory through cleverness or kindness — not luck. Emotional arc: worry → doubt → discovery → triumph.',
 
   '8th': 'This is for family/middle-grade audiences (ages 10-13). Quests can involve real adventure, mystery, and mild danger. Heroes can struggle. Think Percy Jackson or early Harry Potter energy. Avoid: graphic violence, adult romance, extreme horror, or very dark themes.',
 

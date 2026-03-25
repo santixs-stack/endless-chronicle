@@ -120,7 +120,26 @@ export default function QuestGenerateScreen() {
   const [customText, setCustomText] = useState('');
   const [showCustom, setShowCustom] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
-  const detectedGenre = state.world?.genre || 'fantasy';
+  // Use world genre if set, otherwise detect from world description, fallback to fantasy
+  const detectedGenre = state.world?.genre || (() => {
+    const worldText = (state.world?.world || '').toLowerCase();
+    const genreKeywords = {
+      ninja: ['japan','samurai','ninja','feudal','shogun','katana','shinobi','clan'],
+      space: ['space','galaxy','planet','starship','alien','sci-fi','robot'],
+      ocean: ['ocean','sea','pirate','ship','island','sailor','harbor'],
+      horror: ['horror','haunted','ghost','vampire','zombie','curse','demon'],
+      western: ['western','cowboy','frontier','saloon','gunslinger','outlaw','sheriff'],
+      postapoc: ['apocalypse','wasteland','survival','radiation','ruins','nuclear'],
+      cyberpunk: ['cyberpunk','neon','hacker','corporation','android','megacity'],
+      mythology: ['myth','greek','roman','norse','god','titan','olympus','legend'],
+      fairytale: ['fairy tale','enchanted','princess','witch','spell','fairy'],
+      historical: ['rome','egypt','medieval','viking','ancient','revolution'],
+    };
+    for (const [genre, words] of Object.entries(genreKeywords)) {
+      if (words.some(w => worldText.includes(w))) return genre;
+    }
+    return 'fantasy';
+  })();
   const [presetGenreFilter, setPresetGenreFilter] = useState(detectedGenre);
   const [error, setError] = useState(false);
 
@@ -180,7 +199,7 @@ Respond ONLY with a JSON array of 4 objects, each with:
   "icon": "single emoji",
   "name": "quest title (4-6 words)",
   "tagline": "one punchy sentence that hooks the player",
-  "hint": "GM story spine with 5 beats — HOOK: what\'s already going wrong when players arrive | COMPLICATION: how the first approach fails or gets more complex | DARK MOMENT: the low point where failure feels real | TWIST: the discovery that reframes everything | RESOLUTION: what the earned victory looks like. Also include a tracking mechanic (e.g. Track: Clues found 0/4).",
+  "hint": "Story beats: HOOK(what's already wrong) | COMPLICATION(plan fails) | DARK MOMENT(real setback) | TWIST(reframing discovery) | RESOLUTION(earned victory). Plus one tracking mechanic.",
   "start": "The opening line the GM reads aloud — vivid, immediate, drops players into action",
   "tone": "one of: Epic & Exciting | Mysterious & Wondrous | Dark & Mysterious | Funny & Silly",
   "sceneType": "one of: dungeon|cave|forest|plains|castle|ruins|ocean|space|village|city|desert|mountain|swamp|snow|tower|temple|shrine|graveyard|crypt|neon_city|back_alley|corp_building|spaceship|space_station|alien_planet|prairie|frontier_town|canyon|saloon|wasteland|bunker|ruined_city|dojo|bamboo_forest|fortress_jp|olympus|underworld|jungle|manor|market|arena",
@@ -191,7 +210,7 @@ Respond ONLY with a JSON array of 4 objects, each with:
       const response = await withRetry(() => callAPI(
         [{ role: 'user', content: prompt }],
         'You are a creative game master. Generate personalized quest hooks. Respond only with valid JSON arrays.'
-      ), 3, 1500);
+      ), 5, 2000);
       const clean = response.replace(/```json|```/g, '').trim();
       const quests = JSON.parse(clean);
       if (Array.isArray(quests) && quests.length > 0) {

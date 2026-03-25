@@ -30,6 +30,14 @@ export function classifyError(error) {
     retryable: false,
   };
 
+  if (msg.includes('529') || msg.includes('overloaded') || msg.includes('overload_error')) return {
+    type: 'overloaded',
+    title: 'AI Overloaded',
+    message: 'The AI is temporarily overloaded. Retrying in a moment…',
+    retryable: true,
+    delay: 6000,
+  };
+
   if (msg.includes('429') || msg.includes('rate limit') || msg.includes('too many')) return {
     type: 'ratelimit',
     title: 'Too Many Requests',
