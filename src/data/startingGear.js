@@ -32,7 +32,7 @@ export const STARTING_GEAR = {
     spaceranger:['Multi-tool', 'Personal shield', 'Comm beacon', 'Warp flare (×2)'],
     pirate:     ['Boarding axe', 'Grappling hook launcher', 'Space compass', 'Stolen ID'],
   },
-  // ── Ocean ───────────────────────────────────────────────────────────────
+  // ── Pirate / Ocean ───────────────────────────────────────────────────────────────
   pirate: {
     warrior:    ['Boarding cutlass', 'Buckler', 'Sailor\'s knife', 'Rope (50ft)'],
     mage:       ['Tide-caller staff', 'Sea charts', 'Bottled storm', 'Compass'],
@@ -65,7 +65,7 @@ export const STARTING_GEAR = {
     spaceranger:['Colt Peacemaker', 'Sheriff\'s star', 'Wanted posters', 'Trail map'],
     pirate:     ['Sawed-off shotgun', 'Dynamite (×2)', 'Saddle bags', 'Gold nugget'],
   },
-  // ── Post-Apocalyptic ────────────────────────────────────────────────────
+  // ── Wasteland / Post-Apoc ────────────────────────────────────────────────────
   postapoc: {
     warrior:    ['Pipe rifle', 'Metal armor (scavenged)', 'Combat knife', 'RadAway'],
     mage:       ['Geiger counter', 'Mutagen vials', 'Technical manual', 'Scrap parts'],
@@ -98,16 +98,16 @@ export const STARTING_GEAR = {
     spaceranger:['Thunder javelin', 'Aegis fragment', 'Titan\'s blood vial', 'Star chart'],
     pirate:     ['Triton\'s trident', 'Sea-god\'s compass', 'Siren\'s shell', 'Storm bottle'],
   },
-  // ── Fairy Tale ──────────────────────────────────────────────────────────
+  // ── Storybook / Fairy Tale ──────────────────────────────────────────────────────────
   fairytale: {
-    warrior:    ['Enchanted sword', 'Knight\'s crest', 'Dragon-scale armor', 'Lucky horseshoe'],
-    mage:       ['Magic wand', 'Grimoire of wishes', 'Enchanted mirror', 'Glowing potion'],
-    rogue:      ['Magic beans (×3)', 'Invisibility cloak', 'Thief\'s lockpicks', 'Bag of tricks'],
-    ranger:     ['Enchanted bow', 'Arrows that never miss', 'Woodland map', 'Wolf whistle'],
-    healer:     ['Healing berries', 'Forest elder\'s recipe', 'Glowing salve', 'Blessing charm'],
-    bard:       ['Enchanted flute', 'Story book (rewriting itself)', 'Fairy dust', '7 gold coins'],
-    spaceranger:['Wishing star fragment', 'Spell compendium', 'Crystal ball', 'Magic rope'],
-    pirate:     ['Cursed gold coin', 'Siren\'s locket', 'Treasure map', 'Captain\'s hat'],
+    warrior:    ['Thorn-wound blade (cursed)', 'Rose that never wilts', 'Cracked enchanted shield', 'One shard of true courage'],
+    mage:       ['Star-glass wand', 'Book of three wishes (1 used)', 'Pumpkin seed (transforms at midnight)', 'Fairy dust (pinch)'],
+    rogue:      ['Fox-tail cloak', 'Magic beans (×3)', 'Mirror that shows truth', 'Bag of tricks (bottomless)'],
+    ranger:     ['Woodcutter\'s axe (enchanted)', 'Bread crumbs (trail)', 'Talking bird companion', 'Forest elder\'s map'],
+    healer:     ['True love\'s teardrop (heals curses)', 'Cauldron of remedies', 'Seven-herb bundle', 'Grandmother\'s recipe book'],
+    bard:       ['Golden fiddle', 'Story that ends differently each time', 'Jester\'s coin (two heads)', '3 magic words'],
+    spaceranger:['Wishing star shard', 'Glass slipper (fits the right person)', 'Enchanted compass', 'Godmother\'s wand (borrowed)'],
+    pirate:     ['Cursed gold coin', 'Map to the witch\'s tower', 'Enchanted rope (ties itself)', 'Silver mirror'],
   },
   // ── Ninja / Samurai ─────────────────────────────────────────────────────
   ninja: {
@@ -168,7 +168,7 @@ export const ARCHETYPE_SPECIALS = {
   'ninja/spaceranger':    'Pressure Point — disable any creature instantly with one precise strike',
   'ninja/pirate':         'Tide Strike — attack all enemies at once; your blade is everywhere in the same moment',
 
-  // ── Post-Apocalyptic ─────────────────────────────────────────────────
+  // ── Wasteland / Post-Apoc ─────────────────────────────────────────────────
   'postapoc/warrior':     'Rampage — push through any damage and keep fighting at full strength for one scene',
   'postapoc/mage':        'Mutation Surge — your radiation gift activates fully; gain one impossible ability for a scene',
   'postapoc/rogue':       'Wasteland Ghost — disappear completely into the ruins; no one can track you',
@@ -188,7 +188,7 @@ export const ARCHETYPE_SPECIALS = {
   'space/spaceranger':    'Gadget — pull out exactly the right piece of tech for any impossible situation',
   'space/pirate':         'Pirate Broadcast — commandeer any ship\'s systems; fly anything, anywhere, any time',
 
-  // ── Ocean ─────────────────────────────────────────────────────────────
+  // ── Pirate / Ocean ─────────────────────────────────────────────────────────────
   'pirate/warrior':        'Boarding Action — lead a charge onto any vessel; enemies rout before you land',
   'pirate/mage':           'Call the Storm — summon or dismiss weather at will; the sea obeys your command',
   'pirate/rogue':          'Phantom Ship — your vessel is invisible at night; no one sees you coming or going',
@@ -218,15 +218,15 @@ export const ARCHETYPE_SPECIALS = {
   'mythology/spaceranger':'Titan\'s Strength — briefly channel ancient power; feats of impossible strength',
   'mythology/pirate':     'Sea God\'s Favor — the ocean protects you; survive any nautical disaster',
 
-  // ── Fairy Tale ────────────────────────────────────────────────────────
-  'fairytale/warrior':    'True Knight\'s Vow — swear to protect someone; nothing can harm them while you stand',
-  'fairytale/mage':       'Wish — grant one true wish; the world bends; consequences follow',
-  'fairytale/rogue':      'Magic Beans — trade anything for something magical; the bargain always surprises you',
-  'fairytale/ranger':     'Animal Parliament — every creature in the forest helps you with one task',
-  'fairytale/healer':     'True Love\'s Cure — heal any curse, illness, or broken heart with pure intent',
-  'fairytale/bard':       'Enchanting Tale — tell a story so compelling everyone forgets to be your enemy',
-  'fairytale/spaceranger':'Fairy Godmother — once per story, transform something hopeless into something perfect',
-  'fairytale/pirate':     'Cursed Gold — any treasure you claim comes with a twist; sometimes that twist helps',
+  // ── Storybook / Fairy Tale ────────────────────────────────────────────────────────
+  'fairytale/warrior':    'Curse Break — your blade cuts through enchantments; one cursed thing per scene is revealed',
+  'fairytale/mage':       'Wish — grant one true wish per story; the world bends; consequences always follow',
+  'fairytale/rogue':      'Trickster\'s Bargain — offer any trade; the other party always accepts; you choose the terms',
+  'fairytale/ranger':     'Animal Parliament — any creature will help you once if you ask with kindness',
+  'fairytale/healer':     'True Love\'s Cure — heal any curse, wound, or broken heart; requires genuine care, not just skill',
+  'fairytale/bard':       'Story Power — tell a story that changes how someone sees themselves; they act differently for the rest of the tale',
+  'fairytale/spaceranger':'Godmother\'s Grace — once per story, transform one hopeless situation into a second chance',
+  'fairytale/pirate':     'Cursed Treasure — anything you claim comes with a twist; the twist has a way of being exactly what you needed',
 
   // ── Historical ────────────────────────────────────────────────────────
   'historical/warrior':   'Shield Wall — rally allies into formation; your unit is immovable for one engagement',
@@ -357,7 +357,7 @@ export const ITEM_DESCRIPTIONS = {
   'Personal shield':      'Belt-mounted energy barrier. Absorbs first 10 damage per encounter.',
   'Comm beacon':          'Emergency distress beacon. Broadcasts your location across 5 star systems.',
   'Warp flare (×2)':      '2 emergency teleport charges. Each jumps you 100m in any direction.',
-  // ── Post-Apocalyptic ──────────────────────────────────────────
+  // ── Wasteland / Post-Apoc ──────────────────────────────────────────
   'Pipe rifle':           'Scavenged bolt-action. Unreliable (+1 to misfire) but deadly at range.',
   'Metal armor (scavenged)': 'Patchwork plates and leather. Reduces damage by 3. Loud when moving.',
   'Combat knife':         'Military surplus blade. Reliable. Holds an edge.',

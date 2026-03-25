@@ -54,7 +54,7 @@ export const GAME_ICONS = {
     alien:        { file: 'lorc/alien-skull',         alt: 'lorc/alien-skull'            },
     cyborg:       { file: 'lorc/robotic-arm',         alt: 'lorc/android-mask'        },
 
-    // Ocean
+    // Pirate / Ocean
     buccaneer:    { file: 'lorc/plain-dagger',             alt: 'lorc/pirate-skull'        },
     seaWitch:     { file: 'lorc/tentacles-skull',     alt: 'lorc/kraken-tentacle'     },
     smuggler:     { file: 'lorc/anonymous',           alt: 'lorc/swap-bag'            },

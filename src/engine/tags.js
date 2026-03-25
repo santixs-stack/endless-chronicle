@@ -199,7 +199,7 @@ export function parseAllTags(raw) {
       [/\b(an?|the)\s+(bounty\s+hunter|tracker|manhunter)\b/gi,
         'Bounty Hunter', 'bounty hunter', 'bounty_hunter', 'neutral'],
 
-      // ── Ocean / Pirate ───────────────────────────────────────────────────
+      // ── Pirate / Ocean ───────────────────────────────────────────────────
       [/\b(an?|the)\s+(pirate|buccaneer|corsair|freebooter)\s+(steps?|emerges?|draws?|attacks?|boards?|sneers?)/gi,
         'Pirate', 'sea pirate', 'pirate_npc', 'enemy'],
       [/\b(an?|the)\s+(sailor|deckhand|first\s+mate|boatswain|bosun)\b/gi,
@@ -271,7 +271,7 @@ export function parseAllTags(raw) {
       [/\b(an?|the)\s+(viking|norseman|raider)\s+(steps?|emerges?|attacks?|raises?|bellows?)/gi,
         'Viking', 'norse warrior', 'viking', 'enemy'],
 
-      // ── Post-Apocalyptic ─────────────────────────────────────────────────
+      // ── Wasteland / Post-Apoc ─────────────────────────────────────────────────
       [/\b(an?|the)\s+(raider|marauder|scavenger)\s+(steps?|emerges?|attacks?|draws?|levels?)/gi,
         'Raider', 'wasteland raider', 'raider', 'enemy'],
       [/\b(an?|the)\s+(mutant|ghoul|irradiated\s+being)\s+(emerges?|appears?|attacks?|snarls?)/gi,

@@ -291,7 +291,7 @@ export const CREATURE_PARTICLES = {
   satyr:         { type: 'sparkle', color: '#88cc44', size: 1.0, count: 6  },
   cerberus:      { type: 'ember',   color: '#ff4400', size: 1.8, count: 8  },
   griffin:       { type: 'spark',   color: '#ffcc00', size: 1.5, count: 6  },
-  // Ocean
+  // Pirate / Ocean
   siren:         { type: 'sparkle', color: '#44ddff', size: 2.0, count: 10 },
   deep_one:      { type: 'drip',    color: '#225566', size: 1.5, count: 6  },
   sea_serpent:   { type: 'drip',    color: '#226644', size: 2.0, count: 5  },

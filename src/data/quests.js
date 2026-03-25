@@ -40,7 +40,7 @@ Track obstacles cleared 0/3. Guards have names and personalities. The villain sp
   {
     id: 'treasure', icon: '🗺', name: 'Treasure Hunt', genre: 'pirate',
     tagline: 'A map to the greatest treasure ever hidden — and three other teams want it too!',
-    tags: ['adventure', 'exploration', 'pirate'],
+    tags: ['pirate', 'adventure', 'exploration'],
     tone: 'Funny & Silly', sceneType: 'ocean', sceneTime: 'day',
     worldName: 'A world of pirates, ocean islands, and hidden treasure',
     worldLocation: 'A busy harbor town where adventurers gather',
@@ -72,7 +72,7 @@ Track repairs 0-5 parts. The missing crew member has been BEFRIENDING the creatu
   {
     id: 'pirates', icon: '🏴‍☠️', name: 'Pirate Adventure', genre: 'pirate',
     tagline: 'Sail the seven seas, find legendary treasure, and become the greatest pirates ever!',
-    tags: ['pirate', 'adventure'],
+    tags: ['pirate', 'adventure', 'ocean'],
     tone: 'Epic & Exciting', sceneType: 'ocean', sceneTime: 'dawn',
     worldName: 'The Golden Age of Piracy — a world of ships, treasure, and adventure',
     worldLocation: 'The deck of your pirate ship, open ocean ahead',
@@ -202,12 +202,12 @@ Track divine favor 0-100%. Each god the party meets has a personality and an arg
     start: `The earth shook at dawn. The oracle spoke three words: GO. TO. OLYMPUS. Then she handed you a clay tablet and said, "Your great-great-grandmother left this unfinished. The gods have been arguing about it for two hundred years. They want YOU to settle it." The tablet has your family's name on it. And something that looks like a debt.`,
   },
   {
-    id: 'fairytale', icon: '🧚', name: 'The Enchanted Quest', genre: 'fairytale',
-    tagline: 'An ancient curse. A magical kingdom. Only the brave of heart can break the spell.',
-    tags: ['fairy tale', 'magic'],
-    tone: 'Funny & Silly', sceneType: 'forest', sceneTime: 'day',
-    worldName: 'The Enchanted Realm — talking animals, magical castles, and spells on everything',
-    worldLocation: 'The edge of the Whispering Wood, where the trees are definitely gossiping about you',
+    id: 'fairytale', icon: '📖', name: 'Once Upon a Curse', genre: 'fairytale',
+    tagline: 'A kingdom cursed. A villain with a reason. A prophecy pointing the wrong direction.',
+    tags: ['storybook', 'magic', 'curse'],
+    tone: 'Mysterious & Wondrous', sceneType: 'forest', sceneTime: 'dawn',
+    worldName: 'The Enchanted Realm — talking animals, cursed royalty, and magic that always has a cost',
+    worldLocation: 'The edge of the Whispering Wood, eleven days after the prophecy said heroes would arrive',
     hint: `Fairy tale with real emotional stakes and subverted expectations:
 HOOK: The curse is spreading faster than it should — the prophecy said heroes would arrive "just in time" but by the time the party arrives, the kingdom is half-frozen. Someone sped up the curse on purpose.
 COMPLICATION: The "villain" who cast the curse is a child who lost someone to the kingdom's carelessness and cast the spell out of grief, not malice. The curse won't break unless the kingdom acknowledges what it did wrong.
