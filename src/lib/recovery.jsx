@@ -30,20 +30,20 @@ export function classifyError(error) {
     retryable: false,
   };
 
-  if (msg.includes('529') || msg.includes('overloaded') || msg.includes('overload_error')) return {
-    type: 'overloaded',
-    title: 'AI Overloaded',
-    message: 'The AI is temporarily overloaded. Retrying in a moment…',
-    retryable: true,
-    delay: 6000,
-  };
-
   if (msg.includes('429') || msg.includes('rate limit') || msg.includes('too many')) return {
     type: 'ratelimit',
     title: 'Too Many Requests',
     message: 'The AI is busy. Waiting a moment then retrying automatically…',
     retryable: true,
     delay: 8000,
+  };
+
+  if (msg.includes('529') || msg.includes('overload') || msg.includes('overloaded')) return {
+    type: 'overload',
+    title: 'AI is Very Busy',
+    message: 'The AI is handling too many stories right now. Retrying automatically in a few seconds…',
+    retryable: true,
+    delay: 6000,
   };
 
   if (msg.includes('500') || msg.includes('502') || msg.includes('503') || msg.includes('server')) return {
@@ -79,7 +79,7 @@ export function classifyError(error) {
 }
 
 // ── Retry with exponential backoff ──────────
-export async function withRetry(fn, maxAttempts = 3, baseDelay = 1000) {
+export async function withRetry(fn, maxAttempts = 4, baseDelay = 1500) {
   let lastError;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
@@ -94,7 +94,10 @@ export async function withRetry(fn, maxAttempts = 3, baseDelay = 1000) {
       // Don't retry on last attempt
       if (attempt === maxAttempts - 1) throw err;
 
-      const delay = classified.delay || baseDelay * Math.pow(2, attempt);
+      // Exponential backoff with jitter — avoids hammering the API in sync
+      const base = classified.delay || baseDelay * Math.pow(2, attempt);
+      const jitter = Math.random() * 1000;
+      const delay = base + jitter;
       await new Promise(r => setTimeout(r, delay));
     }
   }

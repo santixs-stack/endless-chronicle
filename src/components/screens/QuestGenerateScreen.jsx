@@ -3,7 +3,6 @@ import { RL_QUEST_GUIDANCE } from '../../data/readingLevels.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { callAPI } from '../../engine/api.js';
-import { withRetry } from '../../lib/recovery.jsx';
 import { STORY_GOALS } from '../../data/quests.js';
 import { GAME_ICONS } from '../../data/gameIcons.js';
 import GameIcon from '../ui/GameIcon.jsx';
@@ -94,22 +93,22 @@ const LOADING_LINES = [
 
 // Quest id → game icon path
 const QUEST_ICONS = {
-  dungeon:      'lorc/portculis',
+  dungeon:      'lorc/dungeon-gate',
   rescue:       'lorc/imprisoned',
-  treasure:     'lorc/locked-chest',
+  treasure:     'lorc/open-treasure-chest',
   crash:        'lorc/rocket',
-  pirates:      'lorc/skull-bolt',
+  pirates:      'lorc/pirate-skull',
   wildwest:     'delapouite/revolver',
   dreamworld:   'lorc/moon',
-  spacemystery: 'lorc/alien-skull',
+  spacemystery: 'lorc/ufo',
   haunted:      'lorc/ghost',
-  gladiator:    'lorc/spartan',
+  gladiator:    'lorc/roman-shield',
   wasteland:    'lorc/radioactive',
-  cybercity:    'lorc/circuitry',
+  cybercity:    'lorc/hacking',
   olympus:      'lorc/zeus-sword',
-  fairytale:    'lorc/open-book',
-  shogun:       'lorc/magic-gate',
-  custom:       'lorc/quill',
+  fairytale:    'lorc/fairy-wand',
+  shogun:       'lorc/torii-gate',
+  custom:       'lorc/scroll-quill',
 };
 
 export default function QuestGenerateScreen() {
@@ -120,26 +119,7 @@ export default function QuestGenerateScreen() {
   const [customText, setCustomText] = useState('');
   const [showCustom, setShowCustom] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
-  // Use world genre if set, otherwise detect from world description, fallback to fantasy
-  const detectedGenre = state.world?.genre || (() => {
-    const worldText = (state.world?.world || '').toLowerCase();
-    const genreKeywords = {
-      ninja: ['japan','samurai','ninja','feudal','shogun','katana','shinobi','clan','ronin','edo'],
-      space: ['space','galaxy','planet','starship','alien','sci-fi','robot','orbit','future'],
-      pirate: ['pirate','sea','ship','island','sailor','harbor','treasure','buccaneer','ocean','swashbuckler'],
-      horror: ['horror','haunted','ghost','vampire','zombie','curse','demon','manor','asylum'],
-      western: ['western','cowboy','frontier','saloon','gunslinger','outlaw','sheriff','wild west','ranch'],
-      postapoc: ['apocalypse','wasteland','survival','radiation','ruins','nuclear','fallout','collapse'],
-      cyberpunk: ['cyberpunk','neon','hacker','corporation','android','megacity','cyber','dystopia'],
-      mythology: ['myth','greek','roman','norse','god','titan','olympus','legend','demigod','ancient gods'],
-      fairytale: ['fairy tale','fairytale','enchanted','princess','witch','curse','talking animal','once upon'],
-      historical: ['rome','egypt','medieval','viking','ancient','revolution','war','empire','aztec'],
-    };
-    for (const [genre, words] of Object.entries(genreKeywords)) {
-      if (words.some(w => worldText.includes(w))) return genre;
-    }
-    return 'fantasy';
-  })();
+  const detectedGenre = state.world?.genre || 'fantasy';
   const [presetGenreFilter, setPresetGenreFilter] = useState(detectedGenre);
   const [error, setError] = useState(false);
 
@@ -160,13 +140,6 @@ export default function QuestGenerateScreen() {
   useEffect(() => {
     generateQuests();
   }, []);
-
-  // Auto-show presets if generation fails
-  useEffect(() => {
-    if (!loading && (error || !generatedQuests)) {
-      setShowPresets(true);
-    }
-  }, [loading, error, generatedQuests]);
 
   async function generateQuests() {
     setLoading(true);
@@ -199,18 +172,18 @@ Respond ONLY with a JSON array of 4 objects, each with:
   "icon": "single emoji",
   "name": "quest title (4-6 words)",
   "tagline": "one punchy sentence that hooks the player",
-  "hint": "Story beats: HOOK(what's already wrong) | COMPLICATION(plan fails) | DARK MOMENT(real setback) | TWIST(reframing discovery) | RESOLUTION(earned victory). Plus one tracking mechanic.",
+  "hint": "2-3 sentences for the GM: the core conflict, what's at stake, and a tracking mechanic",
   "start": "The opening line the GM reads aloud — vivid, immediate, drops players into action",
   "tone": "one of: Epic & Exciting | Mysterious & Wondrous | Dark & Mysterious | Funny & Silly",
-  "sceneType": "one of: dungeon|cave|forest|plains|castle|ruins|ocean|space|village|city|desert|mountain|swamp|snow|tower|temple|shrine|graveyard|crypt|neon_city|back_alley|corp_building|spaceship|space_station|alien_planet|prairie|frontier_town|canyon|saloon|wasteland|bunker|ruined_city|dojo|bamboo_forest|fortress_jp|olympus|underworld|jungle|manor|market|arena",
+  "sceneType": "one of: dungeon|cave|forest|plains|castle|ruins|ocean|space|village|city|desert|mountain|swamp|snow",
   "sceneTime": "one of: day|night|dawn|dusk|cave|storm"
 }`;
 
     try {
-      const response = await withRetry(() => callAPI(
+      const response = await callAPI(
         [{ role: 'user', content: prompt }],
         'You are a creative game master. Generate personalized quest hooks. Respond only with valid JSON arrays.'
-      ), 5, 2000);
+      );
       const clean = response.replace(/```json|```/g, '').trim();
       const quests = JSON.parse(clean);
       if (Array.isArray(quests) && quests.length > 0) {
@@ -297,8 +270,11 @@ Respond ONLY with a JSON array of 4 objects, each with:
 
       {!loading && (error || !generatedQuests) && (
         <div className={styles.errorSection}>
-          <p className={styles.errorMsg}>Quest generation stumbled — showing presets instead.</p>
-          <button className="btn-ghost" style={{marginTop:'8px'}} onClick={generateQuests}>↻ Try again</button>
+          <p className={styles.errorMsg}>Quest generation stumbled. Choose a preset instead, or try again.</p>
+          <div className={styles.errorActions}>
+            <button className="btn-primary" onClick={generateQuests}>↻ Try Again</button>
+            <button className="btn-ghost" onClick={() => setShowPresets(true)}>Browse Presets →</button>
+          </div>
         </div>
       )}
 
@@ -361,18 +337,13 @@ Respond ONLY with a JSON array of 4 objects, each with:
           <div className={styles.presetTitle}>Preset Quests</div>
           {/* Genre filter pills */}
           <div className={styles.presetGenreRow}>
-            {[
-              ['fantasy','Fantasy'],['space','Space'],['pirate','Pirate'],
-              ['horror','Horror'],['western','Western'],['postapoc','Wasteland'],
-              ['cyberpunk','Cyberpunk'],['mythology','Mythology'],['fairytale','Storybook'],
-              ['ninja','Ninja'],['historical','Historical'],
-            ].map(([id, label]) => (
+            {['fantasy','space','ocean','horror','western','postapoc','cyberpunk','mythology','fairytale','ninja','historical'].map(g => (
               <button
-                key={id}
-                className={`${styles.presetGenreBtn} ${presetGenreFilter === id ? styles.presetGenreBtnActive : ''}`}
-                onClick={() => setPresetGenreFilter(id)}
+                key={g}
+                className={`${styles.presetGenreBtn} ${presetGenreFilter === g ? styles.presetGenreBtnActive : ''}`}
+                onClick={() => setPresetGenreFilter(g)}
               >
-                {label}
+                {g.charAt(0).toUpperCase() + g.slice(1)}
               </button>
             ))}
           </div>

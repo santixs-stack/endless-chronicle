@@ -27,7 +27,7 @@
   cursor: pointer;
   font-size: 1rem;
 }
-@media (max-width: 1024px) {
+@media (max-width: 640px) {
   .mobileMenuBtn { display: block; }
 }
 

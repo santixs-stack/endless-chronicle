@@ -19,6 +19,7 @@ import GameSidebar from './GameSidebar.jsx';
 import StoryWindow from './StoryWindow.jsx';
 import InputArea from './InputArea.jsx';
 import MilestoneBar from './MilestoneBar.jsx';
+import MusicPlayer from './MusicPlayer.jsx';
 import CombatBanner from './CombatBanner.jsx';
 import SaveDialog from '../overlays/SaveDialog.jsx';
 import SettingsOverlay from '../overlays/SettingsOverlay.jsx';
@@ -237,13 +238,7 @@ Include [SCENE:...] and [ACTIONS:...] tags.`;
     withRetry(() => callAPI(msgs, sysPrompt), 2)
       .then(text => {
         const parsed = parseAllTags(text);
-        const openSceneUpdate = parsed.scene || (parsed.image ? {
-          type: parsed.image.setting || parsed.image.type,
-          time: parsed.image.time || 'day',
-          weather: parsed.image.weather || 'clear',
-          mood: parsed.image.mood || 'exciting',
-        } : null);
-        set({ messages: [...msgs, { role: 'assistant', content: text }], isLoading: false, lastScene: openSceneUpdate || null, currentActions: parsed.actions || [] });
+        set({ messages: [...msgs, { role: 'assistant', content: text }], isLoading: false, lastScene: parsed.scene || null, currentActions: parsed.actions || [] });
         // Music handled in main handler below to respect combat/mood priority
       })
       .catch(err => {
@@ -342,15 +337,7 @@ Include [SCENE:...] and [ACTIONS:...] tags.`;
       }
 
       if (parsed.rolls?.length)   updates.lastRoll    = parsed.rolls[0];   // e.g. 'd20=17'
-      // Update scene from [SCENE:...] OR fall back to [IMAGE:...] which is what the AI uses
-      const sceneUpdate = parsed.scene || (parsed.image ? {
-        type: parsed.image.setting || parsed.image.type,
-        time: parsed.image.time || 'day',
-        weather: parsed.image.weather || 'clear',
-        mood: parsed.image.mood || 'exciting',
-        inCombat: state.lastScene?.inCombat || false,
-      } : null);
-      if (sceneUpdate)            updates.lastScene   = sceneUpdate;
+      if (parsed.scene)           updates.lastScene   = parsed.scene;
       if (parsed.location)        updates.location    = parsed.location;
       if (parsed.milestone != null) updates.milestones = parsed.milestone;
       if (parsed.stats?.health != null) updates.stats = { ...state.stats, health: parsed.stats.health };
@@ -517,6 +504,7 @@ Include [SCENE:...] and [ACTIONS:...] tags.`;
       <div className={styles.main}>
         <CombatBanner />
         <MilestoneBar />
+        <MusicPlayer />
         <StoryWindow />
         <InputArea onAction={handleAction} />
       </div>

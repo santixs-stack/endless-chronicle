@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGame } from '../../hooks/useGameState.jsx';
 import { parseAllTags } from '../../engine/tags.js';
 import { PLAYER_COLORS } from '../../lib/constants.js';
@@ -260,71 +260,26 @@ function TurnHandoff({ playerName, playerColor, playerIcon }) {
 }
 
 
-// ── Roll Strip — full-width banner between player action and GM response ──
-function RollStrip({ roll, playerColor }) {
-  const [phase, setPhase] = React.useState('rolling'); // rolling → landing → settled
-
-  React.useEffect(() => {
-    const t1 = setTimeout(() => setPhase('landing'), 700);
-    const t2 = setTimeout(() => setPhase('settled'), 1100);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
-
-  const isCrit   = roll === 20;
+// ── Animated dice result shown after player action ──────────────────────
+function DiceResult({ roll, color }) {
+  const isCrit = roll === 20;
   const isFumble = roll === 1;
-  const isGreat  = roll >= 15;
-  const isWeak   = roll <= 5;
-
-  const outcome = isCrit ? 'NAT 20' : isFumble ? 'NAT 1' : isGreat ? 'SUCCESS' : isWeak ? 'MISS' : 'PARTIAL';
-  const outcomeColor = isCrit ? '#f0c040' : isFumble ? '#e05555' : isGreat ? '#6dbb7c' : isWeak ? '#e09030' : '#9090b0';
-  const bgColor = isCrit ? 'rgba(240,192,64,0.06)' : isFumble ? 'rgba(224,85,85,0.06)' : 'rgba(255,255,255,0.025)';
+  const isGreat = roll >= 15;
+  const isWeak  = roll <= 5;
+  const label = isCrit ? 'CRIT!' : isFumble ? 'FUMBLE' : isGreat ? 'Great' : isWeak ? 'Miss' : null;
+  const resultColor = isCrit ? '#f0c040' : isFumble ? '#e05555' : isGreat ? '#6dbb7c' : isWeak ? '#e09030' : color;
 
   return (
-    <div className={`${styles.rollStrip} ${styles[`rollPhase_${phase}`]}`}
-      style={{ borderColor: outcomeColor + '33', background: bgColor }}>
-
-      {/* Animated d20 SVG */}
-      <div className={`${styles.rollDiceWrap} ${styles[`diceAnim_${phase}`]}`}>
-        <svg viewBox="0 0 60 60" width="48" height="48" className={styles.rollDiceSvg}>
-          {/* d20 pentagon/icosahedron outline */}
-          <polygon points="30,3 55,20 55,44 30,57 5,44 5,20"
-            fill="none" stroke={outcomeColor} strokeWidth="1.5" opacity="0.6"/>
-          <polygon points="30,3 55,20 30,25" fill={outcomeColor} opacity="0.08"/>
-          <polygon points="30,3 5,20 30,25"  fill={outcomeColor} opacity="0.05"/>
-          <polygon points="30,25 55,20 55,44 30,57 5,44 5,20"
-            fill={outcomeColor} opacity="0.04"/>
-          {/* Inner lines */}
-          <line x1="30" y1="3"  x2="30" y2="25" stroke={outcomeColor} strokeWidth="0.8" opacity="0.3"/>
-          <line x1="55" y1="20" x2="30" y2="25" stroke={outcomeColor} strokeWidth="0.8" opacity="0.3"/>
-          <line x1="5"  y1="20" x2="30" y2="25" stroke={outcomeColor} strokeWidth="0.8" opacity="0.3"/>
-          {/* Number */}
-          {phase !== 'rolling' && (
-            <text x="30" y="40" textAnchor="middle" dominantBaseline="middle"
-              fill={outcomeColor} fontSize={roll >= 10 ? "15" : "17"} fontFamily="monospace" fontWeight="700"
-              className={styles.rollNumberReveal}>
-              {roll}
-            </text>
-          )}
-        </svg>
-      </div>
-
-      {/* Roll info */}
-      <div className={styles.rollInfo}>
-        <span className={styles.rollDieLabel}>d20</span>
-        {phase === 'settled' && (
-          <span className={styles.rollOutcome} style={{ color: outcomeColor }}>
-            {outcome}
-          </span>
-        )}
-      </div>
-
-      {/* Crit/fumble flavor text */}
-      {phase === 'settled' && (isCrit || isFumble) && (
-        <div className={styles.rollFlavor} style={{ color: outcomeColor }}>
-          {isCrit ? '✦ Fortune favors the bold' : '✦ The dice are cruel tonight'}
-        </div>
+    <span className={styles.diceResultWrap}>
+      <span className={`${styles.diceD20} ${isCrit ? styles.diceCrit : isFumble ? styles.diceFumble : ''}`}
+        style={{ borderColor: resultColor + '88', color: resultColor }}>
+        <span className={styles.diceIcon}>⬡</span>
+        <span className={styles.diceNum}>{roll}</span>
+      </span>
+      {label && (
+        <span className={styles.diceLabel} style={{ color: resultColor }}>{label}</span>
       )}
-    </div>
+    </span>
   );
 }
 
@@ -333,16 +288,6 @@ export default function StoryWindow() {
   const { state } = useGame();
   const lastPlayerEntryRef = useRef(null);
   const windowRef = useRef(null);
-
-  // Tablet/mobile detection — covers iPad (768-1024px) and phones (≤640px)
-  // Uses touch capability + screen width to catch all touch devices
-  const isTouchDevice = () => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth <= 1024 ||
-      ('ontouchstart' in window) ||
-      (navigator.maxTouchPoints > 0);
-  };
-  const [sceneCollapsed, setSceneCollapsed] = useState(isTouchDevice);
 
   useEffect(() => {
     if (lastPlayerEntryRef.current) {
@@ -411,10 +356,7 @@ export default function StoryWindow() {
           rollResult = nextParsed.hpDeltas[0].roll || null;
         }
       }
-      timeline.push({ type: 'player', text: clean, playerIdx: pIdx });
-      if (rollResult != null) {
-        timeline.push({ type: 'roll', roll: rollResult, playerIdx: pIdx });
-      }
+      timeline.push({ type: 'player', text: clean, playerIdx: pIdx, roll: rollResult });
       playerTurnCount++;
     } else if (msg.role === 'assistant' && msg !== firstAssistant) {
       const parsed    = parseAllTags(msg.content);
@@ -459,26 +401,14 @@ export default function StoryWindow() {
   return (
     <div className={`${styles.outer} ${state.inCombat ? styles.combatMode : ''}`}>
       {state.lastScene && (
-        <div className={`${styles.sceneWrap} ${sceneCollapsed ? styles.sceneCollapsed : ''}`}>
-          <div className={styles.sceneCollapseBtn} onClick={() => setSceneCollapsed(c => !c)}>
-            <span className={styles.sceneCollapseIcon}>{sceneCollapsed ? '▲' : '▼'}</span>
-            <span className={styles.sceneCollapseLabel}>
-              {sceneCollapsed
-                ? `${state.lastScene.type || 'Scene'} · tap to expand`
-                : 'tap to collapse'}
-            </span>
-          </div>
-          {!sceneCollapsed && (
-            <SceneRenderer
-              scene={state.lastScene}
-              players={state.players}
-              turnCount={state.turnCount || 0}
-              inCombat={state.inCombat || false}
-              enemy={state.combatants?.find(c => c.relationship === 'enemy' || c.relationship === 'hostile')?.name || null}
-              npcs={state.npcs || []}
-            />
-          )}
-        </div>
+        <SceneRenderer
+          scene={state.lastScene}
+          players={state.players}
+          turnCount={state.turnCount || 0}
+          inCombat={state.inCombat || false}
+          enemy={state.combatants?.find(c => c.relationship === 'enemy' || c.relationship === 'hostile')?.name || null}
+          npcs={state.npcs || []}
+        />
       )}
 
       {state.inCombat && (
@@ -520,14 +450,12 @@ export default function StoryWindow() {
                     </div>
                     <span className={styles.playerName}>{playerName}</span>
                     <span className={styles.playerArrow}>▶</span>
+                    {item.roll != null && (
+                      <DiceResult roll={item.roll} color={playerColor} />
+                    )}
                   </div>
                   <div className={styles.playerText}>{item.text}</div>
                 </div>
-              )}
-
-              {/* ── Dice roll strip ── */}
-              {item.type === 'roll' && (
-                <RollStrip roll={item.roll} playerColor={PLAYER_COLORS[item.playerIdx || 0]} />
               )}
 
               {/* ── Narrator block ── */}
@@ -552,7 +480,12 @@ export default function StoryWindow() {
                 />
               )}
 
-              {/* ── NPC introduction cards removed — NPCs appear in scene graphic only ── */}
+              {/* ── NPC introduction cards ── */}
+              {item.type === 'npcs' && (
+                <div className={styles.npcGroup}>
+                  {item.npcs.map((npc, j) => <NpcCard key={j} npc={npc} />)}
+                </div>
+              )}
 
               {/* ── Combat events ── */}
               {item.type === 'combat' && (
