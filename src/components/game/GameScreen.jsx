@@ -19,7 +19,6 @@ import GameSidebar from './GameSidebar.jsx';
 import StoryWindow from './StoryWindow.jsx';
 import InputArea from './InputArea.jsx';
 import MilestoneBar from './MilestoneBar.jsx';
-import MusicPlayer from './MusicPlayer.jsx';
 import CombatBanner from './CombatBanner.jsx';
 import SaveDialog from '../overlays/SaveDialog.jsx';
 import SettingsOverlay from '../overlays/SettingsOverlay.jsx';
@@ -504,7 +503,6 @@ Include [SCENE:...] and [ACTIONS:...] tags.`;
       <div className={styles.main}>
         <CombatBanner />
         <MilestoneBar />
-        <MusicPlayer />
         <StoryWindow />
         <InputArea onAction={handleAction} />
       </div>

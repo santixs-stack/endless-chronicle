@@ -500,8 +500,8 @@ export default function CharacterCreateScreen() {
       name: randName,
       role: preset.char.role + ` — ${randBg}`,
       class: cls.id,
-      className: preset.char.className || cls.name,   // use preset's display name if set
-      archetypeName: preset.char.className || null,
+      className: ({ ageless_slime:'Slime', gruff_veteran:'Veteran', old_wizard:'Wizard', brave_squire:'Squire', sneaky_thief:'Thief', forest_ranger:'Ranger', space_cadet:'Cadet', sea_captain:'Captain' })[preset.id] || preset.char.className || cls.name,
+      archetypeName: ({ ageless_slime:'Slime', gruff_veteran:'Veteran', old_wizard:'Wizard', brave_squire:'Squire', sneaky_thief:'Thief', forest_ranger:'Ranger', space_cadet:'Cadet', sea_captain:'Captain' })[preset.id] || preset.char.className || null,
       classIcon: preset.icon,
       hp: cls.hp, maxHp: cls.hp,
       str: cls.str || 10,
